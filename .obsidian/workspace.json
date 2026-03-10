@@ -1,0 +1,220 @@
+{
+  "main": {
+    "id": "8a6fb8e1eb90f199",
+    "type": "split",
+    "children": [
+      {
+        "id": "7dd2f3d9a8d97741",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "2f2430a6c1126e9f",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "projects/adp/specs/tasks/query-engine.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "query-engine"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "688e7b3351f88e68",
+    "type": "split",
+    "children": [
+      {
+        "id": "ad56027bbf105fcd",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "0fabd34c276c592c",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "46e8d1de3320941f",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "0698507b04ab632d",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "a9b9bce48e28a2c8",
+    "type": "split",
+    "children": [
+      {
+        "id": "5e0a7d15d09b70be",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "a182d7d7fadc0054",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "projects/adp/specs/tasks/query-engine.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for query-engine"
+            }
+          },
+          {
+            "id": "c57251553034748a",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "projects/adp/specs/tasks/query-engine.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from query-engine"
+            }
+          },
+          {
+            "id": "03eafe2562ecb467",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "f7bf809c3cb0b76d",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "7a49b9bb5b554d99",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "projects/adp/specs/tasks/query-engine.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of query-engine"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "0fabd34c276c592c",
+  "lastOpenFiles": [
+    "projects/adp/go.mod",
+    "projects/adp/go.work",
+    "projects/adp/specs/tasks/taxonomy-statistic.md",
+    "projects/adp/specs/tasks/query-engine.md",
+    "projects/adp/specs/tasks/list-entities.md",
+    "projects/adp/specs/tasks/TEMPLATE.md",
+    "projects/adp/API-SPEC.md",
+    "projects/adp/specs/INDEX.md",
+    "projects/adp/specs/tasks/INDEX.md",
+    "AGENTS.md",
+    "projects/adp/specs/api-endpoints.md",
+    "projects/adp/specs/common-types.md",
+    "projects/adp/specs/http-client.md",
+    "projects/adp/src/go/adpgo",
+    "projects/adp/src/go/cmd/adpgo/main.go",
+    "projects/adp/src/go/cmd/adpgo",
+    "projects/adp/src/go/adp-go",
+    "projects/adp/src/go/go.sum",
+    "projects/adp/src/go/cmd/adp-go/main.go",
+    "projects/adp/src/go/cmd/adp-go",
+    "projects/adp/src/go/cmd",
+    "projects/adp/src/go/go.mod",
+    "projects/adp/ADP-SPEC.md",
+    "projects/specs/INDEX.md",
+    "projects/specs/common-types.md",
+    "projects/specs/api-endpoints.md",
+    "projects/specs/tasks/list-entities.md",
+    "projects/specs/tasks/TEMPLATE.md",
+    "projects/specs/tasks/taxonomy-statistic.md",
+    "projects/specs/tasks/query-engine.md",
+    "projects/specs/tasks/INDEX.md"
+  ]
+}
