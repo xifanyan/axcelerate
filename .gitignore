@@ -1,2 +1,3 @@
 # Exclude src folders under projects/
 projects/**/src/
+.worktrees/
