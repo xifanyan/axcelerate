@@ -10,7 +10,71 @@
 
 ---
 
-## Default Configuration
+## Input Arguments
+
+These are the user-facing builder arguments for the fluent API.
+
+### EngineTaxonomyArg
+
+```go
+type EngineTaxonomyArg struct {
+    Taxonomy string // Taxonomy name (e.g., "rm_source", "meta_documentcharacteristics")
+    Negation bool   // Negation flag
+    Query    string // Query string (URL-encoded)
+}
+```
+
+### OutputTaxonomiesArg
+
+```go
+type OutputTaxonomiesArg struct {
+    Taxonomy                  string // Taxonomy name
+    Mode                      string // "Aggregate counts" or "Category counts"
+    MaximumNumberOfCategories int    // Maximum number of categories to return
+}
+```
+
+### Builder Methods
+
+| Method | Type | Default | Description |
+|--------|------|---------|-------------|
+| `EngineName(string)` | string | - | Engine name |
+| `EngineQuery(string)` | string | "*" | Query string |
+| `ComputeCounts(bool)` | bool | true | Compute entity counts |
+| `ListCategoryProperties(bool)` | bool | false | List category properties |
+| `EngineTaxonomies([]EngineTaxonomyArg)` | array | [] | Engine taxonomies to filter |
+| `OutputTaxonomies([]OutputTaxonomiesArg)` | array | [] | Output taxonomies configuration |
+| `ApplicationIdentifier(string)` | string | "" | Application identifier |
+
+---
+
+## CLI Arguments
+
+| Flag | Type | Default | Description |
+|------|------|---------|-------------|
+| `--engineName` | string | - | Engine name |
+| `--engineQuery` | string | "*" | Query string |
+| `--computeCounts` | bool | true | Compute entity counts |
+| `--listCategoryProperties` | bool | false | List category properties |
+| `--engineTaxonomies` | JSON | - | Engine taxonomies (JSON array) |
+| `--outputTaxonomies` | JSON | - | Output taxonomies (JSON array) |
+| `--applicationIdentifier` | string | "" | Application identifier |
+
+### CLI Examples
+
+```bash
+# Simple query
+adpgo taxonomyStatistic --engineName "myEngine"
+
+# With computeCounts
+adpgo taxonomyStatistic --engineName "myEngine" --computeCounts=false
+
+# With engineTaxonomies (JSON)
+adpgo taxonomyStatistic --engineName "myEngine" --engineTaxonomies='[{"Taxonomy":"rm_source","Negation":false,"Query":"file_demo_04"}]'
+
+# With outputTaxonomies (JSON)
+adpgo taxonomyStatistic --engineName "myEngine" --outputTaxonomies='[{"Taxonomy":"rm_source","Mode":"Aggregate counts","MaximumNumberOfCategories":10}]'
+```
 
 > Configuration below shows **all fields with their exact default values** from [[API-SPEC.md]]
 
