@@ -10,6 +10,33 @@
 
 ---
 
+## CLI Arguments
+
+| Flag | Type | Default | Description |
+|------|------|---------|-------------|
+| `--engineName` | string | - | Engine name |
+| `--engineQuery` | string | "*" | Query string |
+| `--engineUserName` | string | - | Engine username |
+| `--engineUserPassword` | string | - | Engine password |
+| `--engineTaxonomies` | JSON | - | Engine taxonomies (JSON array) |
+| `--applicationIdentifier` | string | "" | Application identifier |
+
+### EngineTaxonomiesArg
+
+See [common-types.md](../../common-types.md#enginetaxonomyarg) for the shared type definition.
+
+### CLI Examples
+
+```bash
+# Basic query
+adpgo queryEngine --engineName "myEngine"
+
+# With taxonomies filter
+adpgo queryEngine --engineName "myEngine" --engineTaxonomies='[{"Taxonomy":"rm_source","Negation":false,"Query":"*"}]'
+```
+
+---
+
 ## Default Configuration
 
 > Configuration below shows **all fields with their exact default values** from [API-SPEC.md](../../API-SPEC.md)

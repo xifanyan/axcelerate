@@ -131,6 +131,36 @@ Base structure for all ADP task responses. All responses contain these common fi
 
 ---
 
+## Shared Input Types
+
+These types are used across multiple tasks.
+
+### EngineTaxonomyArg
+
+Used by: Query Engine, Taxonomy Statistic
+
+```go
+type EngineTaxonomyArg struct {
+    Taxonomy string // Taxonomy name (e.g., "rm_source", "meta_documentcharacteristics")
+    Negation bool   // Negation flag
+    Query    string // Query string (URL-encoded)
+}
+```
+
+### OutputTaxonomiesArg
+
+Used by: Taxonomy Statistic
+
+```go
+type OutputTaxonomiesArg struct {
+    Taxonomy                  string // Taxonomy name
+    Mode                      string // "Aggregate counts" or "Category counts"
+    MaximumNumberOfCategories int    // Maximum number of categories to return
+}
+```
+
+---
+
 ## ExecutionStatus Values
 
 | Value | Description |

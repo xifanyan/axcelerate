@@ -12,27 +12,15 @@
 
 ## Input Arguments
 
-These are the user-facing builder arguments for the fluent API.
+These are the user-facing builder arguments for the fluent API. Shared types are defined in [common-types.md](../../common-types.md#shared-input-types).
 
 ### EngineTaxonomyArg
 
-```go
-type EngineTaxonomyArg struct {
-    Taxonomy string // Taxonomy name (e.g., "rm_source", "meta_documentcharacteristics")
-    Negation bool   // Negation flag
-    Query    string // Query string (URL-encoded)
-}
-```
+See [common-types.md](../../common-types.md#enginetaxonomyarg).
 
 ### OutputTaxonomiesArg
 
-```go
-type OutputTaxonomiesArg struct {
-    Taxonomy                  string // Taxonomy name
-    Mode                      string // "Aggregate counts" or "Category counts"
-    MaximumNumberOfCategories int    // Maximum number of categories to return
-}
-```
+See [common-types.md](../../common-types.md#outputtaxonomiesarg).
 
 ### Builder Methods
 

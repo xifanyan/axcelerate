@@ -1,0 +1,73 @@
+{
+  "$schema": "https://schema.example.com/adp-output-types/v1",
+  "tasks": {
+    "Taxonomy Statistic": {
+      "outputType": "TaxonomyStatisticOutput",
+      "description": "Retrieves category counts for a taxonomy",
+      "sourceField": "adp_taxonomy_statistics_json_output",
+      "fields": [
+        {"name": "Date", "type": "string", "description": "Timestamp of the statistics"},
+        {"name": "SearchParameter", "type": "array", "items": {"$ref": "#/definitions/SearchParameter"}},
+        {"name": "Statistics", "type": "Statistics"}
+      ],
+      "definitions": {
+        "SearchParameter": {
+          "fields": [
+            {"name": "Key", "type": "string", "json": "key"},
+            {"name": "Value", "type": "string", "json": "value"}
+          ]
+        },
+        "Statistics": {
+          "fields": [
+            {"name": "Taxonomy", "type": "array", "json": "taxonomy", "items": {"$ref": "#/definitions/TaxonomyCategory"}}
+          ]
+        },
+        "TaxonomyCategory": {
+          "fields": [
+            {"name": "ID", "type": "string", "json": "id"},
+            {"name": "Category", "type": "array", "json": "category", "items": {"$ref": "#/definitions/CategoryItem"}}
+          ]
+        },
+        "CategoryItem": {
+          "fields": [
+            {"name": "ID", "type": "string", "json": "id"},
+            {"name": "DisplayName", "type": "string", "json": "displayName"},
+            {"name": "Count", "type": "integer", "json": "count"},
+            {"name": "Properties", "type": "map_string_string_array", "json": "properties", "optional": true, "description": "Only when listCategoryProperties is enabled"}
+          ]
+        }
+      }
+    },
+    "List Entities": {
+      "outputType": "ListEntitiesOutput",
+      "description": "Writes a list of entities to an output variable",
+      "sourceField": "adp_entities_json_output",
+      "sourceType": "array_direct",
+      "fields": [
+        {"name": "Entities", "type": "array", "items": {"$ref": "#/definitions/Entity"}}
+      ],
+      "definitions": {
+        "Entity": {
+          "fields": [
+            {"name": "ID", "type": "string", "json": "id"},
+            {"name": "DisplayName", "type": "string", "json": "displayName"},
+            {"name": "ProcessStatus", "type": "string", "json": "processStatus"},
+            {"name": "HostName", "type": "string", "json": "hostName"},
+            {"name": "HostId", "type": "string", "json": "hostId"},
+            {"name": "SourceForCreateFromExisting", "type": "boolean", "json": "sourceForCreateFromExisting"}
+          ]
+        }
+      }
+    },
+    "Query Engine": {
+      "outputType": "QueryEngineOutput",
+      "description": "Queries an engine",
+      "sourceField": "ExecutionMetaData",
+      "sourceType": "direct",
+      "fields": [
+        {"name": "DocumentsCount", "type": "string", "json": "documentsCount", "sourceField": "adp_query_engine_documents_count"},
+        {"name": "AggregatedValue", "type": "string", "json": "aggregatedValue", "sourceField": "adp_query_engine_aggregated_value"}
+      ]
+    }
+  }
+}
