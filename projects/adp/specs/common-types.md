@@ -65,20 +65,21 @@ Base structure for all ADP task responses. All responses contain these common fi
 
 ### Common Response Fields
 
-| Field | Type | Description |
-|-------|------|-------------|
-| ExecutionID | string | Unique execution identifier (UUID) |
-| TaskType | string | Task type (e.g., "List Entities", "Query Engine") |
-| LoggingEnabled | boolean | Whether logging is enabled |
-| ProgressMax | integer | Maximum progress value |
-| ExecutionStatus | string | Status of execution ("success", "failed", "running") |
-| ExecutionRootDir | string | Root directory for execution |
-| ContextID | string | Context identifier (UUID) |
-| ExecutionPersistent | boolean | Whether execution is persistent |
-| ProgressCurrent | integer | Current progress value |
-| ProgressPercentage | integer | Progress percentage (0-100) |
-| TaskDisplayName | string | Display name of the task |
-| ExecutionMetaData | object | Task-specific metadata (differs per task) |
+| Field | Type | Description | Notes |
+|-------|------|-------------|-------|
+| executionId | string | Unique execution identifier (UUID) | camelCase |
+| taskType | string | Task type (e.g., "List Entities", "Query Engine") | |
+| loggingEnabled | string | Whether logging is enabled | **String** ("true"/"false"), not boolean |
+| progressMax | integer | Maximum progress value | |
+| executionStatus | string | Status of execution ("success", "failed", "running") | |
+| executionRootDir | string | Root directory for execution | |
+| contextId | string | Context identifier (UUID) | |
+| executionPersistent | string | Whether execution is persistent | **String** ("true"/"false"), not boolean |
+| progressCurrent | integer | Current progress value | |
+| progressPercentage | float | Progress percentage (0-100) | **Float**, not integer |
+| taskDisplayName | string | Display name of the task | |
+| executionMetaData | object? | Task-specific metadata (differs per task) | **Optional** - null when status is "failed" |
+| errorMessage | string? | Error message on failure | **Present when executionStatus is "failed"** |
 
 ---
 
@@ -146,11 +147,18 @@ When execution fails, the response may include:
 
 ```json
 {
-  "ExecutionID": "uuid",
-  "TaskType": "Task Name",
-  "ExecutionStatus": "failed",
-  "ExecutionMetaData": {
-    "error": "Error message details"
-  }
+  "executionId": "uuid",
+  "taskType": "Task Name",
+  "executionStatus": "failed",
+  "errorMessage": "Error message details",
+  "executionMetaData": null
 }
 ```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| executionId | string | Unique execution identifier (UUID) |
+| taskType | string | Task type |
+| executionStatus | string | Will be "failed" |
+| errorMessage | string | Error details |
+| executionMetaData | null | Is null on failure |

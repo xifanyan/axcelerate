@@ -12,22 +12,25 @@
 
 ## Common Response Format
 
+> **IMPORTANT:** All field names in API responses use camelCase (e.g., `executionId`, `executionMetaData`), NOT PascalCase.
+
 All endpoints return responses with these common fields:
 
 | Field | Type | Description |
 |-------|------|-------------|
-| ExecutionID | string | Unique execution identifier (UUID) |
-| TaskType | string | Task type (e.g., "List Entities") |
-| LoggingEnabled | boolean | Whether logging is enabled |
-| ProgressMax | integer | Maximum progress value |
-| ExecutionStatus | string | Status: "success", "failed", "running" |
-| ExecutionRootDir | string | Root directory for execution |
-| ContextID | string | Context identifier (UUID) |
-| ExecutionPersistent | boolean | Whether execution is persistent |
-| ProgressCurrent | integer | Current progress value |
-| ProgressPercentage | integer | Progress percentage (0-100) |
-| TaskDisplayName | string | Display name of the task |
-| ExecutionMetaData | object | Task-specific metadata (differs per task) |
+| executionId | string | Unique execution identifier (UUID) |
+| taskType | string | Task type (e.g., "List Entities") |
+| loggingEnabled | string | Whether logging is enabled ("true"/"false") |
+| progressMax | integer | Maximum progress value |
+| executionStatus | string | Status: "success", "failed", "running" |
+| executionRootDir | string | Root directory for execution |
+| contextId | string | Context identifier (UUID) |
+| executionPersistent | string | Whether execution is persistent ("true"/"false") |
+| progressCurrent | integer | Current progress value |
+| progressPercentage | float | Progress percentage (0-100) |
+| taskDisplayName | string | Display name of the task |
+| executionMetaData | object? | Task-specific metadata (null on failure) |
+| errorMessage | string? | Error message (present on failure) |
 
 ---
 
@@ -72,21 +75,41 @@ Executes an ADP task and waits for completion. Returns the final result when the
 
 ```json
 {
-  "ExecutionID": "f9463001-dc1f-486a-a8a0-efaca8dd29cb",
-  "TaskType": "List Entities",
-  "LoggingEnabled": false,
-  "ProgressMax": 1,
-  "ExecutionStatus": "success",
-  "ExecutionRootDir": "E:\\MindServer\\Projects\\adp.adp\\adpRootDir",
-  "ContextID": "2e5a47e4-d9c8-4547-aaba-45c0a3774d47",
-  "ExecutionPersistent": false,
-  "ProgressCurrent": 1,
-  "ProgressPercentage": 1,
-  "TaskDisplayName": "",
-  "ExecutionMetaData": {
+  "executionId": "f9463001-dc1f-486a-a8a0-efaca8dd29cb",
+  "taskType": "List Entities",
+  "loggingEnabled": "false",
+  "progressMax": 1,
+  "executionStatus": "success",
+  "executionRootDir": "E:\\MindServer\\Projects\\adp.adp\\adpRootDir",
+  "contextId": "2e5a47e4-d9c8-4547-aaba-45c0a3774d47",
+  "executionPersistent": "false",
+  "progressCurrent": 1,
+  "progressPercentage": 1.0,
+  "taskDisplayName": "",
+  "executionMetaData": {
     "adp_entities_output_file_name": "E:\\MindServer\\Projects\\adp.adp\\adpRootDir\\output.json",
     "adp_entities_json_output": "[...]"
   }
+}
+```
+
+#### Example Failure Response
+
+```json
+{
+  "executionId": "f9463001-dc1f-486a-a8a0-efaca8dd29cb",
+  "taskType": "List Entities",
+  "loggingEnabled": "true",
+  "progressMax": 1,
+  "executionStatus": "failed",
+  "errorMessage": "Invalid entity type",
+  "executionRootDir": "E:\\MindServer\\Projects\\adp.adp\\adpRootDir",
+  "contextId": "2e5a47e4-d9c8-4547-aaba-45c0a3774d47",
+  "executionPersistent": "true",
+  "progressCurrent": 0,
+  "progressPercentage": 0.0,
+  "taskDisplayName": "List Entities",
+  "executionMetaData": null
 }
 ```
 
@@ -109,18 +132,18 @@ Same as `executeAdpTask`.
 
 ```json
 {
-  "ExecutionID": "f9463001-dc1f-486a-a8a0-efaca8dd29cb",
-  "TaskType": "List Entities",
-  "LoggingEnabled": false,
-  "ProgressMax": 1,
-  "ExecutionStatus": "running",
-  "ExecutionRootDir": "E:\\MindServer\\Projects\\adp.adp\\adpRootDir",
-  "ContextID": "2e5a47e4-d9c8-4547-aaba-45c0a3774d47",
-  "ExecutionPersistent": false,
-  "ProgressCurrent": 0,
-  "ProgressPercentage": 0,
-  "TaskDisplayName": "",
-  "ExecutionMetaData": {}
+  "executionId": "f9463001-dc1f-486a-a8a0-efaca8dd29cb",
+  "taskType": "List Entities",
+  "loggingEnabled": "false",
+  "progressMax": 1,
+  "executionStatus": "running",
+  "executionRootDir": "E:\\MindServer\\Projects\\adp.adp\\adpRootDir",
+  "contextId": "2e5a47e4-d9c8-4547-aaba-45c0a3774d47",
+  "executionPersistent": "false",
+  "progressCurrent": 0,
+  "progressPercentage": 0.0,
+  "taskDisplayName": "",
+  "executionMetaData": {}
 }
 ```
 
@@ -140,30 +163,30 @@ Polls the status of a previously submitted asynchronous task.
 
 ```json
 {
-  "ExecutionID": "f9463001-dc1f-486a-a8a0-efaca8dd29cb"
+  "executionId": "f9463001-dc1f-486a-a8a0-efaca8dd29cb"
 }
 ```
 
 | Field | Type | Required | Description |
 |-----------|------|----------|-------------|
-| ExecutionID | string | Yes | The execution ID from async task |
+| executionId | string | Yes | The execution ID from async task |
 
 ### Response
 
 ```json
 {
-  "ExecutionID": "f9463001-dc1f-486a-a8a0-efaca8dd29cb",
-  "TaskType": "List Entities",
-  "LoggingEnabled": false,
-  "ProgressMax": 1,
-  "ExecutionStatus": "success",
-  "ExecutionRootDir": "E:\\MindServer\\Projects\\adp.adp\\adpRootDir",
-  "ContextID": "2e5a47e4-d9c8-4547-aaba-45c0a3774d47",
-  "ExecutionPersistent": false,
-  "ProgressCurrent": 1,
-  "ProgressPercentage": 100,
-  "TaskDisplayName": "",
-  "ExecutionMetaData": {
+  "executionId": "f9463001-dc1f-486a-a8a0-efaca8dd29cb",
+  "taskType": "List Entities",
+  "loggingEnabled": "false",
+  "progressMax": 1,
+  "executionStatus": "success",
+  "executionRootDir": "E:\\MindServer\\Projects\\adp.adp\\adpRootDir",
+  "contextId": "2e5a47e4-d9c8-4547-aaba-45c0a3774d47",
+  "executionPersistent": "false",
+  "progressCurrent": 1,
+  "progressPercentage": 100.0,
+  "taskDisplayName": "",
+  "executionMetaData": {
     "adp_entities_output_file_name": "E:\\MindServer\\Projects\\adp.adp\\adpRootDir\\output.json",
     "adp_entities_json_output": "[...]"
   }
