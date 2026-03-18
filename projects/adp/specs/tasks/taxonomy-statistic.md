@@ -57,23 +57,14 @@ type OutputTaxonomiesArg struct {
 | `--computeCounts` | bool | true | Compute entity counts |
 | `--listCategoryProperties` | bool | false | List category properties |
 | `--engineTaxonomies` | JSON | - | Engine taxonomies (JSON array) |
-| `--outputTaxonomies` | JSON | - | Output taxonomies (JSON array) |
+| `--outputTaxonomies` | JSON or string | - | Output taxonomies: comma-separated list or JSON array |
 | `--applicationIdentifier` | string | "" | Application identifier |
 
 ### CLI Examples
 
 ```bash
-# Simple query
-adpgo taxonomyStatistic --engineName "myEngine"
-
-# With computeCounts
-adpgo taxonomyStatistic --engineName "myEngine" --computeCounts=false
-
-# With engineTaxonomies (JSON)
-adpgo taxonomyStatistic --engineName "myEngine" --engineTaxonomies='[{"Taxonomy":"rm_source","Negation":false,"Query":"file_demo_04"}]'
-
-# With outputTaxonomies (JSON)
-adpgo taxonomyStatistic --engineName "myEngine" --outputTaxonomies='[{"Taxonomy":"rm_source","Mode":"Aggregate counts","MaximumNumberOfCategories":10}]'
+# With outputTaxonomies (comma-separated taxonomy names)
+adpgo taxonomyStatistic --engineName "myEngine" --outputTaxonomies=rm_source,meta_documentcharacteristics
 ```
 
 > Configuration below shows **all fields with their exact default values** from [[API-SPEC.md]]
@@ -194,24 +185,123 @@ adpgo taxonomyStatistic --engineName "myEngine" --outputTaxonomies='[{"Taxonomy"
 
 ---
 
-## Example Response
+## Example Response (without category properties)
 
 ```json
 {
-  "ExecutionID": "f9463001-dc1f-486a-a8a0-efaca8dd29cb",
+  "ExecutionID": "40d068f9-ea14-4316-a890-9b8b2b889f18",
   "TaskType": "Taxonomy Statistic",
-  "LoggingEnabled": false,
+  "LoggingEnabled": true,
   "ProgressMax": 1,
   "ExecutionStatus": "success",
   "ExecutionRootDir": "E:\\MindServer\\Projects\\adp.adp\\adpRootDir",
-  "ContextID": "2e5a47e4-d9c8-4547-aaba-45c0a3774d47",
-  "ExecutionPersistent": false,
+  "ContextID": "37178a68-90be-4dc0-a447-43b23784b6ed",
+  "ExecutionPersistent": true,
   "ProgressCurrent": 1,
   "ProgressPercentage": 1,
   "TaskDisplayName": "",
   "ExecutionMetaData": {
     "adp_taxonomy_statistics_json_file_path": "E:\\MindServer\\Projects\\adp.adp\\adpRootDir\\taxonomy_stats.json",
-    "adp_taxonomy_statistics_json_output": "[{\"category\":\"/documents/reports\",\"count\":150},{\"category\":\"/documents/invoices\",\"count\":75}]"
+    "adp_taxonomy_statistics_json_output": "{\"date\":\"Wed Mar 18 02:56:03 EDT 2026\",\"searchParameter\":[{\"key\":\"rm_main\",\"value\":\"[*]\"},{\"key\":\"rm_pagesize\",\"value\":\"[-1]\"}],\"statistics\":{\"taxonomy\":[{\"id\":\"rm_source\",\"category\":[{\"id\":\"file_demo_04\",\"displayName\":\"file_demo_04\",\"count\":761},{\"id\":\"new_demo_02\",\"displayName\":\"new_demo_02\",\"count\":2},{\"id\":\"file_dmoe_03\",\"displayName\":\"file_dmoe_03\",\"count\":1}]}]}}"
+  }
+}
+```
+
+### Output (decoded)
+
+```json
+{
+  "date": "Wed Mar 18 02:56:03 EDT 2026",
+  "searchParameter": [
+    { "key": "rm_main", "value": "[*]" },
+    { "key": "rm_pagesize", "value": "[-1]" }
+  ],
+  "statistics": {
+    "taxonomy": [
+      {
+        "id": "rm_source",
+        "category": [
+          { "id": "file_demo_04", "displayName": "file_demo_04", "count": 761 },
+          { "id": "new_demo_02", "displayName": "new_demo_02", "count": 2 },
+          { "id": "file_dmoe_03", "displayName": "file_dmoe_03", "count": 1 }
+        ]
+      }
+    ]
+  }
+}
+```
+
+---
+
+## Example Response (with category properties)
+
+```json
+{
+  "ExecutionID": "78ad9874-b009-4102-bf2e-3f88c3246dfe",
+  "TaskType": "Taxonomy Statistic",
+  "LoggingEnabled": true,
+  "ProgressMax": 1,
+  "ExecutionStatus": "success",
+  "ExecutionRootDir": "E:\\MindServer\\Projects\\adp.adp\\adpRootDir",
+  "ContextID": "53fc1124-b35e-4f23-8fab-6e1515543e14",
+  "ExecutionPersistent": true,
+  "ProgressCurrent": 1,
+  "ProgressPercentage": 1,
+  "TaskDisplayName": "",
+  "ExecutionMetaData": {
+    "adp_taxonomy_statistics_json_file_path": "E:\\MindServer\\Projects\\adp.adp\\adpRootDir\\taxonomy_stats.json",
+    "adp_taxonomy_statistics_json_output": "{\"date\":\"Wed Mar 18 03:03:06 EDT 2026\",\"searchParameter\":[{\"key\":\"rm_main\",\"value\":\"[*]\"},{\"key\":\"rm_pagesize\",\"value\":\"[-1]\"}],\"statistics\":{\"taxonomy\":[{\"id\":\"rm_source\",\"category\":[{\"id\":\"file_demo_04\",\"displayName\":\"file_demo_04\",\"count\":761,\"properties\":{\"rm_prop_editDate\":[\"1761795365031\"],\"rm_prop_creationDate\":[\"1761795365031\"],\"rm_prop_creator\":[\"system\"]}},{\"id\":\"new_demo_02\",\"displayName\":\"new_demo_02\",\"count\":2,\"properties\":{\"rm_prop_editDate\":[\"1761794623213\"],\"rm_prop_creationDate\":[\"1761794623213\"],\"rm_prop_creator\":[\"system\"]}},{\"id\":\"file_dmoe_03\",\"displayName\":\"file_dmoe_03\",\"count\":1,\"properties\":{\"rm_prop_editDate\":[\"1761620568340\"],\"rm_prop_creationDate\":[\"1761620568340\"],\"rm_prop_creator\":[\"system\"]}}]}]}}"
+  }
+}
+```
+
+### Output (decoded)
+
+```json
+{
+  "date": "Wed Mar 18 03:03:06 EDT 2026",
+  "searchParameter": [
+    { "key": "rm_main", "value": "[*]" },
+    { "key": "rm_pagesize", "value": "[-1]" }
+  ],
+  "statistics": {
+    "taxonomy": [
+      {
+        "id": "rm_source",
+        "category": [
+          {
+            "id": "file_demo_04",
+            "displayName": "file_demo_04",
+            "count": 761,
+            "properties": {
+              "rm_prop_editDate": ["1761795365031"],
+              "rm_prop_creationDate": ["1761795365031"],
+              "rm_prop_creator": ["system"]
+            }
+          },
+          {
+            "id": "new_demo_02",
+            "displayName": "new_demo_02",
+            "count": 2,
+            "properties": {
+              "rm_prop_editDate": ["1761794623213"],
+              "rm_prop_creationDate": ["1761794623213"],
+              "rm_prop_creator": ["system"]
+            }
+          },
+          {
+            "id": "file_dmoe_03",
+            "displayName": "file_dmoe_03",
+            "count": 1,
+            "properties": {
+              "rm_prop_editDate": ["1761620568340"],
+              "rm_prop_creationDate": ["1761620568340"],
+              "rm_prop_creator": ["system"]
+            }
+          }
+        ]
+      }
+    ]
   }
 }
 ```
@@ -225,4 +315,18 @@ All responses include the common fields. Taxonomy Statistic-specific `ExecutionM
 | Field | Type | Description |
 |-------|------|-------------|
 | adp_taxonomy_statistics_json_file_path | string | Output file path |
-| adp_taxonomy_statistics_json_output | string | JSON string containing taxonomy statistics |
+| adp_taxonomy_statistics_json_output | string | JSON string containing taxonomy statistics (date, searchParameter, statistics) |
+
+### statistics JSON structure
+
+The `adp_taxonomy_statistics_json_output` contains:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| date | string | Timestamp of the statistics |
+| searchParameter | array | Search parameters used (key/value pairs) |
+| statistics.taxonomy[].id | string | Taxonomy ID |
+| statistics.taxonomy[].category[] | array | Categories with id, displayName, count |
+| statistics.taxonomy[].category[].properties | object | Category properties (only when listCategoryProperties is enabled) |
+
+When `listCategoryProperties` is enabled, category objects include additional property fields.
