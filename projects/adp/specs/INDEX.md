@@ -11,7 +11,7 @@ Single source of truth for all ADP specifications.
 | [http-client.md](./http-client.md) | HTTP client configuration |
 | [api-endpoints.md](./api-endpoints.md) | API endpoints |
 | [common-types.md](./common-types.md) | Shared types |
-| [languages.md](./languages.md) | Language-specific rules |
+| [languages.md](./languages.md) | Language-specific rules (including service layer) |
 
 ---
 

@@ -4,46 +4,44 @@
 
 | Property | Value | Required |
 |----------|-------|----------|
-| Base URL | Configurable via `--url` | Yes |
+| Base URL | Built from `--host`, `--port`, `--path` | Yes |
 | HTTP Method | PUT | Yes |
 | Content-Type | `application/json` | Yes |
 
-## Authentication
+## CLI Flags
 
-| Header | Description | Required |
-|--------|-------------|----------|
-| Auth-Username | Username from `--username` flag | Yes |
-| Auth-Password | Password from `--password` flag | Yes |
-
-## SSL Configuration
-
-| Flag | Description | Default |
-|------|-------------|---------|
-| `--insecure` | Skip SSL certificate verification | false |
+| Flag | Type | Default | Description |
+|------|------|---------|-------------|
+| `--host` | string | required | ADP host |
+| `--port` | int | 8443 | ADP port |
+| `--path` | string | /adp/rest/api/task | API context path |
+| `--user` | string | required | Username (sets Auth-Username header) |
+| `--password` | string | required | Password (sets Auth-Password header) |
+| `--insecure` | bool | false | Skip SSL certificate verification |
 
 ## Request Format
 
 All requests must:
 1. Use HTTP PUT method
 2. Set `Content-Type: application/json` header
-3. Include authentication headers
+3. Include authentication headers (`--user`, `--password` flags)
 4. Send JSON body
 
-## Example Request Headers
+## Example Request
 
 ```
 PUT /executeAdpTask HTTP/1.1
-Host: <configured-host>
+Host: <host>:<port>
 Content-Type: application/json
-Auth-Username: <username>
+Auth-Username: <user>
 Auth-Password: <password>
 ```
 
-## Client Options
+## Client Options (Library)
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| baseUrl | string | required | ADP API base URL |
+| baseUrl | string | required | ADP API base URL (e.g., https://host:8443/path) |
 | username | string | required | Authentication username |
 | password | string | required | Authentication password |
 | insecure | bool | false | Skip SSL verification |
