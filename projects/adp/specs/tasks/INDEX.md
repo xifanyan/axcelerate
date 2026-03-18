@@ -6,7 +6,7 @@
 | --- | ------------------------------------------- | ------------------ | -------------------------------------- |
 | 1   | [list-entities.md](./list-entities.md)      | List Entities      | host, workspace, type, status          |
 | 2   | [query-engine.md](./query-engine.md)        | Query Engine       | engineName, engineQuery, category      |
-| 3   | [taxonomy-statistic.md](./list-entities.md) | Taxonomy Statistic | engineName, computeCounts, engineQuery |
+| 3   | [taxonomy-statistic.md](./taxonomy-statistic.md) | Taxonomy Statistic | engineName, computeCounts, engineQuery |
 
 ---
 

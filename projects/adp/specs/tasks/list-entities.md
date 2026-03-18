@@ -10,6 +10,38 @@
 
 ---
 
+## CLI Interface
+
+### Input Arguments
+
+| Argument | Type | Default | Description |
+|----------|------|---------|-------------|
+| `--type` | string | "" | Entity type to filter |
+| `--id` | string | "" | Specific entity ID |
+| `--relatedEntity` | string | "" | Related entity ID |
+| `--whiteList` | string | "id,displayName,processStatus,hostName,hostId,sourceForCreateFromExisting" | Fields to include |
+| `--workspace` | string | "" | Workspace name |
+| `--status` | string | "" | Entity status filter |
+
+### Output
+
+Returns parsed JSON array of entities:
+
+```json
+[
+  {
+    "id": "singleMindServer.demo00001",
+    "displayName": "demo00001",
+    "processStatus": "Running",
+    "hostName": "vm-rhauswirth2.otxlab.net",
+    "hostId": "vm-rhauswirth2.otxlab.net",
+    "sourceForCreateFromExisting": false
+  }
+]
+```
+
+---
+
 ## Default Configuration
 
 > Configuration below shows **all fields with their exact default values** from [API-SPEC.md](../../API-SPEC.md)
@@ -69,7 +101,7 @@
 | adp_listEntities_axcRequestTimeoutSeconds | integer | 900 | Request timeout in seconds |
 | adp_taskActive | boolean | true | Whether task is active |
 | adp_listEntities_userHasAccess | string | "" | User access filter |
-| adp_listEntities_whiteList | string | "id,displayName" | Fields to include |
+| adp_listEntities_whiteList | string | "id,displayName,processStatus,hostName,hostId,sourceForCreateFromExisting" | Fields to include |
 | adp_executionPersistent | boolean | true | Persist execution |
 | adp_abortWfOnFailure | boolean | true | Abort workflow on failure |
 | adp_listEntities_relatedEntity | string | "" | Related entity ID |
