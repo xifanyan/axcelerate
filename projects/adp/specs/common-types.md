@@ -147,6 +147,29 @@ type EngineTaxonomyArg struct {
 }
 ```
 
+#### CLI Shorthand Format
+
+For CLI, use the shorthand format instead of JSON. Format: `Taxonomy=Query` or `Taxonomy!=Query`.
+
+| Format | Description | Example |
+|--------|-------------|---------|
+| `Taxonomy=Query` | Equals (Negation=false) | `rm_mimetype=pdf` |
+| `Taxonomy!=Query` | Not equals (Negation=true) | `rm_source!=email` |
+
+- Multiple taxonomies: repeat the flag (e.g., `--engineTaxonomies "rm_source=email" --engineTaxonomies "rm_mimetype=pdf"`)
+
+**CLI Examples:**
+```bash
+# Single taxonomy equals
+--engineTaxonomies "rm_mimetype=pdf"
+
+# Multiple taxonomies
+--engineTaxonomies "rm_source=email" --engineTaxonomies "rm_mimetype=pdf"
+
+# Negation (not equal)
+--engineTaxonomies "rm_source!=email"
+```
+
 ### OutputTaxonomiesArg
 
 Used by: Taxonomy Statistic

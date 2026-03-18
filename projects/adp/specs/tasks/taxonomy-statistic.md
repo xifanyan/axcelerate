@@ -44,15 +44,28 @@ See [common-types.md](../../common-types.md#outputtaxonomiesarg).
 | `--engineQuery` | string | "*" | Query string |
 | `--computeCounts` | bool | true | Compute entity counts |
 | `--listCategoryProperties` | bool | false | List category properties |
-| `--engineTaxonomies` | JSON | - | Engine taxonomies (JSON array) |
+| `--engineTaxonomies` | string | - | Engine taxonomies filter (repeatable, see format below) |
 | `--outputTaxonomies` | JSON or string | - | Output taxonomies: comma-separated list or JSON array |
 | `--applicationIdentifier` | string | "" | Application identifier |
+
+### EngineTaxonomiesArg
+
+See [common-types.md](../../common-types.md#cli-shorthand-format) for the shorthand CLI format.
 
 ### CLI Examples
 
 ```bash
 # With outputTaxonomies (comma-separated taxonomy names)
 adpgo taxonomyStatistic --engineName "myEngine" --outputTaxonomies=rm_source,meta_documentcharacteristics
+
+# Single taxonomy equals
+adpgo taxonomyStatistic --engineName "myEngine" --engineTaxonomies "rm_mimetype=pdf"
+
+# Multiple taxonomies
+adpgo taxonomyStatistic --engineName "myEngine" --engineTaxonomies "rm_source=email" --engineTaxonomies "rm_mimetype=pdf"
+
+# Negation (not equal)
+adpgo taxonomyStatistic --engineName "myEngine" --engineTaxonomies "rm_source!=email"
 ```
 
 > Configuration below shows **all fields with their exact default values** from [[API-SPEC.md]]

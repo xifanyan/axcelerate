@@ -18,12 +18,12 @@
 | `--engineQuery` | string | "*" | Query string |
 | `--engineUserName` | string | - | Engine username |
 | `--engineUserPassword` | string | - | Engine password |
-| `--engineTaxonomies` | JSON | - | Engine taxonomies (JSON array) |
+| `--engineTaxonomies` | string | - | Engine taxonomies filter (repeatable, see format below) |
 | `--applicationIdentifier` | string | "" | Application identifier |
 
 ### EngineTaxonomiesArg
 
-See [common-types.md](../../common-types.md#enginetaxonomyarg) for the shared type definition.
+See [common-types.md](../../common-types.md#cli-shorthand-format) for the shorthand CLI format.
 
 ### CLI Examples
 
@@ -31,8 +31,14 @@ See [common-types.md](../../common-types.md#enginetaxonomyarg) for the shared ty
 # Basic query
 adpgo queryEngine --engineName "myEngine"
 
-# With taxonomies filter
-adpgo queryEngine --engineName "myEngine" --engineTaxonomies='[{"Taxonomy":"rm_source","Negation":false,"Query":"*"}]'
+# Single taxonomy equals
+adpgo queryEngine --engineName "myEngine" --engineTaxonomies "rm_mimetype=pdf"
+
+# Multiple taxonomies
+adpgo queryEngine --engineName "myEngine" --engineTaxonomies "rm_source=email" --engineTaxonomies "rm_mimetype=pdf"
+
+# Negation (not equal)
+adpgo queryEngine --engineName "myEngine" --engineTaxonomies "rm_source!=email"
 ```
 
 ---
