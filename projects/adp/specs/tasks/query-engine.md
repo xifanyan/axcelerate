@@ -164,18 +164,18 @@
 
 ```json
 {
-  "ExecutionID": "f9463001-dc1f-486a-a8a0-efaca8dd29cb",
-  "TaskType": "Query Engine",
-  "LoggingEnabled": false,
-  "ProgressMax": 1,
-  "ExecutionStatus": "success",
-  "ExecutionRootDir": "E:\\MindServer\\Projects\\adp.adp\\adpRootDir",
-  "ContextID": "2e5a47e4-d9c8-4547-aaba-45c0a3774d47",
-  "ExecutionPersistent": false,
-  "ProgressCurrent": 1,
-  "ProgressPercentage": 1,
-  "TaskDisplayName": "",
-  "ExecutionMetaData": {
+  "executionId": "f9463001-dc1f-486a-a8a0-efaca8dd29cb",
+  "taskType": "Query Engine",
+  "loggingEnabled": "false",
+  "progressMax": 1,
+  "executionStatus": "success",
+  "executionRootDir": "E:\\MindServer\\Projects\\adp.adp\\adpRootDir",
+  "contextId": "2e5a47e4-d9c8-4547-aaba-45c0a3774d47",
+  "executionPersistent": "false",
+  "progressCurrent": 1,
+  "progressPercentage": 1.0,
+  "taskDisplayName": "",
+  "executionMetaData": {
     "adp_query_engine_documents_count": "100",
     "adp_query_engine_aggregated_value": "500"
   }

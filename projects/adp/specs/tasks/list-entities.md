@@ -184,18 +184,18 @@ Returns parsed JSON array of entities:
 
 ```json
 {
-  "ExecutionID": "f9463001-dc1f-486a-a8a0-efaca8dd29cb",
-  "TaskType": "List Entities",
-  "LoggingEnabled": false,
-  "ProgressMax": 1,
-  "ExecutionStatus": "success",
-  "ExecutionRootDir": "E:\\MindServer\\Projects\\adp.adp\\adpRootDir",
-  "ContextID": "2e5a47e4-d9c8-4547-aaba-45c0a3774d47",
-  "ExecutionPersistent": false,
-  "ProgressCurrent": 1,
-  "ProgressPercentage": 1,
-  "TaskDisplayName": "",
-  "ExecutionMetaData": {
+  "executionId": "f9463001-dc1f-486a-a8a0-efaca8dd29cb",
+  "taskType": "List Entities",
+  "loggingEnabled": "false",
+  "progressMax": 1,
+  "executionStatus": "success",
+  "executionRootDir": "E:\\MindServer\\Projects\\adp.adp\\adpRootDir",
+  "contextId": "2e5a47e4-d9c8-4547-aaba-45c0a3774d47",
+  "executionPersistent": "false",
+  "progressCurrent": 1,
+  "progressPercentage": 1.0,
+  "taskDisplayName": "",
+  "executionMetaData": {
     "adp_entities_output_file_name": "E:\\MindServer\\Projects\\adp.adp\\adpRootDir\\output.json",
     "adp_entities_json_output": "[{\"id\":\"axcelerate.demo00001_Demo_Review4\",\"displayName\":\"demo00001_Demo_Review4\",\"processStatus\":\"Running\",\"hostId\":\"vm-rhauswirth2.otxlab.net\",\"hostName\":\"vm-rhauswirth2.otxlab.net\",\"sourceForCreateFromExisting\":false},{\"id\":\"axcelerate.demo_01_review\",\"displayName\":\"demo_01_review\",\"processStatus\":\"Killed\",\"hostId\":\"vm-rhauswirth2.otxlab.net\",\"hostName\":\"vm-rhauswirth2.otxlab.net\",\"sourceForCreateFromExisting\":false}]"
   }
@@ -208,15 +208,15 @@ Returns parsed JSON array of entities:
 
 | Field | Type | Description |
 |-------|------|-------------|
-| ExecutionID | string | Unique execution identifier |
-| TaskType | string | Task type ("List Entities") |
-| LoggingEnabled | boolean | Whether logging is enabled |
-| ProgressMax | integer | Maximum progress value |
-| ExecutionStatus | string | Status of execution ("success", "failed", etc.) |
-| ExecutionRootDir | string | Root directory for execution |
-| ContextID | string | Context identifier |
-| ExecutionPersistent | boolean | Whether execution is persistent |
-| ProgressCurrent | integer | Current progress value |
+| executionId | string | Unique execution identifier |
+| taskType | string | Task type ("List Entities") |
+| loggingEnabled | string | Whether logging is enabled ("true"/"false") |
+| progressMax | integer | Maximum progress value |
+| executionStatus | string | Status of execution ("success", "failed", etc.) |
+| executionRootDir | string | Root directory for execution |
+| contextId | string | Context identifier |
+| executionPersistent | string | Whether execution is persistent ("true"/"false") |
+| progressCurrent | integer | Current progress value |
 | ProgressPercentage | integer | Progress percentage |
 | TaskDisplayName | string | Display name of the task |
 | ExecutionMetaData | object | Task-specific metadata |

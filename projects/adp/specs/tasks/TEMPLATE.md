@@ -63,18 +63,18 @@ Use this template when creating new task specification files in `specs/tasks/`.
 
 ```json
 {
-  "ExecutionID": "uuid",
-  "TaskType": "{Task Name}",
-  "LoggingEnabled": false,
-  "ProgressMax": 1,
-  "ExecutionStatus": "success",
-  "ExecutionRootDir": "path",
-  "ContextID": "uuid",
-  "ExecutionPersistent": false,
-  "ProgressCurrent": 1,
-  "ProgressPercentage": 1,
-  "TaskDisplayName": "",
-  "ExecutionMetaData": {
+  "executionId": "uuid",
+  "taskType": "{Task Name}",
+  "loggingEnabled": "false",
+  "progressMax": 1,
+  "executionStatus": "success",
+  "executionRootDir": "path",
+  "contextId": "uuid",
+  "executionPersistent": "false",
+  "progressCurrent": 1,
+  "progressPercentage": 1.0,
+  "taskDisplayName": "",
+  "executionMetaData": {
     // Task-specific fields here
   }
 }
@@ -110,4 +110,4 @@ All responses include the common fields. {Task Name}-specific `ExecutionMetaData
 - Default Configuration must match API-SPEC.md exactly
 - Example Request must match Default Configuration exactly (no custom values)
 - Preserve exact field names, values, and ordering from source
-- Use actual response format: ExecutionID, TaskType, ExecutionStatus, ExecutionMetaData, etc.
+- Use actual response format: executionId, taskType, executionStatus, executionMetaData, etc. (camelCase)

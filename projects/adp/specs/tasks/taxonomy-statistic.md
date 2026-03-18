@@ -189,18 +189,18 @@ adpgo taxonomyStatistic --engineName "myEngine" --outputTaxonomies=rm_source,met
 
 ```json
 {
-  "ExecutionID": "40d068f9-ea14-4316-a890-9b8b2b889f18",
-  "TaskType": "Taxonomy Statistic",
-  "LoggingEnabled": true,
-  "ProgressMax": 1,
-  "ExecutionStatus": "success",
-  "ExecutionRootDir": "E:\\MindServer\\Projects\\adp.adp\\adpRootDir",
-  "ContextID": "37178a68-90be-4dc0-a447-43b23784b6ed",
-  "ExecutionPersistent": true,
-  "ProgressCurrent": 1,
-  "ProgressPercentage": 1,
-  "TaskDisplayName": "",
-  "ExecutionMetaData": {
+  "executionId": "40d068f9-ea14-4316-a890-9b8b2b889f18",
+  "taskType": "Taxonomy Statistic",
+  "loggingEnabled": "true",
+  "progressMax": 1,
+  "executionStatus": "success",
+  "executionRootDir": "E:\\MindServer\\Projects\\adp.adp\\adpRootDir",
+  "contextId": "37178a68-90be-4dc0-a447-43b23784b6ed",
+  "executionPersistent": "true",
+  "progressCurrent": 1,
+  "progressPercentage": 1.0,
+  "taskDisplayName": "",
+  "executionMetaData": {
     "adp_taxonomy_statistics_json_file_path": "E:\\MindServer\\Projects\\adp.adp\\adpRootDir\\taxonomy_stats.json",
     "adp_taxonomy_statistics_json_output": "{\"date\":\"Wed Mar 18 02:56:03 EDT 2026\",\"searchParameter\":[{\"key\":\"rm_main\",\"value\":\"[*]\"},{\"key\":\"rm_pagesize\",\"value\":\"[-1]\"}],\"statistics\":{\"taxonomy\":[{\"id\":\"rm_source\",\"category\":[{\"id\":\"file_demo_04\",\"displayName\":\"file_demo_04\",\"count\":761},{\"id\":\"new_demo_02\",\"displayName\":\"new_demo_02\",\"count\":2},{\"id\":\"file_dmoe_03\",\"displayName\":\"file_dmoe_03\",\"count\":1}]}]}}"
   }
@@ -237,18 +237,18 @@ adpgo taxonomyStatistic --engineName "myEngine" --outputTaxonomies=rm_source,met
 
 ```json
 {
-  "ExecutionID": "78ad9874-b009-4102-bf2e-3f88c3246dfe",
-  "TaskType": "Taxonomy Statistic",
-  "LoggingEnabled": true,
-  "ProgressMax": 1,
-  "ExecutionStatus": "success",
-  "ExecutionRootDir": "E:\\MindServer\\Projects\\adp.adp\\adpRootDir",
-  "ContextID": "53fc1124-b35e-4f23-8fab-6e1515543e14",
-  "ExecutionPersistent": true,
-  "ProgressCurrent": 1,
-  "ProgressPercentage": 1,
-  "TaskDisplayName": "",
-  "ExecutionMetaData": {
+  "executionId": "78ad9874-b009-4102-bf2e-3f88c3246dfe",
+  "taskType": "Taxonomy Statistic",
+  "loggingEnabled": "true",
+  "progressMax": 1,
+  "executionStatus": "success",
+  "executionRootDir": "E:\\MindServer\\Projects\\adp.adp\\adpRootDir",
+  "contextId": "53fc1124-b35e-4f23-8fab-6e1515543e14",
+  "executionPersistent": "true",
+  "progressCurrent": 1,
+  "progressPercentage": 1.0,
+  "taskDisplayName": "",
+  "executionMetaData": {
     "adp_taxonomy_statistics_json_file_path": "E:\\MindServer\\Projects\\adp.adp\\adpRootDir\\taxonomy_stats.json",
     "adp_taxonomy_statistics_json_output": "{\"date\":\"Wed Mar 18 03:03:06 EDT 2026\",\"searchParameter\":[{\"key\":\"rm_main\",\"value\":\"[*]\"},{\"key\":\"rm_pagesize\",\"value\":\"[-1]\"}],\"statistics\":{\"taxonomy\":[{\"id\":\"rm_source\",\"category\":[{\"id\":\"file_demo_04\",\"displayName\":\"file_demo_04\",\"count\":761,\"properties\":{\"rm_prop_editDate\":[\"1761795365031\"],\"rm_prop_creationDate\":[\"1761795365031\"],\"rm_prop_creator\":[\"system\"]}},{\"id\":\"new_demo_02\",\"displayName\":\"new_demo_02\",\"count\":2,\"properties\":{\"rm_prop_editDate\":[\"1761794623213\"],\"rm_prop_creationDate\":[\"1761794623213\"],\"rm_prop_creator\":[\"system\"]}},{\"id\":\"file_dmoe_03\",\"displayName\":\"file_dmoe_03\",\"count\":1,\"properties\":{\"rm_prop_editDate\":[\"1761620568340\"],\"rm_prop_creationDate\":[\"1761620568340\"],\"rm_prop_creator\":[\"system\"]}}]}]}}"
   }
