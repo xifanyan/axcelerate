@@ -16,5 +16,7 @@
 
 1. Copy [TEMPLATE.md](./TEMPLATE.md)
 2. Fill using [API-SPEC.md](../../API-SPEC.md)
-3. Add entry above
+3. Add entry to the [## Available Tasks](#available-tasks) table above — **this table must always reflect all current task specs**
 4. Do NOT generate code - only update specs
+
+> **Rule:** The "Available Tasks" table above is the authoritative list of all tasks. Every task spec must have an entry here. Keep it synchronized — an entry must be added, updated, or removed whenever a task spec changes.
