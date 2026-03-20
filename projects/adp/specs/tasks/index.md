@@ -2,13 +2,13 @@
 
 ## Available Tasks
 
-| #   | Task                                        | Description        | Key Fields                             |
-| --- | ------------------------------------------- | ------------------ | -------------------------------------- |
-| 1   | [list-entities.md](./list-entities.md)      | List Entities      | host, workspace, type, status          |
-| 2   | [query-engine.md](./query-engine.md)        | Query Engine       | engineName, engineQuery, category      |
-| 3   | [start-application.md](./start-application.md) | Start Application | applicationIdentifier                 |
-| 4   | [taxonomy-statistic.md](./taxonomy-statistic.md) | Taxonomy Statistic | engineName, computeCounts, engineQuery |
-| 5   | [csv-merge.md](./csv-merge.md)              | CSV Merge          | engineName, csvFile, mergeType         |
+| #   | Task                                        | Description                                  | Key Fields                                              |
+| --- | ------------------------------------------- | -------------------------------------------- | ------------------------------------------------------- |
+| 1   | [list-entities.md](./list-entities.md)      | Writes a list of entities to an output var   | workspace, type, status, whiteList, id, relatedEntity |
+| 2   | [query-engine.md](./query-engine.md)        | Queries an engine                             | engineName, engineQuery, category, applicationIdentifier |
+| 3   | [start-application.md](./start-application.md) | Starts an application                       | applicationIdentifier, useHttps                        |
+| 4   | [taxonomy-statistic.md](./taxonomy-statistic.md) | Retrieves category counts for a taxonomy  | engineName, engineQuery, computeCounts                  |
+| 5   | [csv-merge.md](./csv-merge.md)              | Merges content/images via CSV file            | csvFile, mergeType, engineName, csvIdFieldKey         |
 
 ---
 
