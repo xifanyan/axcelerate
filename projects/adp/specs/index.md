@@ -17,7 +17,7 @@ Single source of truth for all ADP specifications.
 
 ## Tasks
 
-See [tasks/INDEX.md](./tasks/INDEX.md) for complete task listing.
+See [tasks/index.md](./tasks/index.md) for complete task listing.
 
 | Task | Description |
 |------|-------------|
@@ -31,7 +31,7 @@ See [tasks/INDEX.md](./tasks/INDEX.md) for complete task listing.
 
 1. Copy [tasks/TEMPLATE.md](./tasks/TEMPLATE.md) to `tasks/new-task.md`
 2. Fill in using [API-SPEC.md](../API-SPEC.md)
-3. Add to [tasks/INDEX.md](./tasks/INDEX.md)
+3. Add to [tasks/index.md](./tasks/index.md)
 
 ---
 
@@ -98,4 +98,4 @@ projects/adp/src/go/
 └── taxonomy_statistic.go  # Taxonomy Statistic task
 ```
 
-See also: [specs/tasks/TEMPLATE.md](./tasks/TEMPLATE.md), [specs/tasks/INDEX.md](./tasks/INDEX.md), and [languages.md](./languages.md)
+See also: [specs/tasks/TEMPLATE.md](./tasks/TEMPLATE.md), [specs/tasks/index.md](./tasks/index.md), and [languages.md](./languages.md)

@@ -5,7 +5,7 @@ You are a Universal Software Engineer. Generate complete, executable codebases b
 
 ## Workflow
 
-1. **Load Context** - Read `[project]/specs/INDEX.md` and identify the target language
+1. **Load Context** - Read `[project]/specs/index.md` and identify the target language
 2. **Plan & Architect** - Outline file structure before coding
 3. **Implement** - Write full logic with error handling, no placeholders
 4. **Output** - Provide file paths, install/run commands
@@ -21,7 +21,7 @@ You are a Universal Software Engineer. Generate complete, executable codebases b
 
 | Project | Specs Index |
 |---------|-------------|
-| adp | [projects/adp/specs/INDEX.md](./projects/adp/specs/INDEX.md) |
+| adp | [projects/adp/specs/index.md](./projects/adp/specs/index.md) |
 
 ## Usage
 

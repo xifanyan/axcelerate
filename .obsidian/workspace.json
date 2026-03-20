@@ -192,8 +192,8 @@
     "projects/adp/specs/tasks/list-entities.md",
     "projects/adp/specs/tasks/TEMPLATE.md",
     "projects/adp/API-SPEC.md",
-    "projects/adp/specs/INDEX.md",
-    "projects/adp/specs/tasks/INDEX.md",
+    "projects/adp/specs/index.md",
+    "projects/adp/specs/tasks/index.md",
     "AGENTS.md",
     "projects/adp/specs/api-endpoints.md",
     "projects/adp/specs/common-types.md",
@@ -207,14 +207,6 @@
     "projects/adp/src/go/cmd/adp-go",
     "projects/adp/src/go/cmd",
     "projects/adp/src/go/go.mod",
-    "projects/adp/ADP-SPEC.md",
-    "projects/specs/INDEX.md",
-    "projects/specs/common-types.md",
-    "projects/specs/api-endpoints.md",
-    "projects/specs/tasks/list-entities.md",
-    "projects/specs/tasks/TEMPLATE.md",
-    "projects/specs/tasks/taxonomy-statistic.md",
-    "projects/specs/tasks/query-engine.md",
-    "projects/specs/tasks/INDEX.md"
+    "projects/adp/ADP-SPEC.md"
   ]
 }
