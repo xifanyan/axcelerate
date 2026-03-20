@@ -17,21 +17,7 @@ Single source of truth for all ADP specifications.
 
 ## Tasks
 
-See [tasks/index.md](./tasks/index.md) for complete task listing.
-
-| Task | Description |
-|------|-------------|
-| [list-entities.md](./tasks/list-entities.md) | List Entities |
-| [query-engine.md](./tasks/query-engine.md) | Query Engine |
-| [taxonomy-statistic.md](./tasks/taxonomy-statistic.md) | Taxonomy Statistic |
-
----
-
-## Adding New Tasks
-
-1. Copy [tasks/TEMPLATE.md](./tasks/TEMPLATE.md) to `tasks/new-task.md`
-2. Fill in using [API-SPEC.md](../API-SPEC.md)
-3. Add to [tasks/index.md](./tasks/index.md)
+See [tasks/index.md](./tasks/index.md) for the authoritative task listing and add-task rules.
 
 ---
 
@@ -98,4 +84,4 @@ projects/adp/src/go/
 └── taxonomy_statistic.go  # Taxonomy Statistic task
 ```
 
-See also: [specs/tasks/TEMPLATE.md](./tasks/TEMPLATE.md), [specs/tasks/index.md](./tasks/index.md), and [languages.md](./languages.md)
+See also: [languages.md](./languages.md)
