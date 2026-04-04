@@ -31,8 +31,8 @@ These are the user-facing fields for the request-construction API.
 | listOfJobProperties | string | "" | No | List of job properties |
 | globalSearchJson | string | "" | No | Global search as JSON |
 | globalSearchId | string | "" | No | Global search ID |
-| restrictions | array | [] | No | Restrictions |
-| advancedRestrictions | array | [] | No | Advanced restrictions |
+| restrictions | EngineTaxonomyArg[] | [] | No | Restrictions (see [common-types.md](../common-types.md)) |
+| advancedRestrictions | EngineTaxonomyArg[] | [] | No | Advanced restrictions (see [common-types.md](../common-types.md)) |
 | mainQueryType | string | null | No | Main query type |
 
 ---
@@ -149,6 +149,37 @@ These are the user-facing fields for the request-construction API.
 }
 ```
 
+### Verified Example Request (from live API)
+
+```json
+{
+  "taskType": "Create OCR Job",
+  "taskConfiguration": {
+    "adp_createOcrJob_engineName": "singleMindServer.demo00001",
+    "adp_createOcrJob_jobName": "demo_ocr",
+    "adp_createOcrJob_query": "*",
+    "adp_createOcrJob_restrictions": [
+      {
+        "taxonomy": "rm_source",
+        "negation": false,
+        "query": "file_demo_04"
+      },
+      {
+        "taxonomy": "meta_documentcharacteristics",
+        "negation": false,
+        "query": "Without+Text"
+      },
+      {
+        "taxonomy": "rm_mimetype",
+        "negation": false,
+        "query": "image%2Ftiff OR application%2Fpdf"
+      }
+    ],
+    "adp_createOcrJob_wait": "true"
+  }
+}
+```
+
 ---
 
 ## CLI Arguments
@@ -171,6 +202,8 @@ See [cli.md](../cli.md) for global flags and naming conventions.
 | `--listOfJobProperties` | string | "" | List of job properties |
 | `--globalSearchJson` | string | "" | Global search as JSON |
 | `--globalSearchId` | string | "" | Global search ID |
+| `--restrictions` | string | "" | Restrictions (format: `Taxonomy=Query`, repeat for multiple) |
+| `--advancedRestrictions` | string | "" | Advanced restrictions (format: `Taxonomy=Query`) |
 
 ### CLI Examples
 
@@ -183,6 +216,9 @@ adpgo create-ocr-job --engineName "myEngine" --query "*"
 
 # Wait for completion
 adpgo create-ocr-job --engineName "myEngine" --wait
+
+# With restrictions
+adpgo create-ocr-job --engineName "singleMindServer.demo00001" --jobName "demo_ocr" --restrictions "rm_source=file_demo_04" --restrictions "meta_documentcharacteristics=Without+Text"
 ```
 
 ---

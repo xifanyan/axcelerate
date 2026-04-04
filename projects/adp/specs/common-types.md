@@ -10,7 +10,7 @@ These types are used across multiple tasks.
 
 ### EngineTaxonomyArg
 
-Used by: Query Engine, Taxonomy Statistic
+Used by: Query Engine, Taxonomy Statistic, Create OCR Job
 
 ```json
 {
