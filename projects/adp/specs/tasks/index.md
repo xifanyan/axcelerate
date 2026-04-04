@@ -8,7 +8,7 @@
 | 2 | [query-engine.md](./query-engine.md) | `query-engine` | Queries an engine | documentsCount, aggregatedValue |
 | 3 | [start-application.md](./start-application.md) | `start-application` | Starts an application | applicationUrl |
 | 4 | [taxonomy-statistic.md](./taxonomy-statistic.md) | `taxonomy-statistic` | Retrieves category counts for a taxonomy | outputFile, statistics |
-| 5 | [csv-merge.md](./csv-merge.md) | `csv-merge` | Merges content/images via CSV file | **Pending verification** |
+| 5 | [csv-merge.md](./csv-merge.md) | `csv-merge` | Merges content/images via CSV file | empty array (no result fields) |
 | 6 | [export-documents.md](./export-documents.md) | `export-documents` | Export documents in CSV format | exportFileName, exportPath, searchResultSize |
 | 7 | [read-configuration.md](./read-configuration.md) | `read-configuration` | Read configurations into JSON or XML | outputFile, configuration |
 

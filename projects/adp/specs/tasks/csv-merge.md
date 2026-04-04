@@ -266,27 +266,22 @@ adpgo csv-merge --csvFile "/path/to/data.csv" --csvIdFieldKey "id" --mergeType "
 
 ## Raw Example Response
 
+### Verified Response (from live API)
+
 ```json
 {
-  "executionId": "uuid",
+  "executionId": "ed45a147-18b7-45ec-a0e3-ceb7ff658130",
   "taskType": "CSV Merge",
-  "loggingEnabled": "false",
+  "loggingEnabled": "true",
   "progressMax": 2,
   "executionStatus": "success",
-  "executionRootDir": "path",
-  "contextId": "uuid",
-  "executionPersistent": "false",
-  "progressCurrent": 1,
+  "executionRootDir": "E:\\MindServer\\Projects\\adp.adp\\adpRootDir",
+  "contextId": "4437498a-e67c-4873-95e3-c8e5f625bcd4",
+  "executionPersistent": "true",
+  "progressCurrent": 2,
   "progressPercentage": 1.0,
   "taskDisplayName": "",
-  "executionMetaData": {
-    "adp_csvMerge_csvMergeConfiguration": "",
-    "adp_csvMerge_csvMode": "append",
-    "adp_csvMerge_fieldMappings": [],
-    "adp_csvMerge_engineName": null,
-    "adp_csvMerge_applicationIdentifier": "",
-    "adp_csvMerge_mergeType": "Merge content"
-  }
+  "executionMetaData": []
 }
 ```
 
@@ -296,30 +291,27 @@ adpgo csv-merge --csvFile "/path/to/data.csv" --csvIdFieldKey "id" --mergeType "
 
 ### Result Type
 
-> **Pending**: `executionMetaData` response fields not yet verified against actual API response. The fields above are based on the example response but have not been confirmed as the authoritative output contract.
-
 ```
 CSVMergeResult {
-    # fields to be confirmed
+    // No meaningful result fields — executionMetaData is empty array on success
 }
 ```
 
 ### Decoding Rules
 
-> **Pending**: Awaiting verification against actual API response.
+On `executionStatus: "success"`, `executionMetaData` is an **empty array `[]`**. There is no meaningful result data to decode.
 
 ---
 
 ## executionMetaData Contract
 
+On success, `executionMetaData` is an **empty array `[]`** — no fields to decode.
+
+On failure:
+
 | Field | Type | Description |
 |-------|------|-------------|
-| adp_csvMerge_csvMergeConfiguration | string | CSV merge configuration — pending verification |
-| adp_csvMerge_csvMode | string | CSV mode — pending verification |
-| adp_csvMerge_fieldMappings | array | Field mappings — pending verification |
-| adp_csvMerge_engineName | string | Engine name — pending verification |
-| adp_csvMerge_applicationIdentifier | string | Application identifier — pending verification |
-| adp_csvMerge_mergeType | string | Merge type — pending verification |
+| executionMetaData | null | Always null on failure |
 
 ---
 
@@ -329,7 +321,7 @@ On `executionStatus: "failed"`:
 
 ```json
 {
-  "executionId": "uuid",
+  "executionId": "ed45a147-18b7-45ec-a0e3-ceb7ff658130",
   "taskType": "CSV Merge",
   "executionStatus": "failed",
   "errorMessage": "Error message details",
