@@ -12,6 +12,7 @@
 | 6 | [export-documents.md](./export-documents.md) | `export-documents` | Export documents in CSV format | exportFileName, exportPath, searchResultSize |
 | 7 | [read-configuration.md](./read-configuration.md) | `read-configuration` | Read configurations into JSON or XML | outputFile, configuration |
 | 8 | [create-ocr-job.md](./create-ocr-job.md) | `create-ocr-job` | Changes metaData by using regEx replacement | async-only, empty array |
+| 9 | [cli.md](./cli.md) | `cli` | Runs a native task in its own process | cli_result, json_output, cli_error_path, cli_result_path |
 
 ---
 
