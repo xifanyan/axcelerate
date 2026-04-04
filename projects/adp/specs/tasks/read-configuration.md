@@ -18,8 +18,19 @@ These are the user-facing fields for the request-construction API.
 | Field | Type | Default | Required | Description |
 |-------|------|---------|----------|-------------|
 | entityIdToRead | string | "" | No | Entity ID to read |
-| configsToRead | array | [] | No | Configs to read |
+| configsToRead | ConfigArg[] | [] | No | Configs to read |
 | fileFormat | string | "JSON" | No | Output format: "JSON" or "XML" |
+
+### ConfigArg
+
+| Field | Type | Description |
+|-------|------|-------------|
+| ConfigurationID | string | Configuration identifier |
+| DynamicComponentNames | string | Dynamic component names |
+| FieldList | string | Comma-separated field list |
+| NameValueList | string | Comma-separated name value list |
+| ApplicationType | string | Application type |
+| EntityType | string | Entity type |
 
 ---
 
@@ -99,6 +110,29 @@ These are the user-facing fields for the request-construction API.
 }
 ```
 
+### Verified Example Request (from live API)
+
+```json
+{
+  "taskType": "Read Configuration",
+  "taskDescription": "",
+  "taskDisplayName": "",
+  "taskConfiguration": {
+    "adp_readConfiguration_configsToRead": [
+      {
+        "Configuration ID": "dataSource.file_demo_01",
+        "Dynamic Component Names": "x",
+        "Field list": "name,value,cells",
+        "Name value list": "crawlLocationClassifierRules,uriPerlPatterns",
+        "Application type": "",
+        "Entity type": ""
+      }
+    ],
+    "adp_loggingEnabled": true
+  }
+}
+```
+
 ---
 
 ## CLI Arguments
@@ -108,7 +142,7 @@ See [cli.md](../cli.md) for global flags and naming conventions.
 | Flag | Type | Default | Description |
 |------|------|---------|-------------|
 | `--entityIdToRead` | string | "" | Entity ID to read |
-| `--configsToRead` | string | "" | Configs to read (comma-separated or JSON array) |
+| `--configsToRead` | string | "" | Configs to read (JSON array) |
 | `--fileFormat` | string | "JSON" | Output format: JSON or XML |
 
 ### CLI Examples
@@ -121,7 +155,7 @@ adpgo read-configuration
 adpgo read-configuration --entityIdToRead "my-entity-id"
 
 # With configs
-adpgo read-configuration --configsToRead "config1,config2"
+adpgo read-configuration --configsToRead '[{"Configuration ID":"dataSource.file_demo_01","Field list":"name,value,cells"}]'
 
 # As XML
 adpgo read-configuration --fileFormat "XML"
@@ -131,8 +165,6 @@ adpgo read-configuration --fileFormat "XML"
 
 ## Raw Example Response
 
-> **Pending**: `executionMetaData` response fields not yet verified against actual API response.
-
 ```json
 {
   "executionId": "uuid",
@@ -140,16 +172,25 @@ adpgo read-configuration --fileFormat "XML"
   "loggingEnabled": "false",
   "progressMax": 1,
   "executionStatus": "success",
-  "executionRootDir": "path",
+  "executionRootDir": "E:\\MindServer\\Projects\\adp.adp\\adpRootDir",
   "contextId": "uuid",
   "executionPersistent": "false",
   "progressCurrent": 1,
   "progressPercentage": 1.0,
   "taskDisplayName": "",
   "executionMetaData": {
-    "adp_entities_output_file_name": "path/to/output.json",
-    "adp_entities_json_output": "{...}"
+    "adp_entities_output_file_name": "E:\\MindServer\\Projects\\adp.adp\\adpRootDir\\output.json",
+    "adp_entities_json_output": "{...configuration JSON...}"
   }
+}
+```
+
+### Verified executionMetaData (from live API)
+
+```json
+{
+  "adp_entities_output_file_name": "E:\\MindServer\\Projects\\adp.adp\\adpRootDir\\output.json",
+  "adp_entities_json_output": "{\"dataSource.file_demo_01\" : { \"DynamicComponents\" : { }, \"Global\" : { \"Static\" : { \"Parameters\" : [ {\"cells\":[[{\"value\":\".*\",\"name\":\"Pattern\"},{\"value\":\"source1\",\"name\":\"Label\"},{\"value\":\"rm_source\",\"name\":\"Text Type\"}],[{\"value\":\".*\",\"name\":\"Pattern\"},{\"value\":\"mmt5\",\"name\":\"Label\"},{\"value\":\"rm_custodian\",\"name\":\"Text Type\"}],[{\"value\":\".*\",\"name\":\"Pattern\"},{\"value\":\"batch1\",\"name\":\"Label\"},{\"value\":\"rm_batch\",\"name\":\"Text Type\"}]],\"name\":\"crawlLocationClassifierRules\",\"value\":null}, {\"cells\":[],\"name\":\"uriPerlPatterns\",\"value\":null} ] } } }"
 }
 ```
 
@@ -159,28 +200,32 @@ adpgo read-configuration --fileFormat "XML"
 
 ### Result Type
 
-> **Pending**: `executionMetaData` response fields not yet verified against actual API response.
-
 ```
 ReadConfigurationResult {
-    # fields to be confirmed
+    outputFile: string
+    configuration: map[string]any  # parsed from adp_entities_json_output
 }
 ```
 
 ### Decoding Rules
 
-> **Pending**: Awaiting verification against actual API response.
+1. Map `executionMetaData.adp_entities_output_file_name` to `outputFile`
+2. Parse `executionMetaData.adp_entities_json_output` as a JSON string into `configuration` (map[string]any)
 
 ---
 
 ## executionMetaData Contract
 
-> **Pending**: `executionMetaData` response fields not yet verified against actual API response.
-
 | Field | Type | Description |
 |-------|------|-------------|
-| adp_entities_output_file_name | string | Output file path — pending verification |
-| adp_entities_json_output | string | JSON output — pending verification |
+| adp_entities_output_file_name | string | Output file path |
+| adp_entities_json_output | string | JSON string containing configuration data — must be parsed |
+
+### JSON String Fields
+
+| Field | Parse As |
+|-------|----------|
+| adp_entities_json_output | `map[string]any` (JSON object) |
 
 ---
 
