@@ -4,6 +4,14 @@ Maps the language-agnostic ADP contracts into idiomatic Go APIs.
 
 ---
 
+## Module
+
+```
+github.com/xifanyan/axcelerate/adp
+```
+
+---
+
 ## CLI Framework
 
 Use [urfave/cli/v3](https://github.com/urfave/cli) for CLI implementation.
