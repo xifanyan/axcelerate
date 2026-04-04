@@ -33,7 +33,7 @@ These are the user-facing fields for the request-construction API.
 
 | Field | Type | Description |
 |-------|------|-------------|
-| Parameter | string | Parameter value |
+| parameter | string | Parameter value |
 
 ---
 

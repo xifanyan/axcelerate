@@ -25,12 +25,14 @@ These are the user-facing fields for the request-construction API.
 
 | Field | Type | Description |
 |-------|------|-------------|
-| ConfigurationID | string | Configuration identifier |
-| DynamicComponentNames | string | Dynamic component names |
-| FieldList | string | Comma-separated field list |
-| NameValueList | string | Comma-separated name value list |
-| ApplicationType | string | Application type |
-| EntityType | string | Entity type |
+| configurationId | string | Configuration identifier |
+| dynamicComponentNames | string | Dynamic component names |
+| fieldList | string | Comma-separated field list |
+| nameValueList | string | Comma-separated name value list |
+| applicationType | string | Application type |
+| entityType | string | Entity type |
+
+> **Note:** The raw upstream API may still use keys with spaces (e.g., `"Configuration ID"`, `"Field list"`). Semantic input helper types use camelCase; bindings are responsible for translating to/from upstream keys.
 
 ---
 
@@ -247,7 +249,7 @@ Cell {
 
 | Field | Parse As |
 |-------|----------|
-| adp_entities_json_output | `ReadConfigurationResult` (map[string]ConfigurationInfo) |
+| adp_entities_json_output | `ReadConfigurationResult` (Record<string, ConfigurationInfo>) |
 
 ---
 

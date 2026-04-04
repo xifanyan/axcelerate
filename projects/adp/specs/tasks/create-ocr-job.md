@@ -264,11 +264,23 @@ CreateOcrJobResult {
 
 Poll using `GetTaskStatus` with the returned `executionId`. On completion, `executionMetaData` is an **empty array `[]`** — no fields to decode.
 
+> **Pending verification:** Completion response `executionMetaData` shape is unconfirmed. The verified sample above reflects the **async initial response** only.
+
 ---
 
 ## executionMetaData Contract
 
-On async completion, `executionMetaData` is an **empty array `[]`** — no fields to decode.
+### Async Initial Response (Verified)
+
+| Field | Type | Description |
+|-------|------|-------------|
+| executionMetaData | `[]` | Empty array — no fields to decode |
+
+### Async Completion Response (Pending Verification)
+
+| Field | Type | Description |
+|-------|------|-------------|
+| executionMetaData | `[]` | Empty array — no fields to decode (unconfirmed) |
 
 On failure:
 

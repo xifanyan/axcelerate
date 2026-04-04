@@ -308,7 +308,7 @@ Category {
     id: string
     displayName: string
     count: integer
-    properties: map<string, string[]> | absent  # present only when listCategoryProperties is enabled
+    properties: Record<string, string[]> | absent  # present only when listCategoryProperties is enabled
 }
 ```
 
@@ -317,7 +317,7 @@ Category {
 1. Map `executionMetaData.adp_taxonomy_statistics_json_file_path` to `outputFile`
 2. Parse `executionMetaData.adp_taxonomy_statistics_json_output` as a JSON string into `StatisticsDocument`
 3. `count` fields are integers in the parsed JSON
-4. `properties` field is absent by default; when `listCategoryProperties` is enabled, it is a `map<string, string[]>`
+4. `properties` field is absent by default; when `listCategoryProperties` is enabled, it is a `Record<string, string[]>`
 
 ---
 
