@@ -169,4 +169,17 @@ On `executionStatus: "failed"`:
 - Example Request must match Default Configuration exactly (no custom values)
 - Preserved exact field names, values, and ordering from source
 - Use camelCase for all response field names
-- Decoded Result is the language-agnostic contract for the task's output
+- **Decoded Result types must be language-agnostic** — use TypeScript-like notation:
+
+### Type Notation Standard
+
+| This notation | NOT this | Reason |
+|---------------|----------|--------|
+| `Type[]` | `[]Type` | TS/Go/Rust/Java/C# all understand `Type[]` |
+| `Record<K, V>` | `map[K]V` | TypeScript/Rust standard; clearer than Go-specific |
+| `string` | `String` | TypeScript/Rust/Python convention |
+| `integer` | `int` | Language-neutral numeric type |
+| `boolean` | `bool` | More widely recognized |
+| `any` | `interface{}` | TypeScript/Rust `any`; Go-specific `interface{}` not allowed |
+| `absent` | `null` | "absent" describes optionality; "null" is a value |
+| `Cell[][]` | `[][]Cell` | Arrays of arrays in TS notation |

@@ -15,7 +15,6 @@ Single source of truth for all ADP specifications. This document describes the o
 | [common-types.md](./common-types.md) | Shared input types referenced across multiple specs |
 | [cli.md](./cli.md) | CLI interface, subcommands, flags, output rules |
 | [tasks/index.md](./tasks/index.md) | Available tasks and add-task rules |
-| [api-endpoints.md](./api-endpoints.md) | **Deprecated** — superseded by api-contract.md |
 | [http-client.md](./http-client.md) | HTTP client transport details |
 | [VERIFICATION.md](./VERIFICATION.md) | API response verification checklist |
 
@@ -46,6 +45,15 @@ Markdown specs in `specs/` are the authoritative design documents. Do not mainta
 - Example Request = Default Configuration (no custom values) — used only for documentation of the raw upstream shape
 - **Task Configuration** — Only send fields that need to be changed from defaults; do not include all fields
 - Use **progressive request-construction API** for task configuration (e.g., builder or options-based, language-idiomatic)
+- **Result types must use language-agnostic notation** — TypeScript-like notation only:
+
+| Use | Not |
+|-----|-----|
+| `Type[]` | `[]Type` |
+| `Record<K, V>` | `map[K]V` |
+| `string`, `integer`, `boolean` | `String`, `int`, `bool` |
+| `any` | `interface{}` |
+| `absent` | `null` |
 
 ### Field Casing
 
