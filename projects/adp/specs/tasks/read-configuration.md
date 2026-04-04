@@ -203,14 +203,34 @@ adpgo read-configuration --fileFormat "XML"
 ```
 ReadConfigurationResult {
     outputFile: string
-    configuration: map[string]any  # parsed from adp_entities_json_output
+    configuration: map[string]ConfigurationInfo
+}
+
+ConfigurationInfo {
+    DynamicComponents: map[string]any
+    Global: {
+        Static: {
+            Parameters: ConfigurationParameter[]
+        }
+    }
+}
+
+ConfigurationParameter {
+    Cells: Cell[][]     # 2D array of {value, name}
+    Name: string
+    Value: any
+}
+
+Cell {
+    Value: any
+    Name: string
 }
 ```
 
 ### Decoding Rules
 
 1. Map `executionMetaData.adp_entities_output_file_name` to `outputFile`
-2. Parse `executionMetaData.adp_entities_json_output` as a JSON string into `configuration` (map[string]any)
+2. Parse `executionMetaData.adp_entities_json_output` as a JSON string into `ReadConfigurationResult` (map[string]ConfigurationInfo)
 
 ---
 
@@ -225,7 +245,7 @@ ReadConfigurationResult {
 
 | Field | Parse As |
 |-------|----------|
-| adp_entities_json_output | `map[string]any` (JSON object) |
+| adp_entities_json_output | `ReadConfigurationResult` (map[string]ConfigurationInfo) |
 
 ---
 
