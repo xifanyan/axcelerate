@@ -225,26 +225,26 @@ adpgo create-ocr-job --engineName "singleMindServer.demo00001" --jobName "demo_o
 
 ## Raw Example Response
 
-> **Pending**: `executionMetaData` response fields not yet verified against actual API response.
+### Verified Async Initial Response (from live API)
 
 ```json
 {
-  "executionId": "uuid",
+  "executionId": "fe0ead8d-5348-4c35-8caa-3d411c98974d",
   "taskType": "Create OCR Job",
-  "loggingEnabled": "false",
-  "progressMax": 1,
-  "executionStatus": "success",
-  "executionRootDir": "path",
-  "contextId": "uuid",
-  "executionPersistent": "false",
-  "progressCurrent": 1,
-  "progressPercentage": 1.0,
+  "loggingEnabled": "true",
+  "progressMax": 0,
+  "executionStatus": "",
+  "executionRootDir": "E:\\MindServer\\Projects\\adp.adp\\adpRootDir",
+  "contextId": "860e2cdc-24ec-424b-a369-a4ce29b4f39d",
+  "executionPersistent": "true",
+  "progressCurrent": 0,
+  "progressPercentage": 0,
   "taskDisplayName": "",
-  "executionMetaData": {
-    "adp_createOcrJob_json_output": "{...}"
-  }
+  "executionMetaData": []
 }
 ```
+
+> **Note:** This task only supports async execution. The initial response returns `executionStatus: ""` (empty string) with empty `executionMetaData`. Poll using `executionId` to check completion.
 
 ---
 
@@ -252,33 +252,29 @@ adpgo create-ocr-job --engineName "singleMindServer.demo00001" --jobName "demo_o
 
 ### Result Type
 
-> **Pending**: `executionMetaData` response fields not yet verified against actual API response.
+On async completion, `executionMetaData` is an **empty array `[]`**. There is no meaningful result data to decode.
 
 ```
 CreateOcrJobResult {
-    output: any  # parsed from adp_createOcrJob_json_output — pending verification
+    // No meaningful result fields — executionMetaData is empty array on completion
 }
 ```
 
 ### Decoding Rules
 
-> **Pending**: Awaiting verification against actual API response.
+Poll using `GetTaskStatus` with the returned `executionId`. On completion, `executionMetaData` is an **empty array `[]`** — no fields to decode.
 
 ---
 
 ## executionMetaData Contract
 
-> **Pending**: `executionMetaData` response fields not yet verified against actual API response.
+On async completion, `executionMetaData` is an **empty array `[]`** — no fields to decode.
+
+On failure:
 
 | Field | Type | Description |
 |-------|------|-------------|
-| adp_createOcrJob_json_output | string | JSON output — pending verification |
-
-### JSON String Fields
-
-| Field | Parse As |
-|-------|----------|
-| adp_createOcrJob_json_output | `any` — pending verification |
+| executionMetaData | null | Always null on failure |
 
 ---
 
@@ -288,7 +284,7 @@ On `executionStatus: "failed"`:
 
 ```json
 {
-  "executionId": "uuid",
+  "executionId": "fe0ead8d-5348-4c35-8caa-3d411c98974d",
   "taskType": "Create OCR Job",
   "executionStatus": "failed",
   "errorMessage": "Error message details",
