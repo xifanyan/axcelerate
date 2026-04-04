@@ -7,31 +7,24 @@
 | Task Type | `Start Application` |
 | Description | Starts an application |
 | Display Name | Start application |
+| Subcommand | `start-application` |
 
 ---
 
-## CLI Arguments
+## Semantic Inputs
 
-| Flag | Type | Default | Description |
-|------|------|---------|-------------|
-| `--applicationIdentifier` | string | "" | Application identifier |
-| `--useHttps` | boolean | false | Use HTTPS |
+These are the user-facing fields for the request-construction API.
 
-### CLI Examples
-
-```bash
-# Start an application
-adpgo startApplication --applicationIdentifier "my-app-id"
-
-# Start with HTTPS
-adpgo startApplication --applicationIdentifier "my-app-id" --useHttps
-```
+| Field | Type | Default | Required | Description |
+|-------|------|---------|----------|-------------|
+| applicationIdentifier | string | "" | No | Application identifier |
+| useHttps | boolean | false | No | Use HTTPS |
 
 ---
 
-## Default Configuration
+## Raw Default Configuration
 
-> Configuration below shows **all fields with their exact default values** from [API-SPEC.md](../../API-SPEC.md)
+> Configuration below shows **all fields with their exact default values** from [API-SPEC.md](../../API-SPEC.md). This is for reference only. Clients must not pre-populate all fields. See [request-construction.md](../request-construction.md).
 
 ```json
 {
@@ -72,9 +65,9 @@ adpgo startApplication --applicationIdentifier "my-app-id" --useHttps
 
 ---
 
-## Example Request
+## Raw Example Request
 
-> Example below matches **exactly** the default configuration from API-SPEC.md
+> Example below matches **exactly** the default configuration from [API-SPEC.md](../../API-SPEC.md).
 
 ```json
 {
@@ -98,7 +91,28 @@ adpgo startApplication --applicationIdentifier "my-app-id" --useHttps
 
 ---
 
-## Example Response
+## CLI Arguments
+
+See [cli.md](../cli.md) for global flags and naming conventions.
+
+| Flag | Type | Default | Description |
+|------|------|---------|-------------|
+| `--applicationIdentifier` | string | "" | Application identifier |
+| `--useHttps` | boolean | false | Use HTTPS |
+
+### CLI Examples
+
+```bash
+# Start an application
+adpgo start-application --applicationIdentifier "my-app-id"
+
+# Start with HTTPS
+adpgo start-application --applicationIdentifier "my-app-id" --useHttps
+```
+
+---
+
+## Raw Example Response
 
 ```json
 {
@@ -121,10 +135,40 @@ adpgo startApplication --applicationIdentifier "my-app-id" --useHttps
 
 ---
 
-## Response Fields
+## Decoded Result
 
-All responses include the common fields. Start Application-specific `ExecutionMetaData` fields:
+### Result Type
+
+```
+StartApplicationResult {
+    applicationUrl: string
+}
+```
+
+### Decoding Rules
+
+1. Map `executionMetaData.adp_started_application_url` directly to `applicationUrl`
+
+---
+
+## executionMetaData Contract
 
 | Field | Type | Description |
 |-------|------|-------------|
 | adp_started_application_url | string | The URL of the started application |
+
+---
+
+## Failure Response
+
+On `executionStatus: "failed"`:
+
+```json
+{
+  "executionId": "bea9fb98-c8f1-4189-be46-14e6c1a77d8c",
+  "taskType": "Start Application",
+  "executionStatus": "failed",
+  "errorMessage": "Error message details",
+  "executionMetaData": null
+}
+```

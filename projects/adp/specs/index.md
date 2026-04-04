@@ -1,76 +1,87 @@
-# Specs Index
+# ADP Project Specifications
 
-Single source of truth for all ADP specifications.
+Single source of truth for all ADP specifications. This document describes the overall structure and global rules. Language-agnostic by design.
 
 ---
 
-## Core Specs
+## Spec Structure
 
 | File | Description |
 |------|-------------|
-| [http-client.md](./http-client.md) | HTTP client configuration |
-| [api-endpoints.md](./api-endpoints.md) | API endpoints |
-| [common-types.md](./common-types.md) | Shared types |
-| [languages.md](./languages.md) | Language-specific rules (including service layer) |
+| [index.md](./index.md) | This file — global rules and spec map |
+| [api-contract.md](./api-contract.md) | Raw API transport, endpoints, request/response envelopes |
+| [request-construction.md](./request-construction.md) | How clients build sparse requests |
+| [result-decoding.md](./result-decoding.md) | How clients decode task outputs (sync and async) |
+| [common-types.md](./common-types.md) | Shared input types referenced across multiple specs |
+| [cli.md](./cli.md) | CLI interface, subcommands, flags, output rules |
+| [tasks/index.md](./tasks/index.md) | Available tasks and add-task rules |
+| [api-endpoints.md](./api-endpoints.md) | **Deprecated** — superseded by api-contract.md |
+| [http-client.md](./http-client.md) | HTTP client transport details |
+| [VERIFICATION.md](./VERIFICATION.md) | API response verification checklist |
+
+### Language Bindings
+
+| File | Description |
+|------|-------------|
+| [language-bindings/go.md](./language-bindings/go.md) | Go-specific API conventions |
+| [language-bindings/rust.md](./language-bindings/rust.md) | Rust-specific API conventions |
+| [language-bindings/python.md](./language-bindings/python.md) | Python-specific API conventions |
+| [languages.md](./languages.md) | **Deprecated** — superseded by language-bindings/ |
+
+Language bindings are non-authoritative — they map the contracts defined in core specs into idiomatic APIs for each language.
 
 ---
 
-## Tasks
+## Global Rules
 
-See [tasks/index.md](./tasks/index.md) for the authoritative task listing and add-task rules.
+### Source of Truth
 
----
+`API-SPEC.md` is the authoritative source for upstream task default values and raw field names. All spec documentation must match `API-SPEC.md` exactly.
 
-## ADP-Specific Rules
+Markdown specs in `specs/` are the authoritative design documents. Do not maintain parallel output schemas or generator scripts under `scripts/` for the same contracts.
 
 ### Task Spec Rules
+
 - Task specs must match [API-SPEC.md](../API-SPEC.md) exactly (field names, values, ordering)
-- Example Request = Default Configuration (no custom values)
-- **Task Configuration** - Only send fields that need to be changed from defaults; do not include all fields
-- Use **Builder Pattern** for task configuration (e.g., `ListEntities().Type("x").WhiteList("y").Execute(client)`)
+- Example Request = Default Configuration (no custom values) — used only for documentation of the raw upstream shape
+- **Task Configuration** — Only send fields that need to be changed from defaults; do not include all fields
+- Use **progressive request-construction API** for task configuration (e.g., builder or options-based, language-idiomatic)
+
+### Field Casing
+
+All API request and response field names use **camelCase** exclusively (e.g., `executionId`, `executionMetaData`). This applies to:
+- Raw API request bodies
+- Raw API responses
+- Spec documentation of API fields
+
+PascalCase or other casing must not appear in API-facing documentation.
+
+### Logging
+
+Logging must be **enabled by default** for all tasks. Debug mode must trace request/response payloads. Enable via CLI `--debug` or `-d` flag.
 
 ### Function Naming
+
 - Default functions (e.g., `ListEntities`) are synchronous
 - Add `Async` suffix for asynchronous variants (e.g., `ListEntitiesAsync`)
 
-### Logging
-- Logging must be **enabled by default** for all tasks
-- Debug mode must trace request/response payloads (input and output)
-- Enable via CLI: `--debug` or `-d` flag (e.g., `adpgo --debug ... listEntities`)
-
 ### CLI Interface
+
 - Must support subcommands for each task
 - Global flags: `--host`, `--port`, `--user`, `--password`, `--insecure`, `--debug`
 - `--port` default: 8443
-- Example: `adpgo --host example.com --user adp --password adp listEntities --type singleMindServer`
-- CLI naming: `[project][lang]` (e.g., `adpgo` for Go, `adppy` for Python)
-
-### CLI Output Parsing
-- Each task returns different `ExecutionMetaData` fields
-- CLI must parse output based on **Example Response** in each task's spec
-- See [list-entities.md](./tasks/list-entities.md), [query-engine.md](./tasks/query-engine.md), [taxonomy-statistic.md](./tasks/taxonomy-statistic.md) for task-specific output formats
-
-### CLI Output Rule
-- On HTTP 200 and `ExecutionStatus: "success"` - output only the parsed task-specific data (e.g., JSON array for List Entities)
-- On failure - output error details including `ExecutionID` and `ExecutionMetaData`
-
-### Response Processing
-- Use a **shared response handler** for common fields (`ExecutionID`, `TaskType`, `ExecutionStatus`, `ProgressMax`, `ProgressCurrent`, `ProgressPercentage`)
-- Each task should only implement task-specific `ExecutionMetaData` parsing
-- Do not duplicate common field handling in each command handler
-
-### Response Format
-`ExecutionID`, `TaskType`, `LoggingEnabled`, `ProgressMax`, `ExecutionStatus`, `ExecutionRootDir`, `ContextID`, `ExecutionPersistent`, `ProgressCurrent`, `ProgressPercentage`, `TaskDisplayName`, `ExecutionMetaData`
+- Example: `adpgo --host example.com --user adp --password adp list-entities --type singleMindServer`
+- CLI naming: `[project][lang]` (e.g., `adpgo` for Go, `adppy` for Python, `adprs` for Rust)
 
 ### Code Generation Conventions
 
 When generating code for ADP client library:
 
-1. **One task per file** - Each task (List Entities, Query Engine, Taxonomy Statistic) should be in its own file (e.g., `list_entities.go`, `query_engine.go`, `taxonomy_statistic.go`)
-2. **Shared types** - Common types go in `types.go`
-3. **Client** - HTTP client implementation in `client.go`
-4. **Config structs** - Place in the same file as the task builder function
-5. **CLI** - CLI implementation in `cmd/adpgo/main.go`
+1. **One task per file** — Each task in its own file (e.g., `list_entities.go`, `query_engine.go`)
+2. **Shared types** — Common types go in `types.go` or the equivalent
+3. **Client** — HTTP client implementation in `client.go`
+4. **Config structs** — Place in the same file as the task builder function
+5. **CLI** — CLI implementation in `cmd/adpgo/main.go`
 
 Example structure:
 ```
@@ -84,4 +95,9 @@ projects/adp/src/go/
 └── taxonomy_statistic.go  # Taxonomy Statistic task
 ```
 
-See also: [languages.md](./languages.md)
+See also:
+- [api-contract.md](./api-contract.md)
+- [request-construction.md](./request-construction.md)
+- [result-decoding.md](./result-decoding.md)
+- [cli.md](./cli.md)
+- [tasks/index.md](./tasks/index.md)

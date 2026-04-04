@@ -7,68 +7,37 @@
 | Task Type | `Taxonomy Statistic` |
 | Description | Retrieves category counts for a taxonomy |
 | Display Name | Taxonomy statistic |
+| Subcommand | `taxonomy-statistic` |
 
 ---
 
-## Input Arguments
+## Semantic Inputs
 
-These are the user-facing builder arguments for the fluent API. Shared types are defined in [common-types.md](../../common-types.md#shared-input-types).
+These are the user-facing fields for the request-construction API.
+
+| Field | Type | Default | Required | Description |
+|-------|------|---------|----------|-------------|
+| engineName | string | — | Yes | Engine name |
+| engineQuery | string | "*" | No | Query string |
+| computeCounts | boolean | true | No | Compute entity counts |
+| listCategoryProperties | boolean | false | No | List category properties |
+| engineTaxonomies | EngineTaxonomyArg[] | [] | No | Engine taxonomies to filter |
+| outputTaxonomies | OutputTaxonomiesArg[] | [] | No | Output taxonomies configuration |
+| applicationIdentifier | string | "" | No | Application identifier |
 
 ### EngineTaxonomyArg
 
-See [common-types.md](../../common-types.md#enginetaxonomyarg).
+See [api-contract.md](../api-contract.md#enginetaxonomyarg).
 
 ### OutputTaxonomiesArg
 
-See [common-types.md](../../common-types.md#outputtaxonomiesarg).
-
-### Builder Methods
-
-| Method | Type | Default | Description |
-|--------|------|---------|-------------|
-| `EngineName(string)` | string | - | Engine name |
-| `EngineQuery(string)` | string | "*" | Query string |
-| `ComputeCounts(bool)` | bool | true | Compute entity counts |
-| `ListCategoryProperties(bool)` | bool | false | List category properties |
-| `EngineTaxonomies([]EngineTaxonomyArg)` | array | [] | Engine taxonomies to filter |
-| `OutputTaxonomies([]OutputTaxonomiesArg)` | array | [] | Output taxonomies configuration |
-| `ApplicationIdentifier(string)` | string | "" | Application identifier |
+See [api-contract.md](../api-contract.md#outputtaxonomiesarg).
 
 ---
 
-## CLI Arguments
+## Raw Default Configuration
 
-| Flag | Type | Default | Description |
-|------|------|---------|-------------|
-| `--engineName` | string | - | Engine name |
-| `--engineQuery` | string | "*" | Query string |
-| `--computeCounts` | bool | true | Compute entity counts |
-| `--listCategoryProperties` | bool | false | List category properties |
-| `--engineTaxonomies` | string | - | Engine taxonomies filter (repeatable, see format below) |
-| `--outputTaxonomies` | JSON or string | - | Output taxonomies: comma-separated list or JSON array |
-| `--applicationIdentifier` | string | "" | Application identifier |
-
-### EngineTaxonomiesArg
-
-See [common-types.md](../../common-types.md#cli-shorthand-format) for the shorthand CLI format.
-
-### CLI Examples
-
-```bash
-# With outputTaxonomies (comma-separated taxonomy names)
-adpgo taxonomyStatistic --engineName "myEngine" --outputTaxonomies=rm_source,meta_documentcharacteristics
-
-# Single taxonomy equals
-adpgo taxonomyStatistic --engineName "myEngine" --engineTaxonomies "rm_mimetype=pdf"
-
-# Multiple taxonomies
-adpgo taxonomyStatistic --engineName "myEngine" --engineTaxonomies "rm_source=email" --engineTaxonomies "rm_mimetype=pdf"
-
-# Negation (not equal)
-adpgo taxonomyStatistic --engineName "myEngine" --engineTaxonomies "rm_source!=email"
-```
-
-> Configuration below shows **all fields with their exact default values** from [[API-SPEC.md]]
+> Configuration below shows **all fields with their exact default values** from [API-SPEC.md](../../API-SPEC.md). This is for reference only. Clients must not pre-populate all fields. See [request-construction.md](../request-construction.md).
 
 ```json
 {
@@ -143,9 +112,9 @@ adpgo taxonomyStatistic --engineName "myEngine" --engineTaxonomies "rm_source!=e
 
 ---
 
-## Example Request
+## Raw Example Request
 
-> Example below matches **exactly** the default configuration from API-SPEC.md
+> Example below matches **exactly** the default configuration from [API-SPEC.md](../../API-SPEC.md).
 
 ```json
 {
@@ -186,7 +155,50 @@ adpgo taxonomyStatistic --engineName "myEngine" --engineTaxonomies "rm_source!=e
 
 ---
 
-## Example Response (without category properties)
+## CLI Arguments
+
+See [cli.md](../cli.md) for global flags and naming conventions.
+
+| Flag | Type | Default | Description |
+|------|------|---------|-------------|
+| `--engineName` | string | — | Engine name |
+| `--engineQuery` | string | "*" | Query string |
+| `--computeCounts` | boolean | true | Compute entity counts |
+| `--listCategoryProperties` | boolean | false | List category properties |
+| `--engineTaxonomies` | string | — | Engine taxonomies filter (repeatable, see format below) |
+| `--outputTaxonomies` | string | — | Output taxonomies: comma-separated list or JSON array |
+| `--applicationIdentifier` | string | "" | Application identifier |
+
+### EngineTaxonomiesArg CLI Format
+
+Shorthand format: `Taxonomy=Query` or `Taxonomy!=Query`
+
+| Format | Description | Example |
+|--------|-------------|---------|
+| `Taxonomy=Query` | Equals (negation=false) | `rm_mimetype=pdf` |
+| `Taxonomy!=Query` | Not equals (negation=true) | `rm_source!=email` |
+
+Repeatable flag.
+
+### CLI Examples
+
+```bash
+# With outputTaxonomies (comma-separated taxonomy names)
+adpgo taxonomy-statistic --engineName "myEngine" --outputTaxonomies "rm_source,meta_documentcharacteristics"
+
+# Single taxonomy equals
+adpgo taxonomy-statistic --engineName "myEngine" --engineTaxonomies "rm_mimetype=pdf"
+
+# Multiple taxonomies
+adpgo taxonomy-statistic --engineName "myEngine" --engineTaxonomies "rm_source=email" --engineTaxonomies "rm_mimetype=pdf"
+
+# Negation (not equal)
+adpgo taxonomy-statistic --engineName "myEngine" --engineTaxonomies "rm_source!=email"
+```
+
+---
+
+## Raw Example Response (without category properties)
 
 ```json
 {
@@ -208,7 +220,7 @@ adpgo taxonomyStatistic --engineName "myEngine" --engineTaxonomies "rm_source!=e
 }
 ```
 
-### Output (decoded)
+### Decoded (without category properties)
 
 ```json
 {
@@ -234,7 +246,7 @@ adpgo taxonomyStatistic --engineName "myEngine" --engineTaxonomies "rm_source!=e
 
 ---
 
-## Example Response (with category properties)
+## Raw Example Response (with category properties)
 
 ```json
 {
@@ -256,78 +268,84 @@ adpgo taxonomyStatistic --engineName "myEngine" --engineTaxonomies "rm_source!=e
 }
 ```
 
-### Output (decoded)
+---
 
-```json
-{
-  "date": "Wed Mar 18 03:03:06 EDT 2026",
-  "searchParameter": [
-    { "key": "rm_main", "value": "[*]" },
-    { "key": "rm_pagesize", "value": "[-1]" }
-  ],
-  "statistics": {
-    "taxonomy": [
-      {
-        "id": "rm_source",
-        "category": [
-          {
-            "id": "file_demo_04",
-            "displayName": "file_demo_04",
-            "count": 761,
-            "properties": {
-              "rm_prop_editDate": ["1761795365031"],
-              "rm_prop_creationDate": ["1761795365031"],
-              "rm_prop_creator": ["system"]
-            }
-          },
-          {
-            "id": "new_demo_02",
-            "displayName": "new_demo_02",
-            "count": 2,
-            "properties": {
-              "rm_prop_editDate": ["1761794623213"],
-              "rm_prop_creationDate": ["1761794623213"],
-              "rm_prop_creator": ["system"]
-            }
-          },
-          {
-            "id": "file_dmoe_03",
-            "displayName": "file_dmoe_03",
-            "count": 1,
-            "properties": {
-              "rm_prop_editDate": ["1761620568340"],
-              "rm_prop_creationDate": ["1761620568340"],
-              "rm_prop_creator": ["system"]
-            }
-          }
-        ]
-      }
-    ]
-  }
+## Decoded Result
+
+### Result Type
+
+```
+TaxonomyStatisticResult {
+    outputFile: string
+    statistics: StatisticsDocument
 }
 ```
 
+### StatisticsDocument
+
+```
+StatisticsDocument {
+    date: string
+    searchParameter: SearchParameter[]
+    statistics: Statistics
+}
+
+SearchParameter {
+    key: string
+    value: string
+}
+
+Statistics {
+    taxonomy: TaxonomyEntry[]
+}
+
+TaxonomyEntry {
+    id: string
+    category: Category[]
+}
+
+Category {
+    id: string
+    displayName: string
+    count: integer
+    properties: map<string, string[]> | absent  # present only when listCategoryProperties is enabled
+}
+```
+
+### Decoding Rules
+
+1. Map `executionMetaData.adp_taxonomy_statistics_json_file_path` to `outputFile`
+2. Parse `executionMetaData.adp_taxonomy_statistics_json_output` as a JSON string into `StatisticsDocument`
+3. `count` fields are integers in the parsed JSON
+4. `properties` field is absent by default; when `listCategoryProperties` is enabled, it is a `map<string, string[]>`
+
 ---
 
-## Response Fields
-
-All responses include the common fields. Taxonomy Statistic-specific `ExecutionMetaData` fields:
+## executionMetaData Contract
 
 | Field | Type | Description |
 |-------|------|-------------|
 | adp_taxonomy_statistics_json_file_path | string | Output file path |
-| adp_taxonomy_statistics_json_output | string | JSON string containing taxonomy statistics (date, searchParameter, statistics) |
+| adp_taxonomy_statistics_json_output | string | JSON string containing taxonomy statistics — must be parsed |
 
-### statistics JSON structure
+### JSON String Fields
 
-The `adp_taxonomy_statistics_json_output` contains:
+| Field | Parse As |
+|-------|----------|
+| adp_taxonomy_statistics_json_output | `StatisticsDocument` |
 
-| Field | Type | Description |
-|-------|------|-------------|
-| date | string | Timestamp of the statistics |
-| searchParameter | array | Search parameters used (key/value pairs) |
-| statistics.taxonomy[].id | string | Taxonomy ID |
-| statistics.taxonomy[].category[] | array | Categories with id, displayName, count |
-| statistics.taxonomy[].category[].properties | object | Category properties (only when listCategoryProperties is enabled) |
+---
 
-When `listCategoryProperties` is enabled, category objects include additional property fields.
+## Failure Response
+
+On `executionStatus: "failed"`:
+
+```json
+{
+  "executionId": "f9463001-dc1f-486a-a8a0-efaca8dd29cb",
+  "taskType": "Taxonomy Statistic",
+  "executionStatus": "failed",
+  "errorMessage": "Error message details",
+  "executionMetaData": null
+}
+```

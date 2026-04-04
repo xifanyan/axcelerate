@@ -5,46 +5,30 @@
 | Property | Value |
 |----------|-------|
 | Task Type | `List Entities` |
-| Description | Writes a list of entities ot an output variable |
+| Description | Writes a list of entities to an output variable |
 | Display Name | List entities |
+| Subcommand | `list-entities` |
 
 ---
 
-## CLI Interface
+## Semantic Inputs
 
-### Input Arguments
+These are the user-facing fields for the request-construction API.
 
-| Argument | Type | Default | Description |
-|----------|------|---------|-------------|
-| `--type` | string | "" | Entity type to filter |
-| `--id` | string | "" | Specific entity ID |
-| `--relatedEntity` | string | "" | Related entity ID |
-| `--whiteList` | string | "id,displayName,processStatus,hostName,hostId,sourceForCreateFromExisting" | Fields to include |
-| `--workspace` | string | "" | Workspace name |
-| `--status` | string | "" | Entity status filter |
-
-### Output
-
-Returns parsed JSON array of entities:
-
-```json
-[
-  {
-    "id": "singleMindServer.demo00001",
-    "displayName": "demo00001",
-    "processStatus": "Running",
-    "hostName": "vm-rhauswirth2.otxlab.net",
-    "hostId": "vm-rhauswirth2.otxlab.net",
-    "sourceForCreateFromExisting": false
-  }
-]
-```
+| Field | Type | Default | Required | Description |
+|-------|------|---------|----------|-------------|
+| type | string | "" | No | Entity type to filter |
+| id | string | "" | No | Specific entity ID |
+| relatedEntity | string | "" | No | Related entity ID |
+| whiteList | string | "id,displayName" | No | Fields to include in output |
+| workspace | string | "" | No | Workspace name |
+| status | string | "" | No | Entity status filter |
 
 ---
 
-## Default Configuration
+## Raw Default Configuration
 
-> Configuration below shows **all fields with their exact default values** from [API-SPEC.md](../../API-SPEC.md)
+> Configuration below shows **all fields with their exact default values** from [API-SPEC.md](../../API-SPEC.md). This is for reference only. Clients must not pre-populate all fields. See [request-construction.md](../request-construction.md).
 
 ```json
 {
@@ -101,7 +85,7 @@ Returns parsed JSON array of entities:
 | adp_listEntities_axcRequestTimeoutSeconds | integer | 900 | Request timeout in seconds |
 | adp_taskActive | boolean | true | Whether task is active |
 | adp_listEntities_userHasAccess | string | "" | User access filter |
-| adp_listEntities_whiteList | string | "id,displayName,processStatus,hostName,hostId,sourceForCreateFromExisting" | Fields to include |
+| adp_listEntities_whiteList | string | "id,displayName" | Fields to include |
 | adp_executionPersistent | boolean | true | Persist execution |
 | adp_abortWfOnFailure | boolean | true | Abort workflow on failure |
 | adp_listEntities_relatedEntity | string | "" | Related entity ID |
@@ -131,9 +115,9 @@ Returns parsed JSON array of entities:
 
 ---
 
-## Example Request
+## Raw Example Request
 
-> Example below matches **exactly** the default configuration from API-SPEC.md
+> Example below matches **exactly** the default configuration from [API-SPEC.md](../../API-SPEC.md).
 
 ```json
 {
@@ -180,7 +164,35 @@ Returns parsed JSON array of entities:
 
 ---
 
-## Example Response
+## CLI Arguments
+
+See [cli.md](../cli.md) for global flags and naming conventions.
+
+| Flag | Type | Default | Description |
+|------|------|---------|-------------|
+| `--type` | string | "" | Entity type to filter |
+| `--id` | string | "" | Specific entity ID |
+| `--relatedEntity` | string | "" | Related entity ID |
+| `--whiteList` | string | "id,displayName" | Fields to include |
+| `--workspace` | string | "" | Workspace name |
+| `--status` | string | "" | Entity status filter |
+
+### CLI Examples
+
+```bash
+# Basic
+adpgo list-entities
+
+# With type filter
+adpgo list-entities --type singleMindServer
+
+# With multiple options
+adpgo list-entities --type singleMindServer --whiteList "id,displayName,processStatus"
+```
+
+---
+
+## Raw Example Response
 
 ```json
 {
@@ -197,64 +209,70 @@ Returns parsed JSON array of entities:
   "taskDisplayName": "",
   "executionMetaData": {
     "adp_entities_output_file_name": "E:\\MindServer\\Projects\\adp.adp\\adpRootDir\\output.json",
-    "adp_entities_json_output": "[{\"id\":\"axcelerate.demo00001_Demo_Review4\",\"displayName\":\"demo00001_Demo_Review4\",\"processStatus\":\"Running\",\"hostId\":\"vm-rhauswirth2.otxlab.net\",\"hostName\":\"vm-rhauswirth2.otxlab.net\",\"sourceForCreateFromExisting\":false},{\"id\":\"axcelerate.demo_01_review\",\"displayName\":\"demo_01_review\",\"processStatus\":\"Killed\",\"hostId\":\"vm-rhauswirth2.otxlab.net\",\"hostName\":\"vm-rhauswirth2.otxlab.net\",\"sourceForCreateFromExisting\":false}]"
+    "adp_entities_json_output": "[{\"id\":\"axcelerate.demo00001_Demo_Review4\",\"displayName\":\"demo00001_Demo_Review4\",\"processStatus\":\"Running\",\"hostId\":\"vm-rhauswirth2.otxlab.net\",\"hostName\":\"vm-rhauswirth2.otxlab.net\",\"sourceForCreateFromExisting\":false}]"
   }
 }
 ```
 
 ---
 
-## Response Fields
+## Decoded Result
 
-| Field | Type | Description |
-|-------|------|-------------|
-| executionId | string | Unique execution identifier |
-| taskType | string | Task type ("List Entities") |
-| loggingEnabled | string | Whether logging is enabled ("true"/"false") |
-| progressMax | integer | Maximum progress value |
-| executionStatus | string | Status of execution ("success", "failed", etc.) |
-| executionRootDir | string | Root directory for execution |
-| contextId | string | Context identifier |
-| executionPersistent | string | Whether execution is persistent ("true"/"false") |
-| progressCurrent | integer | Current progress value |
-| ProgressPercentage | integer | Progress percentage |
-| TaskDisplayName | string | Display name of the task |
-| ExecutionMetaData | object | Task-specific metadata |
-| ExecutionMetaData.adp_entities_output_file_name | string | Output file path |
-| ExecutionMetaData.adp_entities_json_output | string | JSON string of entities array |
+### Result Type
 
----
+```
+ListEntitiesResult {
+    outputFile: string
+    entities: Entity[]
+}
+```
 
-## Entity Fields
+### Entity Type
 
-> The `adp_entities_json_output` field in `ExecutionMetaData` is a JSON string that must be parsed. Each entity contains:
+```
+Entity {
+    id: string
+    displayName: string
+    processStatus: string
+    hostId: string
+    hostName: string
+    sourceForCreateFromExisting: boolean
+}
+```
 
-| Field | Type | Description |
-|-------|------|-------------|
-| id | string | Entity identifier |
-| displayName | string | Entity display name |
-| processStatus | string | Process status (e.g., "Running", "Killed", "Not running") |
-| hostId | string | Host ID |
-| hostName | string | Host name |
-| sourceForCreateFromExisting | boolean | Whether source is for creating from existing |
+### Decoding Rules
+
+1. Map `executionMetaData.adp_entities_output_file_name` to `outputFile`
+2. Parse `executionMetaData.adp_entities_json_output` as a JSON string into `entities[]`
+3. Each entity field type is inferred from the JSON value (string, boolean)
 
 ---
 
-## Parsing Example
+## executionMetaData Contract
+
+| Field | Type | Description |
+|-------|------|-------------|
+| adp_entities_output_file_name | string | Output file path |
+| adp_entities_json_output | string | JSON string containing array of entities — must be parsed |
+
+### JSON String Fields
+
+| Field | Parse As |
+|-------|----------|
+| adp_entities_json_output | `Entity[]` (JSON array) |
+
+---
+
+## Failure Response
+
+On `executionStatus: "failed"`:
 
 ```json
-// ExecutionMetaData.adp_entities_json_output contains:
-"[{\"id\":\"axcelerate.demo00001_Demo_Review4\",\"displayName\":\"demo00001_Demo_Review4\",\"processStatus\":\"Running\",...}]"
-
-// After parsing as JSON array:
-[
-  {
-    "id": "axcelerate.demo00001_Demo_Review4",
-    "displayName": "demo00001_Demo_Review4",
-    "processStatus": "Running",
-    "hostId": "vm-rhauswirth2.otxlab.net",
-    "hostName": "vm-rhauswirth2.otxlab.net",
-    "sourceForCreateFromExisting": false
-  }
-]
+{
+  "executionId": "f9463001-dc1f-486a-a8a0-efaca8dd29cb",
+  "taskType": "List Entities",
+  "executionStatus": "failed",
+  "errorMessage": "Error message details",
+  "executionMetaData": null
+}
 ```

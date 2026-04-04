@@ -7,45 +7,28 @@
 | Task Type | `Query Engine` |
 | Description | Queries an engine |
 | Display Name | Query engine |
+| Subcommand | `query-engine` |
 
 ---
 
-## CLI Arguments
+## Semantic Inputs
 
-| Flag | Type | Default | Description |
-|------|------|---------|-------------|
-| `--engineName` | string | - | Engine name |
-| `--engineQuery` | string | "*" | Query string |
-| `--engineUserName` | string | - | Engine username |
-| `--engineUserPassword` | string | - | Engine password |
-| `--engineTaxonomies` | string | - | Engine taxonomies filter (repeatable, see format below) |
-| `--applicationIdentifier` | string | "" | Application identifier |
+These are the user-facing fields for the request-construction API.
 
-### EngineTaxonomiesArg
-
-See [common-types.md](../../common-types.md#cli-shorthand-format) for the shorthand CLI format.
-
-### CLI Examples
-
-```bash
-# Basic query
-adpgo queryEngine --engineName "myEngine"
-
-# Single taxonomy equals
-adpgo queryEngine --engineName "myEngine" --engineTaxonomies "rm_mimetype=pdf"
-
-# Multiple taxonomies
-adpgo queryEngine --engineName "myEngine" --engineTaxonomies "rm_source=email" --engineTaxonomies "rm_mimetype=pdf"
-
-# Negation (not equal)
-adpgo queryEngine --engineName "myEngine" --engineTaxonomies "rm_source!=email"
-```
+| Field | Type | Default | Required | Description |
+|-------|------|---------|----------|-------------|
+| engineName | string | — | Yes | Engine name |
+| engineQuery | string | "*" | No | Query string |
+| engineUserName | string | — | No | Engine username |
+| engineUserPassword | string | — | No | Engine password |
+| engineTaxonomies | EngineTaxonomyArg[] | [] | No | Engine taxonomies filter |
+| applicationIdentifier | string | "" | No | Application identifier |
 
 ---
 
-## Default Configuration
+## Raw Default Configuration
 
-> Configuration below shows **all fields with their exact default values** from [API-SPEC.md](../../API-SPEC.md)
+> Configuration below shows **all fields with their exact default values** from [API-SPEC.md](../../API-SPEC.md). This is for reference only. Clients must not pre-populate all fields. See [request-construction.md](../request-construction.md).
 
 ```json
 {
@@ -140,9 +123,9 @@ adpgo queryEngine --engineName "myEngine" --engineTaxonomies "rm_source!=email"
 
 ---
 
-## Example Request
+## Raw Example Request
 
-> Example below matches **exactly** the default configuration from API-SPEC.md
+> Example below matches **exactly** the default configuration from [API-SPEC.md](../../API-SPEC.md).
 
 ```json
 {
@@ -193,7 +176,49 @@ adpgo queryEngine --engineName "myEngine" --engineTaxonomies "rm_source!=email"
 
 ---
 
-## Example Response
+## CLI Arguments
+
+See [cli.md](../cli.md) for global flags and naming conventions.
+
+| Flag | Type | Default | Description |
+|------|------|---------|-------------|
+| `--engineName` | string | — | Engine name |
+| `--engineQuery` | string | "*" | Query string |
+| `--engineUserName` | string | — | Engine username |
+| `--engineUserPassword` | string | — | Engine password |
+| `--engineTaxonomies` | string | — | Engine taxonomies filter (repeatable, see format below) |
+| `--applicationIdentifier` | string | "" | Application identifier |
+
+### EngineTaxonomiesArg CLI Format
+
+Shorthand format: `Taxonomy=Query` or `Taxonomy!=Query`
+
+| Format | Description | Example |
+|--------|-------------|---------|
+| `Taxonomy=Query` | Equals (negation=false) | `rm_mimetype=pdf` |
+| `Taxonomy!=Query` | Not equals (negation=true) | `rm_source!=email` |
+
+Repeatable flag.
+
+### CLI Examples
+
+```bash
+# Basic query
+adpgo query-engine --engineName "myEngine"
+
+# Single taxonomy equals
+adpgo query-engine --engineName "myEngine" --engineTaxonomies "rm_mimetype=pdf"
+
+# Multiple taxonomies
+adpgo query-engine --engineName "myEngine" --engineTaxonomies "rm_source=email" --engineTaxonomies "rm_mimetype=pdf"
+
+# Negation (not equal)
+adpgo query-engine --engineName "myEngine" --engineTaxonomies "rm_source!=email"
+```
+
+---
+
+## Raw Example Response
 
 ```json
 {
@@ -217,11 +242,43 @@ adpgo queryEngine --engineName "myEngine" --engineTaxonomies "rm_source!=email"
 
 ---
 
-## Response Fields
+## Decoded Result
 
-All responses include the common fields. Query Engine-specific `ExecutionMetaData` fields:
+### Result Type
+
+```
+QueryEngineResult {
+    documentsCount: integer
+    aggregatedValue: string
+}
+```
+
+### Decoding Rules
+
+1. Parse `executionMetaData.adp_query_engine_documents_count` from string to integer
+2. Map `executionMetaData.adp_query_engine_aggregated_value` directly to `aggregatedValue` (string)
+
+---
+
+## executionMetaData Contract
 
 | Field | Type | Description |
 |-------|------|-------------|
-| adp_query_engine_documents_count | string | Number of documents matching the query |
+| adp_query_engine_documents_count | string | Number of documents matching the query — coerce to integer |
 | adp_query_engine_aggregated_value | string | Aggregated value result |
+
+---
+
+## Failure Response
+
+On `executionStatus: "failed"`:
+
+```json
+{
+  "executionId": "f9463001-dc1f-486a-a8a0-efaca8dd29cb",
+  "taskType": "Query Engine",
+  "executionStatus": "failed",
+  "errorMessage": "Error message details",
+  "executionMetaData": null
+}
+```
