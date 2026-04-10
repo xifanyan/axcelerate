@@ -107,6 +107,14 @@ func (c *Client) execute(ctx context.Context, endpoint string, req rawTaskReques
 		fmt.Fprintf(c.debugOut, "response body: %s\n", respBody)
 	}
 
+	if httpResp.StatusCode < http.StatusOK || httpResp.StatusCode >= http.StatusMultipleChoices {
+		message := fmt.Sprintf("unexpected HTTP status %s", httpResp.Status)
+		if bodyText := strings.TrimSpace(string(respBody)); bodyText != "" {
+			message += ": " + bodyText
+		}
+		return nil, errors.New(message)
+	}
+
 	var resp TaskResponse
 	if err := json.Unmarshal(respBody, &resp); err != nil {
 		return nil, fmt.Errorf("decode response: %w", err)

@@ -161,3 +161,46 @@ func TestExecuteReturnsTaskExecutionErrorOnFailedStatus(t *testing.T) {
 		t.Fatalf("unexpected execution error: %+v", execErr)
 	}
 }
+
+func TestExecuteReturnsHTTPErrorForNon2xxResponses(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusBadGateway)
+		io.WriteString(w, "upstream failed")
+	}))
+	defer server.Close()
+
+	client, err := NewClient(ClientConfig{BaseURL: server.URL, Username: "adp", Password: "secret"})
+	if err != nil {
+		t.Fatalf("NewClient error: %v", err)
+	}
+
+	_, err = client.execute(context.Background(), "/executeAdpTask", rawTaskRequest{TaskType: "List Entities"})
+	if err == nil {
+		t.Fatal("expected error")
+	}
+
+	if got := err.Error(); got != "unexpected HTTP status 502 Bad Gateway: upstream failed" {
+		t.Fatalf("error = %q", got)
+	}
+}
+
+func TestExecuteReturnsDecodeErrorForMalformedResponseBody(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		io.WriteString(w, "not-json")
+	}))
+	defer server.Close()
+
+	client, err := NewClient(ClientConfig{BaseURL: server.URL, Username: "adp", Password: "secret"})
+	if err != nil {
+		t.Fatalf("NewClient error: %v", err)
+	}
+
+	_, err = client.execute(context.Background(), "/executeAdpTask", rawTaskRequest{TaskType: "List Entities"})
+	if err == nil {
+		t.Fatal("expected error")
+	}
+
+	if got := err.Error(); got != "decode response: invalid character 'o' in literal null (expecting 'u')" {
+		t.Fatalf("error = %q", got)
+	}
+}
