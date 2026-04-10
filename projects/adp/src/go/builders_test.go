@@ -2,6 +2,7 @@ package adp
 
 import (
 	"context"
+	"encoding/json"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -99,6 +100,27 @@ func TestQueryEngineRejectsEmptyEngineName(t *testing.T) {
 
 func TestQueryEngineBuildsTaxonomyFiltersAndDecodesResult(t *testing.T) {
 	client := testClientForBuilder(t, func(w http.ResponseWriter, r *http.Request) {
+		var req rawTaskRequest
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			t.Fatalf("Decode request error: %v", err)
+		}
+		if req.TaskConfiguration["adp_queryEngine_engineName"] != "engineA" {
+			t.Fatalf("engineName = %#v", req.TaskConfiguration["adp_queryEngine_engineName"])
+		}
+
+		taxonomies, ok := req.TaskConfiguration["adp_queryEngine_engineTaxonomies"].([]any)
+		if !ok || len(taxonomies) != 1 {
+			t.Fatalf("engineTaxonomies = %#v", req.TaskConfiguration["adp_queryEngine_engineTaxonomies"])
+		}
+
+		taxonomy, ok := taxonomies[0].(map[string]any)
+		if !ok {
+			t.Fatalf("taxonomy = %#v", taxonomies[0])
+		}
+		if taxonomy["taxonomy"] != "rm_mimetype" || taxonomy["query"] != "pdf" || taxonomy["negation"] != false {
+			t.Fatalf("taxonomy = %#v", taxonomy)
+		}
+
 		io.WriteString(w, `{"executionId":"6","taskType":"Query Engine","loggingEnabled":"true","progressMax":1,"executionStatus":"success","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":1,"progressPercentage":1.0,"taskDisplayName":"Query engine","executionMetaData":{"adp_query_engine_documents_count":"100","adp_query_engine_aggregated_value":"500"}}`)
 	})
 
@@ -112,4 +134,25 @@ func TestQueryEngineBuildsTaxonomyFiltersAndDecodesResult(t *testing.T) {
 	if got.DocumentsCount != 100 || got.AggregatedValue != "500" {
 		t.Fatalf("got = %#v", got)
 	}
+}
+
+func TestDecodeQueryEngineRequiresExpectedMetadataFields(t *testing.T) {
+	t.Run("documents count must be string", func(t *testing.T) {
+		_, err := decodeQueryEngine(map[string]any{
+			"adp_query_engine_documents_count":  100,
+			"adp_query_engine_aggregated_value": "500",
+		})
+		if err == nil || err.Error() != "adp_query_engine_documents_count must be a string" {
+			t.Fatalf("err = %v", err)
+		}
+	})
+
+	t.Run("aggregated value is required", func(t *testing.T) {
+		_, err := decodeQueryEngine(map[string]any{
+			"adp_query_engine_documents_count": "100",
+		})
+		if err == nil || err.Error() != "missing adp_query_engine_aggregated_value" {
+			t.Fatalf("err = %v", err)
+		}
+	})
 }
