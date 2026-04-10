@@ -20,6 +20,10 @@ type rawTaskRequest struct {
 	TaskDisplayName   string         `json:"taskDisplayName,omitempty"`
 }
 
+type statusRequest struct {
+	ExecutionID string `json:"executionId"`
+}
+
 type ClientConfig struct {
 	BaseURL  string
 	Username string
@@ -131,4 +135,93 @@ func (c *Client) execute(ctx context.Context, endpoint string, req rawTaskReques
 	}
 
 	return &resp, nil
+}
+
+func (c *Client) Poll(ctx context.Context, executionID string) (*TaskResponse, error) {
+	body, err := json.Marshal(statusRequest{ExecutionID: executionID})
+	if err != nil {
+		return nil, fmt.Errorf("marshal request: %w", err)
+	}
+
+	if c.debug {
+		fmt.Fprintf(c.debugOut, "request body: %s\n", body)
+	}
+
+	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPut, c.baseURL+"/statusAndProgress", bytes.NewReader(body))
+	if err != nil {
+		return nil, fmt.Errorf("build request: %w", err)
+	}
+	httpReq.Header.Set("Content-Type", "application/json")
+	httpReq.Header.Set("Auth-Username", c.username)
+	httpReq.Header.Set("Auth-Password", c.password)
+
+	httpResp, err := c.httpClient.Do(httpReq)
+	if err != nil {
+		return nil, fmt.Errorf("execute request: %w", err)
+	}
+	defer httpResp.Body.Close()
+
+	respBody, err := io.ReadAll(httpResp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("read response: %w", err)
+	}
+
+	if c.debug {
+		fmt.Fprintf(c.debugOut, "response body: %s\n", respBody)
+	}
+
+	if httpResp.StatusCode < http.StatusOK || httpResp.StatusCode >= http.StatusMultipleChoices {
+		message := fmt.Sprintf("unexpected HTTP status %s", httpResp.Status)
+		if bodyText := strings.TrimSpace(string(respBody)); bodyText != "" {
+			message += ": " + bodyText
+		}
+		return nil, errors.New(message)
+	}
+
+	var resp TaskResponse
+	if err := json.Unmarshal(respBody, &resp); err != nil {
+		return nil, fmt.Errorf("decode response: %w", err)
+	}
+
+	if resp.ExecutionStatus == "failed" {
+		return nil, &TaskExecutionError{
+			ExecutionID:       resp.ExecutionID,
+			TaskType:          resp.TaskType,
+			ExecutionStatus:   resp.ExecutionStatus,
+			ErrorMessage:      resp.ErrorMessage,
+			ExecutionMetaData: resp.ExecutionMetaData,
+		}
+	}
+
+	return &resp, nil
+}
+
+func (c *Client) Wait(ctx context.Context, executionID string, interval time.Duration) (*TaskResponse, error) {
+	if interval <= 0 {
+		interval = time.Second
+	}
+
+	for {
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
+
+		resp, err := c.Poll(ctx, executionID)
+		if err != nil {
+			return nil, err
+		}
+		if resp.ExecutionStatus == "success" {
+			return resp, nil
+		}
+
+		timer := time.NewTimer(interval)
+		select {
+		case <-ctx.Done():
+			if !timer.Stop() {
+				<-timer.C
+			}
+			return nil, ctx.Err()
+		case <-timer.C:
+		}
+	}
 }

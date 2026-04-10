@@ -2,6 +2,7 @@ package adp
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"io"
 	"net/http"
@@ -203,5 +204,61 @@ func TestExecuteReturnsDecodeErrorForMalformedResponseBody(t *testing.T) {
 
 	if got := err.Error(); !strings.HasPrefix(got, "decode response:") {
 		t.Fatalf("error = %q", got)
+	}
+}
+
+func TestPollSendsExecutionID(t *testing.T) {
+	var gotBody map[string]any
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if err := json.NewDecoder(r.Body).Decode(&gotBody); err != nil {
+			t.Fatalf("decode request body: %v", err)
+		}
+		io.WriteString(w, `{"executionId":"3","taskType":"Create OCR Job","loggingEnabled":"true","progressMax":1,"executionStatus":"running","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":0,"progressPercentage":0.0,"taskDisplayName":"Create OCR Job","executionMetaData":[]}`)
+	}))
+	defer server.Close()
+
+	client, err := NewClient(ClientConfig{BaseURL: server.URL, Username: "adp", Password: "secret"})
+	if err != nil {
+		t.Fatalf("NewClient error: %v", err)
+	}
+
+	_, err = client.Poll(context.Background(), "abc-123")
+	if err != nil {
+		t.Fatalf("Poll error: %v", err)
+	}
+
+	if gotBody["executionId"] != "abc-123" {
+		t.Fatalf("executionId body = %#v", gotBody["executionId"])
+	}
+}
+
+func TestWaitPollsUntilTerminalSuccess(t *testing.T) {
+	calls := 0
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		calls++
+		if calls == 1 {
+			io.WriteString(w, `{"executionId":"4","taskType":"Create OCR Job","loggingEnabled":"true","progressMax":1,"executionStatus":"running","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":0,"progressPercentage":0.0,"taskDisplayName":"Create OCR Job","executionMetaData":[]}`)
+			return
+		}
+		io.WriteString(w, `{"executionId":"4","taskType":"Create OCR Job","loggingEnabled":"true","progressMax":1,"executionStatus":"success","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":1,"progressPercentage":1.0,"taskDisplayName":"Create OCR Job","executionMetaData":[]}`)
+	}))
+	defer server.Close()
+
+	client, err := NewClient(ClientConfig{BaseURL: server.URL, Username: "adp", Password: "secret"})
+	if err != nil {
+		t.Fatalf("NewClient error: %v", err)
+	}
+
+	resp, err := client.Wait(context.Background(), "4", time.Millisecond)
+	if err != nil {
+		t.Fatalf("Wait error: %v", err)
+	}
+	if resp.ExecutionStatus != "success" {
+		t.Fatalf("status = %q, want success", resp.ExecutionStatus)
+	}
+	if calls != 2 {
+		t.Fatalf("calls = %d, want 2", calls)
 	}
 }
