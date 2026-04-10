@@ -262,3 +262,24 @@ func TestWaitPollsUntilTerminalSuccess(t *testing.T) {
 		t.Fatalf("calls = %d, want 2", calls)
 	}
 }
+
+func TestPollReturnsProtocolErrorForMissingExecutionStatus(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		io.WriteString(w, `{}`)
+	}))
+	defer server.Close()
+
+	client, err := NewClient(ClientConfig{BaseURL: server.URL, Username: "adp", Password: "secret"})
+	if err != nil {
+		t.Fatalf("NewClient error: %v", err)
+	}
+
+	_, err = client.Poll(context.Background(), "abc-123")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+
+	if got := err.Error(); got != "invalid polling response: missing executionStatus" {
+		t.Fatalf("error = %q", got)
+	}
+}

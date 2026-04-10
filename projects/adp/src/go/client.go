@@ -182,6 +182,9 @@ func (c *Client) Poll(ctx context.Context, executionID string) (*TaskResponse, e
 	if err := json.Unmarshal(respBody, &resp); err != nil {
 		return nil, fmt.Errorf("decode response: %w", err)
 	}
+	if resp.ExecutionStatus == "" {
+		return nil, errors.New("invalid polling response: missing executionStatus")
+	}
 
 	if resp.ExecutionStatus == "failed" {
 		return nil, &TaskExecutionError{
