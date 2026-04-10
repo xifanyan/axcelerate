@@ -22,8 +22,30 @@ func TestParseEngineTaxonomyArgNotEquals(t *testing.T) {
 	}
 }
 
+func TestParseEngineTaxonomyArgTrimsWhitespace(t *testing.T) {
+	got, err := parseEngineTaxonomyArg(" rm_source != email ")
+	if err != nil {
+		t.Fatalf("parseEngineTaxonomyArg error: %v", err)
+	}
+	if got.Taxonomy != "rm_source" || !got.Negation || got.Query != "email" {
+		t.Fatalf("got = %#v", got)
+	}
+}
+
 func TestParseEngineTaxonomyArgInvalid(t *testing.T) {
 	_, err := parseEngineTaxonomyArg("rm_source")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
+func TestParseEngineTaxonomyArgRejectsTrimmedEmptyValues(t *testing.T) {
+	_, err := parseEngineTaxonomyArg("  != value ")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+
+	_, err = parseEngineTaxonomyArg(" taxonomy =   ")
 	if err == nil {
 		t.Fatal("expected error")
 	}
@@ -44,7 +66,7 @@ func TestParseOutputTaxonomiesCSV(t *testing.T) {
 	if err != nil {
 		t.Fatalf("parseOutputTaxonomies error: %v", err)
 	}
-	if len(got) != 2 || got[0].Mode != "Category counts" || got[0].MaximumNumberOfCategories != 10 {
+	if len(got) != 2 || got[0].Taxonomy != "rm_source" || got[0].Mode != "Category counts" || got[0].MaximumNumberOfCategories != 10 || got[1].Taxonomy != "meta_documentcharacteristics" || got[1].Mode != "Category counts" || got[1].MaximumNumberOfCategories != 10 {
 		t.Fatalf("got = %#v", got)
 	}
 }
@@ -64,7 +86,7 @@ func TestParseConfigArgsJSON(t *testing.T) {
 	if err != nil {
 		t.Fatalf("parseConfigArgs error: %v", err)
 	}
-	if len(got) != 1 || got[0].ConfigurationID != "dataSource.file_demo_01" {
+	if len(got) != 1 || got[0].ConfigurationID != "dataSource.file_demo_01" || got[0].DynamicComponentNames != "x" || got[0].FieldList != "name,value" || got[0].NameValueList != "crawlLocationClassifierRules" || got[0].ApplicationType != "" || got[0].EntityType != "" {
 		t.Fatalf("got = %#v", got)
 	}
 }
@@ -84,7 +106,7 @@ func TestParseBatchScriptParametersJSON(t *testing.T) {
 	if err != nil {
 		t.Fatalf("parseBatchScriptParameters error: %v", err)
 	}
-	if len(got) != 2 || got[1].Parameter != "c:/demo/test.ps1" {
+	if len(got) != 2 || got[0].Parameter != "-File" || got[1].Parameter != "c:/demo/test.ps1" {
 		t.Fatalf("got = %#v", got)
 	}
 }

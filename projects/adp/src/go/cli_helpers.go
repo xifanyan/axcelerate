@@ -14,15 +14,25 @@ func parseEngineTaxonomyArg(input string) (EngineTaxonomyArg, error) {
 		{value: "!=", negation: true},
 		{value: "=", negation: false},
 	} {
+		if separator.value == "=" && strings.Contains(input, "!=") {
+			continue
+		}
+
 		parts := strings.SplitN(input, separator.value, 2)
-		if len(parts) != 2 || parts[0] == "" || parts[1] == "" {
+		if len(parts) != 2 {
+			continue
+		}
+
+		taxonomy := strings.TrimSpace(parts[0])
+		query := strings.TrimSpace(parts[1])
+		if taxonomy == "" || query == "" {
 			continue
 		}
 
 		return EngineTaxonomyArg{
-			Taxonomy: parts[0],
+			Taxonomy: taxonomy,
 			Negation: separator.negation,
-			Query:    parts[1],
+			Query:    query,
 		}, nil
 	}
 
