@@ -156,3 +156,27 @@ func TestDecodeQueryEngineRequiresExpectedMetadataFields(t *testing.T) {
 		}
 	})
 }
+
+func TestTaxonomyStatisticRequiresEngineName(t *testing.T) {
+	client := testClientForBuilder(t, func(w http.ResponseWriter, r *http.Request) {})
+	_, err := NewTaxonomyStatisticBuilder(client).Execute(context.Background())
+	if err == nil || err.Error() != "engineName is required" {
+		t.Fatalf("err = %v", err)
+	}
+}
+
+func TestTaxonomyStatisticDecodesStatisticsDocument(t *testing.T) {
+	client := testClientForBuilder(t, func(w http.ResponseWriter, r *http.Request) {
+		io.WriteString(w, `{"executionId":"7","taskType":"Taxonomy Statistic","loggingEnabled":"true","progressMax":1,"executionStatus":"success","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":1,"progressPercentage":1.0,"taskDisplayName":"Taxonomy statistic","executionMetaData":{"adp_taxonomy_statistics_json_file_path":"taxonomy_stats.json","adp_taxonomy_statistics_json_output":"{\"date\":\"Wed\",\"searchParameter\":[],\"statistics\":{\"taxonomy\":[{\"id\":\"rm_source\",\"category\":[{\"id\":\"file_demo_04\",\"displayName\":\"file_demo_04\",\"count\":761}]}]}}"}}`)
+	})
+
+	got, err := NewTaxonomyStatisticBuilder(client).
+		EngineName("engineA").
+		Execute(context.Background())
+	if err != nil {
+		t.Fatalf("Execute error: %v", err)
+	}
+	if got.OutputFile != "taxonomy_stats.json" || len(got.Statistics.Statistics.Taxonomy) != 1 {
+		t.Fatalf("got = %#v", got)
+	}
+}
