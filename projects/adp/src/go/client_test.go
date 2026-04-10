@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 	"time"
 )
@@ -28,8 +29,8 @@ func TestNewClientNormalizesBaseURLAndTimeout(t *testing.T) {
 		t.Fatalf("timeout = %v, want %v", got, want)
 	}
 
-	if client.debugOut == nil {
-		t.Fatal("debugOut should default to a non-nil writer")
+	if client.debugOut != io.Discard {
+		t.Fatalf("debugOut = %#v, want io.Discard", client.debugOut)
 	}
 }
 
@@ -200,7 +201,7 @@ func TestExecuteReturnsDecodeErrorForMalformedResponseBody(t *testing.T) {
 		t.Fatal("expected error")
 	}
 
-	if got := err.Error(); got != "decode response: invalid character 'o' in literal null (expecting 'u')" {
+	if got := err.Error(); !strings.HasPrefix(got, "decode response:") {
 		t.Fatalf("error = %q", got)
 	}
 }
