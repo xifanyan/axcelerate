@@ -263,9 +263,9 @@ func TestWaitPollsUntilTerminalSuccess(t *testing.T) {
 	}
 }
 
-func TestPollReturnsProtocolErrorForMissingExecutionStatus(t *testing.T) {
+func TestPollReturnsProtocolErrorForEmptyExecutionStatus(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		io.WriteString(w, `{}`)
+		io.WriteString(w, `{"executionId":"5","taskType":"Create OCR Job","loggingEnabled":"true","progressMax":1,"executionStatus":"","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":0,"progressPercentage":0.0,"taskDisplayName":"Create OCR Job","executionMetaData":[]}`)
 	}))
 	defer server.Close()
 
