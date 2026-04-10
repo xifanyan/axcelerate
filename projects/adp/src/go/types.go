@@ -129,7 +129,7 @@ type CLIBatchParameter struct {
 }
 
 type builderCommon[B any] struct {
-	self                B
+	owner               *B
 	taskActive          *bool
 	taskTimeout         *int
 	executionPersistent *bool
@@ -138,38 +138,38 @@ type builderCommon[B any] struct {
 	cleanUpHistory      *bool
 }
 
-func newBuilderCommon[B any](self B) builderCommon[B] {
-	return builderCommon[B]{self: self}
+func newBuilderCommon[B any](owner *B) builderCommon[B] {
+	return builderCommon[B]{owner: owner}
 }
 
-func (b *builderCommon[B]) TaskActive(value bool) B {
+func (b *builderCommon[B]) TaskActive(value bool) *B {
 	b.taskActive = &value
-	return b.self
+	return b.owner
 }
 
-func (b *builderCommon[B]) TaskTimeout(value int) B {
+func (b *builderCommon[B]) TaskTimeout(value int) *B {
 	b.taskTimeout = &value
-	return b.self
+	return b.owner
 }
 
-func (b *builderCommon[B]) ExecutionPersistent(value bool) B {
+func (b *builderCommon[B]) ExecutionPersistent(value bool) *B {
 	b.executionPersistent = &value
-	return b.self
+	return b.owner
 }
 
-func (b *builderCommon[B]) AbortWfOnFailure(value bool) B {
+func (b *builderCommon[B]) AbortWfOnFailure(value bool) *B {
 	b.abortWfOnFailure = &value
-	return b.self
+	return b.owner
 }
 
-func (b *builderCommon[B]) LoggingEnabled(value bool) B {
+func (b *builderCommon[B]) LoggingEnabled(value bool) *B {
 	b.loggingEnabled = &value
-	return b.self
+	return b.owner
 }
 
-func (b *builderCommon[B]) CleanUpHistory(value bool) B {
+func (b *builderCommon[B]) CleanUpHistory(value bool) *B {
 	b.cleanUpHistory = &value
-	return b.self
+	return b.owner
 }
 
 func (b builderCommon[B]) apply(dst map[string]any) {
