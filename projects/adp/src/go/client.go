@@ -28,7 +28,8 @@ type Client struct {
 }
 
 func NewClient(cfg ClientConfig) (*Client, error) {
-	if strings.TrimSpace(cfg.BaseURL) == "" {
+	baseURL := strings.TrimSpace(cfg.BaseURL)
+	if baseURL == "" {
 		return nil, errors.New("base URL is required")
 	}
 	if strings.TrimSpace(cfg.Username) == "" {
@@ -49,7 +50,7 @@ func NewClient(cfg ClientConfig) (*Client, error) {
 	}
 
 	return &Client{
-		baseURL:    strings.TrimRight(cfg.BaseURL, "/"),
+		baseURL:    strings.TrimRight(baseURL, "/"),
 		username:   cfg.Username,
 		password:   cfg.Password,
 		httpClient: &http.Client{Timeout: timeout},
