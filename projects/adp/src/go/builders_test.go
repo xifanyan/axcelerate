@@ -212,3 +212,50 @@ func TestTaxonomyStatisticDecodesStatisticsDocument(t *testing.T) {
 		t.Fatalf("got = %#v", got)
 	}
 }
+
+func TestStartApplicationDecodesURL(t *testing.T) {
+	client := testClientForBuilder(t, func(w http.ResponseWriter, r *http.Request) {
+		io.WriteString(w, `{"executionId":"8","taskType":"Start Application","loggingEnabled":"true","progressMax":1,"executionStatus":"success","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":1,"progressPercentage":1.0,"taskDisplayName":"Start application","executionMetaData":{"adp_started_application_url":"https://example/app"}}`)
+	})
+
+	got, err := NewStartApplicationBuilder(client).ApplicationIdentifier("app").Execute(context.Background())
+	if err != nil {
+		t.Fatalf("Execute error: %v", err)
+	}
+	if got.ApplicationURL != "https://example/app" {
+		t.Fatalf("got = %#v", got)
+	}
+}
+
+func TestExportDocumentsDecodesCounts(t *testing.T) {
+	client := testClientForBuilder(t, func(w http.ResponseWriter, r *http.Request) {
+		io.WriteString(w, `{"executionId":"9","taskType":"Export Documents","loggingEnabled":"true","progressMax":1,"executionStatus":"success","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":1,"progressPercentage":1.0,"taskDisplayName":"Export documents task","executionMetaData":{"adp_exportDocuments_exportFileName":"export.csv","adp_exportDocuments_exportPath":"/tmp/export.csv","adp_exportDocuments_searchResultSize":"1000"}}`)
+	})
+
+	got, err := NewExportDocumentsBuilder(client).Query("*").Execute(context.Background())
+	if err != nil {
+		t.Fatalf("Execute error: %v", err)
+	}
+	if got.SearchResultSize != 1000 {
+		t.Fatalf("got = %#v", got)
+	}
+}
+
+func TestCSVMergeRequiresCSVFileAndAcceptsEmptyArrayMetadata(t *testing.T) {
+	client := testClientForBuilder(t, func(w http.ResponseWriter, r *http.Request) {
+		io.WriteString(w, `{"executionId":"10","taskType":"CSV Merge","loggingEnabled":"true","progressMax":2,"executionStatus":"success","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":2,"progressPercentage":1.0,"taskDisplayName":"Csv merge task","executionMetaData":[]}`)
+	})
+
+	_, err := NewCSVMergeBuilder(client).Execute(context.Background())
+	if err == nil || err.Error() != "csvFile is required" {
+		t.Fatalf("err = %v", err)
+	}
+
+	got, err := NewCSVMergeBuilder(client).CSVFile("/tmp/data.csv").Execute(context.Background())
+	if err != nil {
+		t.Fatalf("Execute error: %v", err)
+	}
+	if got != (CSVMergeResult{}) {
+		t.Fatalf("got = %#v", got)
+	}
+}
