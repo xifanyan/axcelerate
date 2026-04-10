@@ -88,6 +88,15 @@ func TestQueryEngineRequiresEngineName(t *testing.T) {
 	}
 }
 
+func TestQueryEngineRejectsEmptyEngineName(t *testing.T) {
+	client := testClientForBuilder(t, func(w http.ResponseWriter, r *http.Request) {})
+
+	_, err := NewQueryEngineBuilder(client).EngineName("").Execute(context.Background())
+	if err == nil || err.Error() != "engineName is required" {
+		t.Fatalf("err = %v", err)
+	}
+}
+
 func TestQueryEngineBuildsTaxonomyFiltersAndDecodesResult(t *testing.T) {
 	client := testClientForBuilder(t, func(w http.ResponseWriter, r *http.Request) {
 		io.WriteString(w, `{"executionId":"6","taskType":"Query Engine","loggingEnabled":"true","progressMax":1,"executionStatus":"success","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":1,"progressPercentage":1.0,"taskDisplayName":"Query engine","executionMetaData":{"adp_query_engine_documents_count":"100","adp_query_engine_aggregated_value":"500"}}`)

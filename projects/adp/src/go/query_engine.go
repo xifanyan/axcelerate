@@ -61,7 +61,7 @@ func (b *QueryEngineBuilder) ApplicationIdentifier(value string) *QueryEngineBui
 }
 
 func (b *QueryEngineBuilder) buildRequest() (rawTaskRequest, error) {
-	if b.engineName == nil {
+	if b.engineName == nil || *b.engineName == "" {
 		return rawTaskRequest{}, errors.New("engineName is required")
 	}
 
