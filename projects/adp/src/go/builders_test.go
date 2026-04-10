@@ -165,6 +165,38 @@ func TestTaxonomyStatisticRequiresEngineName(t *testing.T) {
 	}
 }
 
+func TestTaxonomyStatisticBuildRequestSerializesBoolFlagsAsStringsAndOmitsUnsetFields(t *testing.T) {
+	client := testClientForBuilder(t, func(w http.ResponseWriter, r *http.Request) {})
+
+	req, err := NewTaxonomyStatisticBuilder(client).
+		EngineName("engineA").
+		ComputeCounts(true).
+		ListCategoryProperties(false).
+		buildRequest()
+	if err != nil {
+		t.Fatalf("buildRequest error: %v", err)
+	}
+
+	if got := req.TaskConfiguration["adp_taxonomyStatistic_computeCounts"]; got != "true" {
+		t.Fatalf("computeCounts = %#v", got)
+	}
+	if got := req.TaskConfiguration["adp_taxonomyStatistic_listCategoryProperties"]; got != "false" {
+		t.Fatalf("listCategoryProperties = %#v", got)
+	}
+	if _, ok := req.TaskConfiguration["adp_taxonomyStatistic_engineQuery"]; ok {
+		t.Fatalf("engineQuery should be omitted: %#v", req.TaskConfiguration)
+	}
+	if _, ok := req.TaskConfiguration["adp_taxonomyStatistic_engineTaxonomies"]; ok {
+		t.Fatalf("engineTaxonomies should be omitted: %#v", req.TaskConfiguration)
+	}
+	if _, ok := req.TaskConfiguration["adp_taxonomyStatistic_outputTaxonomies"]; ok {
+		t.Fatalf("outputTaxonomies should be omitted: %#v", req.TaskConfiguration)
+	}
+	if _, ok := req.TaskConfiguration["adp_taxonomyStatistic_applicationIdentifier"]; ok {
+		t.Fatalf("applicationIdentifier should be omitted: %#v", req.TaskConfiguration)
+	}
+}
+
 func TestTaxonomyStatisticDecodesStatisticsDocument(t *testing.T) {
 	client := testClientForBuilder(t, func(w http.ResponseWriter, r *http.Request) {
 		io.WriteString(w, `{"executionId":"7","taskType":"Taxonomy Statistic","loggingEnabled":"true","progressMax":1,"executionStatus":"success","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":1,"progressPercentage":1.0,"taskDisplayName":"Taxonomy statistic","executionMetaData":{"adp_taxonomy_statistics_json_file_path":"taxonomy_stats.json","adp_taxonomy_statistics_json_output":"{\"date\":\"Wed\",\"searchParameter\":[],\"statistics\":{\"taxonomy\":[{\"id\":\"rm_source\",\"category\":[{\"id\":\"file_demo_04\",\"displayName\":\"file_demo_04\",\"count\":761}]}]}}"}}`)
