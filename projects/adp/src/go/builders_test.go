@@ -40,6 +40,29 @@ func TestListEntitiesBuildRequestIsSparse(t *testing.T) {
 	if req.TaskConfiguration["adp_listEntities_type"] != "singleMindServer" {
 		t.Fatalf("missing type mapping: %#v", req.TaskConfiguration)
 	}
+	if req.TaskConfiguration["adp_listEntities_whiteList"] != "id,displayName,processStatus" {
+		t.Fatalf("missing whitelist mapping: %#v", req.TaskConfiguration)
+	}
+}
+
+func TestListEntitiesBuildRequestIncludesCommonBuilderFields(t *testing.T) {
+	client := testClientForBuilder(t, func(w http.ResponseWriter, r *http.Request) {})
+
+	req, err := NewListEntitiesBuilder(client).
+		Type("singleMindServer").
+		LoggingEnabled(false).
+		TaskTimeout(45).
+		buildRequest()
+	if err != nil {
+		t.Fatalf("buildRequest error: %v", err)
+	}
+
+	if req.TaskConfiguration["adp_loggingEnabled"] != false {
+		t.Fatalf("missing common logging mapping: %#v", req.TaskConfiguration)
+	}
+	if req.TaskConfiguration["adp_taskTimeout"] != 45 {
+		t.Fatalf("missing common timeout mapping: %#v", req.TaskConfiguration)
+	}
 }
 
 func TestListEntitiesExecuteDecodesEntities(t *testing.T) {
