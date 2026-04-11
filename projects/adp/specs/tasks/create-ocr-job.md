@@ -36,6 +36,9 @@ These are the user-facing fields for the request-construction API.
 | mainQueryType | string | null | No | Main query type |
 
 > engineName and applicationIdentifier are mutually exclusive selectors. Exactly one must be provided.
+>
+> When applicationIdentifier is used, the client still treats it as the single effective selector, but for live ADP compatibility it explicitly serializes engineName as an empty string to clear the server-side default.
+> Application-selected requests intentionally include `adp_createOcrJob_engineName: ""` alongside `adp_createOcrJob_applicationIdentifier` for live ADP compatibility.
 
 ---
 
@@ -210,6 +213,8 @@ See [cli.md](../cli.md) for global flags and naming conventions.
 | `--advancedRestrictions` | string | "" | Advanced restrictions (format: `Taxonomy=Query`) |
 
 > engineName and applicationIdentifier are mutually exclusive selectors. Exactly one must be provided.
+>
+> When `--applicationIdentifier` is used, generated requests still treat it as the single effective selector and intentionally include `adp_createOcrJob_engineName: ""` to clear the live ADP server default.
 
 ### CLI Examples
 
