@@ -26,6 +26,10 @@ These are the user-facing fields for the request-construction API.
 | applicationIdentifier | string | "" | Conditional | Application identifier |
 
 > engineName and applicationIdentifier are mutually exclusive selectors. Exactly one must be provided.
+>
+> When applicationIdentifier is used, the client still treats it as the single effective selector, but for live ADP compatibility it explicitly serializes engineName as an empty string to clear the server-side default.
+> This is a task-specific exception to the normal sparse-request rule described in [request-construction.md](../request-construction.md).
+> Application-selected requests intentionally include `adp_taxonomyStatistic_engineName: ""` alongside `adp_taxonomyStatistic_applicationIdentifier` for live ADP compatibility.
 
 ### EngineTaxonomyArg
 
@@ -172,6 +176,8 @@ See [cli.md](../cli.md) for global flags and naming conventions.
 | `--applicationIdentifier` | string | "" | Application identifier |
 
 > engineName and applicationIdentifier are mutually exclusive selectors. Exactly one must be provided.
+>
+> The same task-specific exception to the normal sparse-request rule applies to CLI-generated requests: when `--applicationIdentifier` is used, generated requests intentionally include `adp_taxonomyStatistic_engineName: ""` alongside `adp_taxonomyStatistic_applicationIdentifier` for live ADP compatibility.
 
 ### EngineTaxonomiesArg CLI Format
 

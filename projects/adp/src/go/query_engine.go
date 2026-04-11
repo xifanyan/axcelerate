@@ -74,6 +74,10 @@ func (b *QueryEngineBuilder) buildRequest() (rawTaskRequest, error) {
 	if hasEngine {
 		cfg["adp_queryEngine_engineName"] = *b.engineName
 	}
+	if hasApplication {
+		cfg["adp_queryEngine_engineName"] = ""
+		cfg["adp_queryEngine_applicationIdentifier"] = *b.applicationIdentifier
+	}
 	if b.engineQuery != nil {
 		cfg["adp_queryEngine_engineQuery"] = *b.engineQuery
 	}
@@ -85,9 +89,6 @@ func (b *QueryEngineBuilder) buildRequest() (rawTaskRequest, error) {
 	}
 	if b.engineTaxonomies != nil {
 		cfg["adp_queryEngine_engineTaxonomies"] = *b.engineTaxonomies
-	}
-	if hasApplication {
-		cfg["adp_queryEngine_applicationIdentifier"] = *b.applicationIdentifier
 	}
 	b.apply(cfg)
 

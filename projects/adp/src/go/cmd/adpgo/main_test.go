@@ -427,7 +427,12 @@ func TestQueryEngineCommandRejectsBothSelectors(t *testing.T) {
 func TestQueryEngineCommandAllowsApplicationIdentifier(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		cfg := decodeTaskConfiguration(t, r)
-		assertApplicationSelectorOnly(t, cfg, "adp_queryEngine_applicationIdentifier", "adp_queryEngine_engineName")
+		if got := cfg["adp_queryEngine_applicationIdentifier"]; got != "appA" {
+			t.Fatalf("adp_queryEngine_applicationIdentifier = %#v", got)
+		}
+		if got := cfg["adp_queryEngine_engineName"]; got != "" {
+			t.Fatalf("adp_queryEngine_engineName = %#v", got)
+		}
 
 		_, _ = io.WriteString(w, `{"executionId":"2","taskType":"Query Engine","loggingEnabled":"true","progressMax":1,"executionStatus":"success","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":1,"progressPercentage":1.0,"taskDisplayName":"Query engine","executionMetaData":{"adp_query_engine_documents_count":"100","adp_query_engine_aggregated_value":"500"}}`)
 	}))
@@ -600,7 +605,12 @@ func TestTaxonomyStatisticCommandRejectsBothSelectors(t *testing.T) {
 func TestTaxonomyStatisticCommandAllowsApplicationIdentifier(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		cfg := decodeTaskConfiguration(t, r)
-		assertApplicationSelectorOnly(t, cfg, "adp_taxonomyStatistic_applicationIdentifier", "adp_taxonomyStatistic_engineName")
+		if got := cfg["adp_taxonomyStatistic_applicationIdentifier"]; got != "appA" {
+			t.Fatalf("adp_taxonomyStatistic_applicationIdentifier = %#v", got)
+		}
+		if got := cfg["adp_taxonomyStatistic_engineName"]; got != "" {
+			t.Fatalf("adp_taxonomyStatistic_engineName = %#v", got)
+		}
 
 		_, _ = io.WriteString(w, `{"executionId":"7","taskType":"Taxonomy Statistic","loggingEnabled":"true","progressMax":1,"executionStatus":"success","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":1,"progressPercentage":1.0,"taskDisplayName":"Taxonomy statistic","executionMetaData":{"adp_taxonomy_statistics_json_file_path":"taxonomy_stats.json","adp_taxonomy_statistics_json_output":"{\"date\":\"Wed\",\"searchParameter\":[],\"statistics\":{\"taxonomy\":[{\"id\":\"rm_source\",\"category\":[{\"id\":\"file_demo_04\",\"displayName\":\"file_demo_04\",\"count\":761}]}]}}"}}`)
 	}))
@@ -903,7 +913,12 @@ func TestCreateOcrJobCommandAllowsApplicationIdentifierWithoutEngineName(t *test
 			t.Fatalf("path = %q, want /executeAdpTaskAsync", r.URL.Path)
 		}
 		cfg := decodeTaskConfiguration(t, r)
-		assertApplicationSelectorOnly(t, cfg, "adp_createOcrJob_applicationIdentifier", "adp_createOcrJob_engineName")
+		if got := cfg["adp_createOcrJob_applicationIdentifier"]; got != "appA" {
+			t.Fatalf("adp_createOcrJob_applicationIdentifier = %#v", got)
+		}
+		if got := cfg["adp_createOcrJob_engineName"]; got != "" {
+			t.Fatalf("adp_createOcrJob_engineName = %#v", got)
+		}
 
 		_, _ = io.WriteString(w, `{"executionId":"ocr-123","taskType":"Create OCR Job","loggingEnabled":"true","progressMax":0,"executionStatus":"","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":0,"progressPercentage":0.0,"taskDisplayName":"Create OCR Job","executionMetaData":[]}`)
 	}))
