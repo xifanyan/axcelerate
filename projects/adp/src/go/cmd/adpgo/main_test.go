@@ -324,6 +324,7 @@ func TestQueryEngineCommandParsesTaxonomyFlags(t *testing.T) {
 		if !ok {
 			t.Fatalf("taskConfiguration type = %T", req["taskConfiguration"])
 		}
+		assertEngineSelectorOnly(t, cfg, "adp_queryEngine_engineName", "adp_queryEngine_applicationIdentifier")
 
 		rawTaxonomies, ok := cfg["adp_queryEngine_engineTaxonomies"].([]any)
 		if !ok {
@@ -504,6 +505,7 @@ func TestCSVMergeCommandParsesFieldMappingsJSON(t *testing.T) {
 		if !ok {
 			t.Fatalf("taskConfiguration type = %T", req["taskConfiguration"])
 		}
+		assertEngineSelectorOnly(t, cfg, "adp_csvMerge_engineName", "adp_csvMerge_applicationIdentifier")
 
 		fieldMappings, ok := cfg["adp_csvMerge_fieldMappings"].([]any)
 		if !ok {
@@ -778,6 +780,8 @@ func TestCreateOcrJobCommandStartsWithoutWaitingByDefault(t *testing.T) {
 	requests := make([]string, 0, 2)
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		requests = append(requests, r.URL.Path)
+		cfg := decodeTaskConfiguration(t, r)
+		assertEngineSelectorOnly(t, cfg, "adp_createOcrJob_engineName", "adp_createOcrJob_applicationIdentifier")
 		_, _ = io.WriteString(w, `{"executionId":"ocr-123","taskType":"Create OCR Job","loggingEnabled":"true","progressMax":0,"executionStatus":"","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":0,"progressPercentage":0.0,"taskDisplayName":"Create OCR Job","executionMetaData":[]}`)
 	}))
 	defer server.Close()
