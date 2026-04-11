@@ -114,7 +114,7 @@ These are the user-facing fields for the request-construction API.
 
 ## Raw Example Request
 
-> Example below shows a valid raw request example with exactly one selector.
+> Example below matches **exactly** the default configuration from [API-SPEC.md](../../API-SPEC.md).
 
 ```json
 {
@@ -132,7 +132,7 @@ These are the user-facing fields for the request-construction API.
     "adp_createOcrJob_AdvancedRestrictions": [],
     "adp_createOcrJob_globalSearchJson": "",
     "adp_createOcrJob_wait": "false",
-    "adp_createOcrJob_engineName": "myEngine",
+    "adp_createOcrJob_engineName": "",
     "adp_createOcrJob_jobDescription": "",
     "adp_createOcrJob_applicationIdentifier": "",
     "adp_createOcrJob_jobPriority": "10",

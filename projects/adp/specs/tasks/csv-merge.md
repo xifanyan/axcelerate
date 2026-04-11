@@ -165,7 +165,7 @@ These are the user-facing fields for the request-construction API.
 
 ## Raw Example Request
 
-> Example below shows a valid raw request example with exactly one selector.
+> Example below matches **exactly** the default configuration from [API-SPEC.md](../../API-SPEC.md).
 
 ```json
 {
@@ -174,7 +174,7 @@ These are the user-facing fields for the request-construction API.
     "adp_csvMerge_noUniqueMatch": "false",
     "adp_csvMerge_noFlushAfterMerge": "false",
     "adp_csvMerge_forceChange": "false",
-    "adp_csvMerge_engineName": "myEngine",
+    "adp_csvMerge_engineName": null,
     "adp_csvMerge_applicationIdentifier": "",
     "adp_csvMerge_mergeType": "Merge content",
     "adp_csvMerge_displayNameMappingErrorFile": null,
@@ -204,7 +204,7 @@ These are the user-facing fields for the request-construction API.
     "adp_abortWfOnFailure": true,
     "adp_csvMerge_customLineSeparator": "U+000DU+000A",
     "adp_csvMerge_multiValueDelimiter": null,
-    "adp_csvMerge_csvFile": "/path/to/data.csv",
+    "adp_csvMerge_csvFile": null,
     "adp_csvMerge_csvIdFieldKey": null,
     "adp_csvMerge_textFileRefIndicator": "",
     "adp_csvMerge_engineUser": null,
