@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"testing"
 )
 
@@ -467,15 +468,28 @@ func TestDecodeCLITaskAcceptsJSONNumber(t *testing.T) {
 }
 
 func TestCLITaskExecutePreservesLargeIntegerMetadataPrecision(t *testing.T) {
+	const cliResultText = "9007199254740993"
+
 	client := testClientForBuilder(t, func(w http.ResponseWriter, r *http.Request) {
-		io.WriteString(w, `{"executionId":"13","taskType":"CLI","loggingEnabled":"true","progressMax":1,"executionStatus":"success","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":1,"progressPercentage":1.0,"taskDisplayName":"Command Line Task","executionMetaData":{"cli_result":9007199254740993,"cli_error_path":"err.log","cli_result_path":"out.log"}}`)
+		io.WriteString(w, `{"executionId":"13","taskType":"CLI","loggingEnabled":"true","progressMax":1,"executionStatus":"success","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":1,"progressPercentage":1.0,"taskDisplayName":"Command Line Task","executionMetaData":{"cli_result":`+cliResultText+`,"cli_error_path":"err.log","cli_result_path":"out.log"}}`)
 	})
 
 	got, err := NewCLITaskBuilder(client).BatchScriptPath("c:/demo/script.ps1").Execute(context.Background())
+	if strconv.IntSize == 32 {
+		if err == nil || err.Error() != "cli_result out of range" {
+			t.Fatalf("err = %v", err)
+		}
+		return
+	}
+
 	if err != nil {
 		t.Fatalf("Execute error: %v", err)
 	}
-	if got.Result != 9007199254740993 {
+	expected, parseErr := strconv.ParseInt(cliResultText, 10, 64)
+	if parseErr != nil {
+		t.Fatalf("ParseInt error: %v", parseErr)
+	}
+	if int64(got.Result) != expected {
 		t.Fatalf("got = %#v", got)
 	}
 }
