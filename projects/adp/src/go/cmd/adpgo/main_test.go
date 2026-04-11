@@ -324,7 +324,7 @@ func TestQueryEngineCommandParsesTaxonomyFlags(t *testing.T) {
 		if !ok {
 			t.Fatalf("taskConfiguration type = %T", req["taskConfiguration"])
 		}
-		assertEngineSelectorOnly(t, cfg, "adp_queryEngine_engineName", "adp_queryEngine_applicationIdentifier")
+		assertEngineSelectorOnly(t, cfg, "adp_queryEngine_engineName", "adp_queryEngine_applicationIdentifier", "myEngine")
 
 		rawTaxonomies, ok := cfg["adp_queryEngine_engineTaxonomies"].([]any)
 		if !ok {
@@ -505,7 +505,7 @@ func TestCSVMergeCommandParsesFieldMappingsJSON(t *testing.T) {
 		if !ok {
 			t.Fatalf("taskConfiguration type = %T", req["taskConfiguration"])
 		}
-		assertEngineSelectorOnly(t, cfg, "adp_csvMerge_engineName", "adp_csvMerge_applicationIdentifier")
+		assertEngineSelectorOnly(t, cfg, "adp_csvMerge_engineName", "adp_csvMerge_applicationIdentifier", "engineA")
 
 		fieldMappings, ok := cfg["adp_csvMerge_fieldMappings"].([]any)
 		if !ok {
@@ -633,7 +633,7 @@ func TestTaxonomyStatisticCommandAllowsApplicationIdentifier(t *testing.T) {
 func TestTaxonomyStatisticCommandAllowsEngineName(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		cfg := decodeTaskConfiguration(t, r)
-		assertEngineSelectorOnly(t, cfg, "adp_taxonomyStatistic_engineName", "adp_taxonomyStatistic_applicationIdentifier")
+		assertEngineSelectorOnly(t, cfg, "adp_taxonomyStatistic_engineName", "adp_taxonomyStatistic_applicationIdentifier", "engineA")
 
 		_, _ = io.WriteString(w, `{"executionId":"7","taskType":"Taxonomy Statistic","loggingEnabled":"true","progressMax":1,"executionStatus":"success","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":1,"progressPercentage":1.0,"taskDisplayName":"Taxonomy statistic","executionMetaData":{"adp_taxonomy_statistics_json_file_path":"taxonomy_stats.json","adp_taxonomy_statistics_json_output":"{\"date\":\"Wed\",\"searchParameter\":[],\"statistics\":{\"taxonomy\":[{\"id\":\"rm_source\",\"category\":[{\"id\":\"file_demo_04\",\"displayName\":\"file_demo_04\",\"count\":761}]}]}}"}}`)
 	}))
@@ -781,7 +781,7 @@ func TestCreateOcrJobCommandStartsWithoutWaitingByDefault(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		requests = append(requests, r.URL.Path)
 		cfg := decodeTaskConfiguration(t, r)
-		assertEngineSelectorOnly(t, cfg, "adp_createOcrJob_engineName", "adp_createOcrJob_applicationIdentifier")
+		assertEngineSelectorOnly(t, cfg, "adp_createOcrJob_engineName", "adp_createOcrJob_applicationIdentifier", "engineA")
 		_, _ = io.WriteString(w, `{"executionId":"ocr-123","taskType":"Create OCR Job","loggingEnabled":"true","progressMax":0,"executionStatus":"","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":0,"progressPercentage":0.0,"taskDisplayName":"Create OCR Job","executionMetaData":[]}`)
 	}))
 	defer server.Close()
@@ -818,6 +818,8 @@ func TestCreateOcrJobCommandWaitsWhenRequested(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		requests = append(requests, r.URL.Path)
 		if len(requests) == 1 {
+			cfg := decodeTaskConfiguration(t, r)
+			assertEngineSelectorOnly(t, cfg, "adp_createOcrJob_engineName", "adp_createOcrJob_applicationIdentifier", "engineA")
 			_, _ = io.WriteString(w, `{"executionId":"ocr-123","taskType":"Create OCR Job","loggingEnabled":"true","progressMax":0,"executionStatus":"","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":0,"progressPercentage":0.0,"taskDisplayName":"Create OCR Job","executionMetaData":[]}`)
 			return
 		}
@@ -1076,10 +1078,10 @@ func assertApplicationSelectorOnly(t *testing.T, cfg map[string]any, application
 	}
 }
 
-func assertEngineSelectorOnly(t *testing.T, cfg map[string]any, engineKey, applicationKey string) {
+func assertEngineSelectorOnly(t *testing.T, cfg map[string]any, engineKey, applicationKey, wantEngine string) {
 	t.Helper()
 
-	if got := cfg[engineKey]; got != "engineA" {
+	if got := cfg[engineKey]; got != wantEngine {
 		t.Fatalf("%s = %#v", engineKey, got)
 	}
 	if _, ok := cfg[applicationKey]; ok {
