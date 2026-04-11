@@ -7,12 +7,23 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 
 	cli "github.com/urfave/cli/v3"
 	adp "github.com/xifanyan/axcelerate/adp"
 )
 
 const pollInterval = 0
+
+type cliConfigFile struct {
+	Host     *string `json:"host"`
+	Port     *int    `json:"port"`
+	Path     *string `json:"path"`
+	User     *string `json:"user"`
+	Password *string `json:"password"`
+	Insecure *bool   `json:"insecure"`
+	Debug    *bool   `json:"debug"`
+}
 
 func main() {
 	os.Exit(run(os.Stdout, os.Stderr, os.Args))
@@ -42,11 +53,11 @@ func newApp(stdout io.Writer, stderr io.Writer) *cli.Command {
 		ExitErrHandler: func(_ context.Context, _ *cli.Command, _ error) {
 		},
 		Flags: []cli.Flag{
-			&cli.StringFlag{Name: "host", Usage: "ADP server host", Required: true},
+			&cli.StringFlag{Name: "host", Usage: "ADP server host"},
 			&cli.IntFlag{Name: "port", Usage: "ADP server port", Value: 8443},
 			&cli.StringFlag{Name: "path", Usage: "ADP task API path", Value: "/adp/rest/api/task"},
-			&cli.StringFlag{Name: "user", Usage: "ADP username", Required: true},
-			&cli.StringFlag{Name: "password", Usage: "ADP password", Required: true},
+			&cli.StringFlag{Name: "user", Usage: "ADP username"},
+			&cli.StringFlag{Name: "password", Usage: "ADP password"},
 			&cli.BoolFlag{Name: "insecure", Usage: "Skip TLS certificate verification"},
 			&cli.BoolFlag{Name: "debug", Aliases: []string{"d"}, Usage: "Enable debug logging"},
 		},
@@ -460,14 +471,52 @@ func newApp(stdout io.Writer, stderr io.Writer) *cli.Command {
 }
 
 func newClient(cmd *cli.Command) (*adp.Client, error) {
+	cfg, err := loadCLIConfigFile()
+	if err != nil {
+		return nil, err
+	}
+
+	host := strings.TrimSpace(resolvedString(cmd, "host", cfg.Host))
+	user := strings.TrimSpace(resolvedString(cmd, "user", cfg.User))
+	password := strings.TrimSpace(resolvedString(cmd, "password", cfg.Password))
+	missing := make([]string, 0, 3)
+	if host == "" {
+		missing = append(missing, "host")
+	}
+	if user == "" {
+		missing = append(missing, "user")
+	}
+	if password == "" {
+		missing = append(missing, "password")
+	}
+	if len(missing) > 0 {
+		return nil, fmt.Errorf("missing required global setting(s): %s", strings.Join(missing, ", "))
+	}
+
 	return adp.NewClient(adp.ClientConfig{
-		BaseURL:  adp.MustBaseURL(cmd.String("host"), cmd.Int("port"), cmd.String("path")),
-		Username: cmd.String("user"),
-		Password: cmd.String("password"),
-		Insecure: cmd.Bool("insecure"),
-		Debug:    cmd.Bool("debug"),
+		BaseURL:  adp.MustBaseURL(host, resolvedInt(cmd, "port", cfg.Port), resolvedString(cmd, "path", cfg.Path)),
+		Username: user,
+		Password: password,
+		Insecure: resolvedBool(cmd, "insecure", cfg.Insecure),
+		Debug:    resolvedBool(cmd, "debug", cfg.Debug),
 		DebugOut: cmd.ErrWriter,
 	})
+}
+
+func loadCLIConfigFile() (cliConfigFile, error) {
+	body, err := os.ReadFile("adp_config.json")
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			return cliConfigFile{}, nil
+		}
+		return cliConfigFile{}, fmt.Errorf("read adp_config.json: %w", err)
+	}
+
+	var cfg cliConfigFile
+	if err := json.Unmarshal(body, &cfg); err != nil {
+		return cliConfigFile{}, fmt.Errorf("invalid adp_config.json: %w", err)
+	}
+	return cfg, nil
 }
 
 func writeJSON(w io.Writer, value any) error {
@@ -493,6 +542,36 @@ func applyString[T any](cmd *cli.Command, name string, apply func(string) T) {
 	if cmd.IsSet(name) {
 		apply(cmd.String(name))
 	}
+}
+
+func resolvedString(cmd *cli.Command, name string, configValue *string) string {
+	if cmd.IsSet(name) {
+		return cmd.String(name)
+	}
+	if configValue != nil {
+		return *configValue
+	}
+	return cmd.String(name)
+}
+
+func resolvedInt(cmd *cli.Command, name string, configValue *int) int {
+	if cmd.IsSet(name) {
+		return cmd.Int(name)
+	}
+	if configValue != nil {
+		return *configValue
+	}
+	return cmd.Int(name)
+}
+
+func resolvedBool(cmd *cli.Command, name string, configValue *bool) bool {
+	if cmd.IsSet(name) {
+		return cmd.Bool(name)
+	}
+	if configValue != nil {
+		return *configValue
+	}
+	return cmd.Bool(name)
 }
 
 func parseEngineTaxonomies(values []string) ([]adp.EngineTaxonomyArg, error) {
