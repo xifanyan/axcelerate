@@ -81,7 +81,7 @@ These are the user-facing fields for the request-construction API.
     "adp_abortWfOnFailure": true,
     "adp_csvMerge_customLineSeparator": "U+000DU+000A",
     "adp_csvMerge_multiValueDelimiter": null,
-    "adp_csvMerge_csvFile": "/path/to/data.csv",
+    "adp_csvMerge_csvFile": null,
     "adp_csvMerge_csvIdFieldKey": null,
     "adp_csvMerge_textFileRefIndicator": "",
     "adp_csvMerge_engineUser": null,
