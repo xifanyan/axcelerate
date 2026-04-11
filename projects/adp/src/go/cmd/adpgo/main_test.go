@@ -537,6 +537,7 @@ func TestCSVMergeCommandParsesFieldMappingsJSON(t *testing.T) {
 		"--password", "secret",
 		"csv-merge",
 		"--csvFile", "input.csv",
+		"--engineName", "engineA",
 		"--fieldMappings", `[{"csvField":"id","targetField":"rm_id"}]`,
 	})
 	if err != nil {
@@ -627,6 +628,39 @@ func TestTaxonomyStatisticCommandAllowsApplicationIdentifier(t *testing.T) {
 	}
 }
 
+func TestTaxonomyStatisticCommandAllowsEngineName(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		cfg := decodeTaskConfiguration(t, r)
+		assertEngineSelectorOnly(t, cfg, "adp_taxonomyStatistic_engineName", "adp_taxonomyStatistic_applicationIdentifier")
+
+		_, _ = io.WriteString(w, `{"executionId":"7","taskType":"Taxonomy Statistic","loggingEnabled":"true","progressMax":1,"executionStatus":"success","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":1,"progressPercentage":1.0,"taskDisplayName":"Taxonomy statistic","executionMetaData":{"adp_taxonomy_statistics_json_file_path":"taxonomy_stats.json","adp_taxonomy_statistics_json_output":"{\"date\":\"Wed\",\"searchParameter\":[],\"statistics\":{\"taxonomy\":[{\"id\":\"rm_source\",\"category\":[{\"id\":\"file_demo_04\",\"displayName\":\"file_demo_04\",\"count\":761}]}]}}"}}`)
+	}))
+	defer server.Close()
+
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+	cmd := newApp(stdout, stderr)
+
+	err := cmd.Run(context.Background(), []string{
+		"adpgo",
+		"--host", server.URL,
+		"--path", "",
+		"--user", "adp",
+		"--password", "secret",
+		"taxonomy-statistic",
+		"--engineName", "engineA",
+	})
+	if err != nil {
+		t.Fatalf("Run error: %v", err)
+	}
+	if stderr.Len() != 0 {
+		t.Fatalf("stderr = %q", stderr.String())
+	}
+	if !strings.Contains(stdout.String(), `"rm_source"`) {
+		t.Fatalf("stdout = %q", stdout.String())
+	}
+}
+
 func TestRunPrintsParserErrorsToStderr(t *testing.T) {
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
@@ -657,6 +691,47 @@ func TestRunPrintsTaxonomyStatisticParserErrorsToStderr(t *testing.T) {
 		"--user", "adp",
 		"--password", "secret",
 		"taxonomy-statistic",
+	})
+
+	if exitCode != 1 {
+		t.Fatalf("exitCode = %d, want 1", exitCode)
+	}
+	if got, want := stderr.String(), "exactly one of engineName or applicationIdentifier is required\n"; got != want {
+		t.Fatalf("stderr = %q, want %q", got, want)
+	}
+}
+
+func TestRunPrintsCreateOcrJobSelectorErrorsToStderr(t *testing.T) {
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+
+	exitCode := run(stdout, stderr, []string{
+		"adpgo",
+		"--host", "https://example.test",
+		"--user", "adp",
+		"--password", "secret",
+		"create-ocr-job",
+	})
+
+	if exitCode != 1 {
+		t.Fatalf("exitCode = %d, want 1", exitCode)
+	}
+	if got, want := stderr.String(), "exactly one of engineName or applicationIdentifier is required\n"; got != want {
+		t.Fatalf("stderr = %q, want %q", got, want)
+	}
+}
+
+func TestRunPrintsCSVMergeSelectorErrorsToStderr(t *testing.T) {
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+
+	exitCode := run(stdout, stderr, []string{
+		"adpgo",
+		"--host", "https://example.test",
+		"--user", "adp",
+		"--password", "secret",
+		"csv-merge",
+		"--csvFile", "input.csv",
 	})
 
 	if exitCode != 1 {
@@ -994,6 +1069,17 @@ func assertApplicationSelectorOnly(t *testing.T, cfg map[string]any, application
 	}
 	if _, ok := cfg[engineKey]; ok {
 		t.Fatalf("taskConfiguration should omit %s: %#v", engineKey, cfg)
+	}
+}
+
+func assertEngineSelectorOnly(t *testing.T, cfg map[string]any, engineKey, applicationKey string) {
+	t.Helper()
+
+	if got := cfg[engineKey]; got != "engineA" {
+		t.Fatalf("%s = %#v", engineKey, got)
+	}
+	if _, ok := cfg[applicationKey]; ok {
+		t.Fatalf("taskConfiguration should omit %s: %#v", applicationKey, cfg)
 	}
 }
 
