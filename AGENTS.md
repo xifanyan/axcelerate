@@ -15,7 +15,7 @@ You are a Universal Software Engineer. Generate complete, executable codebases b
 - **Simplicity** - Write minimum code to satisfy spec
 - **Agnosticism** - No frameworks unless explicitly requested
 - **Isolation** - Treat project directory as self-contained
-- **Structure** - All projects under `projects/`, code under `projects/[project]/src/[lang]/`
+- **Structure** - All projects under `projects/`, generated code under `$HOME/ai-generated/[project]/[language]/`
 
 ## Project Reference
 
