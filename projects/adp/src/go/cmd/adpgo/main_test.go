@@ -165,3 +165,62 @@ func TestCommandFailureFormatsTaskExecutionError(t *testing.T) {
 		}
 	}
 }
+
+func TestCSVMergeCommandParsesFieldMappingsJSON(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var req map[string]any
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			t.Fatalf("decode request: %v", err)
+		}
+
+		cfg, ok := req["taskConfiguration"].(map[string]any)
+		if !ok {
+			t.Fatalf("taskConfiguration type = %T", req["taskConfiguration"])
+		}
+
+		fieldMappings, ok := cfg["adp_csvMerge_fieldMappings"].([]any)
+		if !ok {
+			t.Fatalf("fieldMappings type = %T", cfg["adp_csvMerge_fieldMappings"])
+		}
+		if len(fieldMappings) != 1 {
+			t.Fatalf("len(fieldMappings) = %d, want 1", len(fieldMappings))
+		}
+
+		mapping, ok := fieldMappings[0].(map[string]any)
+		if !ok {
+			t.Fatalf("mapping type = %T", fieldMappings[0])
+		}
+		if mapping["csvField"] != "id" || mapping["targetField"] != "rm_id" {
+			t.Fatalf("mapping = %#v", mapping)
+		}
+
+		_, _ = io.WriteString(w, `{"executionId":"3","taskType":"CSV Merge","loggingEnabled":"true","progressMax":1,"executionStatus":"success","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":1,"progressPercentage":1.0,"taskDisplayName":"Csv merge task","executionMetaData":[]}`)
+	}))
+	defer server.Close()
+
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+	cmd := newApp(stdout, stderr)
+
+	err := cmd.Run(context.Background(), []string{
+		"adpgo",
+		"--host", server.URL,
+		"--path", "",
+		"--user", "adp",
+		"--password", "secret",
+		"csv-merge",
+		"--csvFile", "input.csv",
+		"--fieldMappings", `[{"csvField":"id","targetField":"rm_id"}]`,
+	})
+	if err != nil {
+		t.Fatalf("Run error: %v", err)
+	}
+
+	if stderr.Len() != 0 {
+		t.Fatalf("stderr = %q", stderr.String())
+	}
+
+	if got, want := strings.TrimSpace(stdout.String()), "{}"; got != want {
+		t.Fatalf("stdout = %q, want %q", got, want)
+	}
+}

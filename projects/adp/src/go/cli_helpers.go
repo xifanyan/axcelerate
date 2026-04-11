@@ -135,27 +135,61 @@ func parseConfigArgs(input string) ([]ConfigArg, error) {
 		return nil, nil
 	}
 
-	var raw []struct {
-		ConfigurationID       string `json:"Configuration ID"`
-		DynamicComponentNames string `json:"Dynamic Component Names"`
-		FieldList             string `json:"Field list"`
-		NameValueList         string `json:"Name value list"`
-		ApplicationType       string `json:"Application type"`
-		EntityType            string `json:"Entity type"`
+	type rawConfigArg struct {
+		ConfigurationIDRaw       string `json:"Configuration ID"`
+		DynamicComponentNamesRaw string `json:"Dynamic Component Names"`
+		FieldListRaw             string `json:"Field list"`
+		NameValueListRaw         string `json:"Name value list"`
+		ApplicationTypeRaw       string `json:"Application type"`
+		EntityTypeRaw            string `json:"Entity type"`
+
+		ConfigurationID       string `json:"configurationId"`
+		DynamicComponentNames string `json:"dynamicComponentNames"`
+		FieldList             string `json:"fieldList"`
+		NameValueList         string `json:"nameValueList"`
+		ApplicationType       string `json:"applicationType"`
+		EntityType            string `json:"entityType"`
 	}
+
+	var raw []rawConfigArg
 	if err := json.Unmarshal([]byte(input), &raw); err != nil {
 		return nil, err
 	}
 
 	result := make([]ConfigArg, len(raw))
 	for i, item := range raw {
+		configurationID := item.ConfigurationID
+		if configurationID == "" {
+			configurationID = item.ConfigurationIDRaw
+		}
+		dynamicComponentNames := item.DynamicComponentNames
+		if dynamicComponentNames == "" {
+			dynamicComponentNames = item.DynamicComponentNamesRaw
+		}
+		fieldList := item.FieldList
+		if fieldList == "" {
+			fieldList = item.FieldListRaw
+		}
+		nameValueList := item.NameValueList
+		if nameValueList == "" {
+			nameValueList = item.NameValueListRaw
+		}
+		applicationType := item.ApplicationType
+		if applicationType == "" {
+			applicationType = item.ApplicationTypeRaw
+		}
+		entityType := item.EntityType
+		if entityType == "" {
+			entityType = item.EntityTypeRaw
+		}
+
 		result[i] = ConfigArg{
-			ConfigurationID:       item.ConfigurationID,
-			DynamicComponentNames: item.DynamicComponentNames,
-			FieldList:             item.FieldList,
-			NameValueList:         item.NameValueList,
-			ApplicationType:       item.ApplicationType,
-			EntityType:            item.EntityType,
+			ConfigurationID:       configurationID,
+			DynamicComponentNames: dynamicComponentNames,
+			FieldList:             fieldList,
+			NameValueList:         nameValueList,
+			ApplicationType:       applicationType,
+			EntityType:            entityType,
 		}
 	}
 

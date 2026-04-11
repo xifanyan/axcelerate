@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -194,6 +195,7 @@ func newApp(stdout io.Writer, stderr io.Writer) *cli.Command {
 					&cli.StringFlag{Name: "enginePassword"},
 					&cli.StringFlag{Name: "engineIdFieldKey"},
 					&cli.StringFlag{Name: "applicationIdentifier"},
+					&cli.StringFlag{Name: "fieldMappings"},
 					&cli.StringFlag{Name: "fieldSeparator"},
 					&cli.StringFlag{Name: "imageBasePath"},
 					&cli.StringFlag{Name: "nativeBasePath"},
@@ -219,6 +221,13 @@ func newApp(stdout io.Writer, stderr io.Writer) *cli.Command {
 					applyString(cmd, "enginePassword", builder.EnginePassword)
 					applyString(cmd, "engineIdFieldKey", builder.EngineIDFieldKey)
 					applyString(cmd, "applicationIdentifier", builder.ApplicationIdentifier)
+					if cmd.IsSet("fieldMappings") {
+						var fieldMappings []map[string]any
+						if err := json.Unmarshal([]byte(cmd.String("fieldMappings")), &fieldMappings); err != nil {
+							return err
+						}
+						builder.FieldMappings(fieldMappings)
+					}
 					applyString(cmd, "fieldSeparator", builder.FieldSeparator)
 					applyString(cmd, "imageBasePath", builder.ImageBasePath)
 					applyString(cmd, "nativeBasePath", builder.NativeBasePath)

@@ -91,6 +91,16 @@ func TestParseConfigArgsJSON(t *testing.T) {
 	}
 }
 
+func TestParseConfigArgsCamelCaseJSON(t *testing.T) {
+	got, err := ParseConfigArgs(`[{"configurationId":"dataSource.file_demo_01","dynamicComponentNames":"x","fieldList":"name,value","nameValueList":"crawlLocationClassifierRules","applicationType":"demo","entityType":"folder"}]`)
+	if err != nil {
+		t.Fatalf("ParseConfigArgs error: %v", err)
+	}
+	if len(got) != 1 || got[0].ConfigurationID != "dataSource.file_demo_01" || got[0].DynamicComponentNames != "x" || got[0].FieldList != "name,value" || got[0].NameValueList != "crawlLocationClassifierRules" || got[0].ApplicationType != "demo" || got[0].EntityType != "folder" {
+		t.Fatalf("got = %#v", got)
+	}
+}
+
 func TestParseConfigArgsEmpty(t *testing.T) {
 	got, err := parseConfigArgs("")
 	if err != nil {
