@@ -165,7 +165,7 @@ These are the user-facing fields for the request-construction API.
 
 ## Raw Example Request
 
-> Example below shows a minimal valid request with exactly one selector.
+> Example below shows a valid raw request example with exactly one selector.
 
 ```json
 {
