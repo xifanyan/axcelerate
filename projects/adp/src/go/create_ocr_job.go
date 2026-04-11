@@ -2,6 +2,7 @@ package adp
 
 import (
 	"context"
+	"errors"
 	"strconv"
 	"time"
 )
@@ -127,8 +128,17 @@ func (b *CreateOcrJobBuilder) MainQueryType(value string) *CreateOcrJobBuilder {
 }
 
 func (b *CreateOcrJobBuilder) buildRequest() (rawTaskRequest, error) {
+	hasEngine := b.engineName != nil && *b.engineName != ""
+	hasApplication := b.applicationIdentifier != nil && *b.applicationIdentifier != ""
+	if !hasEngine && !hasApplication {
+		return rawTaskRequest{}, errors.New("exactly one of engineName or applicationIdentifier is required")
+	}
+	if hasEngine && hasApplication {
+		return rawTaskRequest{}, errors.New("engineName and applicationIdentifier are mutually exclusive")
+	}
+
 	cfg := map[string]any{}
-	if b.engineName != nil {
+	if hasEngine {
 		cfg["adp_createOcrJob_engineName"] = *b.engineName
 	}
 	if b.query != nil {
@@ -149,7 +159,7 @@ func (b *CreateOcrJobBuilder) buildRequest() (rawTaskRequest, error) {
 	if b.jobPriority != nil {
 		cfg["adp_createOcrJob_jobPriority"] = strconv.Itoa(*b.jobPriority)
 	}
-	if b.applicationIdentifier != nil {
+	if hasApplication {
 		cfg["adp_createOcrJob_applicationIdentifier"] = *b.applicationIdentifier
 	}
 	if b.applicationType != nil {

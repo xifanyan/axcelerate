@@ -61,12 +61,18 @@ func (b *QueryEngineBuilder) ApplicationIdentifier(value string) *QueryEngineBui
 }
 
 func (b *QueryEngineBuilder) buildRequest() (rawTaskRequest, error) {
-	if b.engineName == nil || *b.engineName == "" {
-		return rawTaskRequest{}, errors.New("engineName is required")
+	hasEngine := b.engineName != nil && *b.engineName != ""
+	hasApplication := b.applicationIdentifier != nil && *b.applicationIdentifier != ""
+	if !hasEngine && !hasApplication {
+		return rawTaskRequest{}, errors.New("exactly one of engineName or applicationIdentifier is required")
+	}
+	if hasEngine && hasApplication {
+		return rawTaskRequest{}, errors.New("engineName and applicationIdentifier are mutually exclusive")
 	}
 
-	cfg := map[string]any{
-		"adp_queryEngine_engineName": *b.engineName,
+	cfg := map[string]any{}
+	if hasEngine {
+		cfg["adp_queryEngine_engineName"] = *b.engineName
 	}
 	if b.engineQuery != nil {
 		cfg["adp_queryEngine_engineQuery"] = *b.engineQuery
@@ -80,7 +86,7 @@ func (b *QueryEngineBuilder) buildRequest() (rawTaskRequest, error) {
 	if b.engineTaxonomies != nil {
 		cfg["adp_queryEngine_engineTaxonomies"] = *b.engineTaxonomies
 	}
-	if b.applicationIdentifier != nil {
+	if hasApplication {
 		cfg["adp_queryEngine_applicationIdentifier"] = *b.applicationIdentifier
 	}
 	b.apply(cfg)
