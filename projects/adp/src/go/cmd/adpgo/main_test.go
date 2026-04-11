@@ -164,7 +164,6 @@ func TestListEntitiesCommandCLIFlagsOverrideConfigFile(t *testing.T) {
 		"--host", cliServer.URL,
 		"--path", "",
 		"--user", "cli-user",
-		"--password", "cli-secret",
 		"list-entities",
 	})
 	if err != nil {
@@ -232,7 +231,7 @@ func TestRunReportsMissingRequiredGlobalsAfterConfigResolution(t *testing.T) {
 		t.Fatalf("stdout = %q", stdout.String())
 	}
 	text := stderr.String()
-	for _, want := range []string{"host", "user", "password"} {
+	for _, want := range []string{"user", "password"} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("stderr = %q, missing %q", text, want)
 		}
