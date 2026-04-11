@@ -508,8 +508,10 @@ func TestCLITaskExecuteRejectsExponentMetadataResult(t *testing.T) {
 
 func TestCreateOcrJobStartBuildsRestrictions(t *testing.T) {
 	var gotBody map[string]any
+	var gotPath string
 
 	client := testClientForBuilder(t, func(w http.ResponseWriter, r *http.Request) {
+		gotPath = r.URL.Path
 		if err := json.NewDecoder(r.Body).Decode(&gotBody); err != nil {
 			t.Fatalf("decode request: %v", err)
 		}
@@ -520,9 +522,13 @@ func TestCreateOcrJobStartBuildsRestrictions(t *testing.T) {
 		EngineName("singleMindServer.demo00001").
 		JobName("demo_ocr").
 		Restrictions([]EngineTaxonomyArg{{Taxonomy: "rm_source", Negation: false, Query: "file_demo_04"}}).
+		AdvancedRestrictions([]EngineTaxonomyArg{{Taxonomy: "rm_mimetype", Negation: false, Query: "application%2Fpdf"}}).
 		Start(context.Background())
 	if err != nil {
 		t.Fatalf("Start error: %v", err)
+	}
+	if gotPath != "/executeAdpTaskAsync" {
+		t.Fatalf("path = %q", gotPath)
 	}
 
 	cfg := gotBody["taskConfiguration"].(map[string]any)
@@ -530,12 +536,18 @@ func TestCreateOcrJobStartBuildsRestrictions(t *testing.T) {
 	if len(restrictions) != 1 {
 		t.Fatalf("restrictions = %#v", restrictions)
 	}
+	advancedRestrictions := cfg["adp_createOcrJob_AdvancedRestrictions"].([]any)
+	if len(advancedRestrictions) != 1 {
+		t.Fatalf("advancedRestrictions = %#v", advancedRestrictions)
+	}
 }
 
 func TestCreateOcrJobWaitReturnsEmptyResult(t *testing.T) {
 	calls := 0
+	paths := make([]string, 0, 2)
 	client := testClientForBuilder(t, func(w http.ResponseWriter, r *http.Request) {
 		calls++
+		paths = append(paths, r.URL.Path)
 		if calls == 1 {
 			io.WriteString(w, `{"executionId":"13","taskType":"Create OCR Job","loggingEnabled":"true","progressMax":0,"executionStatus":"","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":0,"progressPercentage":0.0,"taskDisplayName":"Create OCR Job","executionMetaData":[]}`)
 			return
@@ -546,6 +558,9 @@ func TestCreateOcrJobWaitReturnsEmptyResult(t *testing.T) {
 	got, err := NewCreateOcrJobBuilder(client).EngineName("engineA").Wait(context.Background(), time.Millisecond)
 	if err != nil {
 		t.Fatalf("Wait error: %v", err)
+	}
+	if len(paths) == 0 || paths[0] != "/executeAdpTaskAsync" {
+		t.Fatalf("paths = %#v", paths)
 	}
 	if got != (CreateOcrJobResult{}) {
 		t.Fatalf("got = %#v", got)
