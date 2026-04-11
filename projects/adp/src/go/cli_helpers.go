@@ -3,8 +3,69 @@ package adp
 import (
 	"encoding/json"
 	"fmt"
+	"net"
+	"net/url"
+	"strconv"
 	"strings"
 )
+
+func ParseEngineTaxonomyArg(input string) (EngineTaxonomyArg, error) {
+	return parseEngineTaxonomyArg(input)
+}
+
+func ParseOutputTaxonomies(input string) ([]OutputTaxonomiesArg, error) {
+	return parseOutputTaxonomies(input)
+}
+
+func ParseConfigArgs(input string) ([]ConfigArg, error) {
+	return parseConfigArgs(input)
+}
+
+func ParseBatchScriptParameters(input string) ([]CLIBatchParameter, error) {
+	return parseBatchScriptParameters(input)
+}
+
+func PrettyJSON(v any) ([]byte, error) {
+	return json.MarshalIndent(v, "", "  ")
+}
+
+func MustBaseURL(host string, port int, path string) string {
+	host = strings.TrimSpace(host)
+	if host == "" {
+		panic("host is required")
+	}
+
+	path = strings.TrimSpace(path)
+	if !strings.HasPrefix(host, "http://") && !strings.HasPrefix(host, "https://") {
+		host = "https://" + host
+	}
+
+	parsed, err := url.Parse(host)
+	if err != nil {
+		panic(err)
+	}
+	if parsed.Scheme == "" {
+		parsed.Scheme = "https"
+	}
+	if parsed.Host == "" && parsed.Path != "" {
+		parsed.Host = parsed.Path
+		parsed.Path = ""
+	}
+
+	if parsed.Port() == "" {
+		parsed.Host = net.JoinHostPort(parsed.Hostname(), strconv.Itoa(port))
+	}
+
+	if path != "" {
+		if strings.HasPrefix(path, "/") {
+			parsed.Path = path
+		} else {
+			parsed.Path = "/" + path
+		}
+	}
+
+	return strings.TrimRight(parsed.String(), "/")
+}
 
 func parseEngineTaxonomyArg(input string) (EngineTaxonomyArg, error) {
 	for _, separator := range []struct {
