@@ -10,10 +10,39 @@ Describes the command-line interface contract. Language-agnostic.
 |------|------|---------|-------------|
 | `--host` | string | — | ADP server host (required) |
 | `--port` | integer | 8443 | ADP server port |
+| `--path` | string | `/adp/rest/api/task` | ADP task endpoint path |
 | `--user` | string | — | Username (required) |
 | `--password` | string | — | Password (required) |
 | `--insecure` | boolean | false | Skip TLS certificate verification |
 | `--debug` | boolean | false | Enable debug logging — traces request/response payloads |
+
+Global flags may be provided by explicit CLI flags or `adp_config.json`.
+
+## CLI Configuration File
+
+All language CLIs must support `adp_config.json`.
+
+Supported config keys:
+- `host`
+- `port`
+- `path`
+- `user`
+- `password`
+- `insecure`
+- `debug`
+
+Resolution precedence for all global flags:
+1. Explicit command-line flag
+2. `adp_config.json`
+3. Built-in default
+
+Built-in defaults:
+- `port=8443`
+- `path=/adp/rest/api/task`
+- `insecure=false`
+- `debug=false`
+
+`host`, `user`, and `password` are required after resolution.
 
 ---
 

@@ -76,8 +76,11 @@ Logging must be **enabled by default** for all tasks. Debug mode must trace requ
 ### CLI Interface
 
 - Must support subcommands for each task
-- Global flags: `--host`, `--port`, `--user`, `--password`, `--insecure`, `--debug`
+- Global flags: `--host`, `--port`, `--path`, `--user`, `--password`, `--insecure`, `--debug`
+- All language CLIs must support `adp_config.json` for global flag values
+- Precedence for all global flags: explicit CLI flag > `adp_config.json` > built-in default
 - `--port` default: 8443
+- `--path` default: `/adp/rest/api/task`
 - Example: `adpgo --host example.com --user adp --password adp list-entities --type singleMindServer`
 - CLI naming: `[project][lang]` (e.g., `adpgo` for Go, `adppy` for Python, `adprs` for Rust)
 
