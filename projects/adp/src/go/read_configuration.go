@@ -41,14 +41,26 @@ func (b *ReadConfigurationBuilder) FileFormat(value string) *ReadConfigurationBu
 func readConfigRaw(items []ConfigArg) []map[string]any {
 	raw := make([]map[string]any, 0, len(items))
 	for _, item := range items {
-		raw = append(raw, map[string]any{
-			"Configuration ID":        item.ConfigurationID,
-			"Dynamic Component Names": item.DynamicComponentNames,
-			"Field list":              item.FieldList,
-			"Name value list":         item.NameValueList,
-			"Application type":        item.ApplicationType,
-			"Entity type":             item.EntityType,
-		})
+		entry := map[string]any{}
+		if item.ConfigurationID != "" {
+			entry["Configuration ID"] = item.ConfigurationID
+		}
+		if item.DynamicComponentNames != "" {
+			entry["Dynamic Component Names"] = item.DynamicComponentNames
+		}
+		if item.FieldList != "" {
+			entry["Field list"] = item.FieldList
+		}
+		if item.NameValueList != "" {
+			entry["Name value list"] = item.NameValueList
+		}
+		if item.ApplicationType != "" {
+			entry["Application type"] = item.ApplicationType
+		}
+		if item.EntityType != "" {
+			entry["Entity type"] = item.EntityType
+		}
+		raw = append(raw, entry)
 	}
 	return raw
 }

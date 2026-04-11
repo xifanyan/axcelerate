@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"math/big"
 	"strconv"
 	"strings"
 )
@@ -159,9 +160,28 @@ func decodeCLITask(meta any) (CLIResult, error) {
 		if value != math.Trunc(value) {
 			return CLIResult{}, errors.New("cli_result must be an integer")
 		}
+		if value < math.MinInt || value > math.MaxInt {
+			return CLIResult{}, errors.New("cli_result out of range")
+		}
 		result = int(value)
 	case int:
 		result = value
+	case json.Number:
+		if strings.ContainsAny(value.String(), ".eE") {
+			return CLIResult{}, errors.New("cli_result must be an integer")
+		}
+		parsed, ok := new(big.Int).SetString(value.String(), 10)
+		if !ok {
+			return CLIResult{}, fmt.Errorf("cli_result must be numeric, got %T", resultValue)
+		}
+		if !parsed.IsInt64() {
+			return CLIResult{}, errors.New("cli_result out of range")
+		}
+		parsed64 := parsed.Int64()
+		if strconv.IntSize == 32 && (parsed64 < math.MinInt32 || parsed64 > math.MaxInt32) {
+			return CLIResult{}, errors.New("cli_result out of range")
+		}
+		result = int(parsed64)
 	default:
 		return CLIResult{}, fmt.Errorf("cli_result must be numeric, got %T", resultValue)
 	}

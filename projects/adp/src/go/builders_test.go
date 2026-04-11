@@ -345,7 +345,16 @@ func TestCSVMergeBuildRequestSerializesFieldMappingsAsArrayAndOmitsEmptyValue(t 
 }
 
 func TestReadConfigurationBuildsConfigObjectsAndDecodesResult(t *testing.T) {
+	type requestCapture struct {
+		req rawTaskRequest
+		err error
+	}
+	requestCh := make(chan requestCapture, 1)
+
 	client := testClientForBuilder(t, func(w http.ResponseWriter, r *http.Request) {
+		var req rawTaskRequest
+		err := json.NewDecoder(r.Body).Decode(&req)
+		requestCh <- requestCapture{req: req, err: err}
 		io.WriteString(w, `{"executionId":"11","taskType":"Read Configuration","loggingEnabled":"true","progressMax":1,"executionStatus":"success","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":1,"progressPercentage":1.0,"taskDisplayName":"Read Configuration","executionMetaData":{"adp_entities_output_file_name":"output.json","adp_entities_json_output":"{\"dataSource.file_demo_01\":{\"DynamicComponents\":{},\"Global\":{\"Static\":{\"Parameters\":[]}}}}"}}`)
 	})
 
@@ -354,6 +363,27 @@ func TestReadConfigurationBuildsConfigObjectsAndDecodesResult(t *testing.T) {
 		Execute(context.Background())
 	if err != nil {
 		t.Fatalf("Execute error: %v", err)
+	}
+	captured := <-requestCh
+	if captured.err != nil {
+		t.Fatalf("Decode request error: %v", captured.err)
+	}
+	configs, ok := captured.req.TaskConfiguration["adp_readConfiguration_configsToRead"].([]any)
+	if !ok || len(configs) != 1 {
+		t.Fatalf("configsToRead = %#v", captured.req.TaskConfiguration["adp_readConfiguration_configsToRead"])
+	}
+	config, ok := configs[0].(map[string]any)
+	if !ok {
+		t.Fatalf("config = %#v", configs[0])
+	}
+	if len(config) != 2 {
+		t.Fatalf("config = %#v", config)
+	}
+	if config["Configuration ID"] != "dataSource.file_demo_01" || config["Field list"] != "name,value" {
+		t.Fatalf("config = %#v", config)
+	}
+	if _, ok := config["Dynamic Component Names"]; ok {
+		t.Fatalf("config should omit empty fields: %#v", config)
 	}
 	if got.OutputFile != "output.json" || len(got.Configuration) != 1 {
 		t.Fatalf("got = %#v", got)
@@ -375,6 +405,43 @@ func TestCLITaskRequiresBatchScriptPathAndDecodesJSONOutput(t *testing.T) {
 		t.Fatalf("Execute error: %v", err)
 	}
 	if got.Result != 0 || got.JSONOutput["stdout"] != "ok" {
+		t.Fatalf("got = %#v", got)
+	}
+}
+
+func TestDecodeCLITaskRejectsFractionalResult(t *testing.T) {
+	_, err := decodeCLITask(map[string]any{
+		"cli_result":      0.5,
+		"cli_error_path":  "err.log",
+		"cli_result_path": "out.log",
+	})
+	if err == nil || err.Error() != "cli_result must be an integer" {
+		t.Fatalf("err = %v", err)
+	}
+}
+
+func TestDecodeCLITaskRejectsMalformedJSONOutput(t *testing.T) {
+	_, err := decodeCLITask(map[string]any{
+		"cli_result":      0.0,
+		"json_output":     "{",
+		"cli_error_path":  "err.log",
+		"cli_result_path": "out.log",
+	})
+	if err == nil || err.Error() == "" {
+		t.Fatalf("err = %v", err)
+	}
+}
+
+func TestDecodeCLITaskAcceptsJSONNumber(t *testing.T) {
+	got, err := decodeCLITask(map[string]any{
+		"cli_result":      json.Number("7"),
+		"cli_error_path":  "err.log",
+		"cli_result_path": "out.log",
+	})
+	if err != nil {
+		t.Fatalf("err = %v", err)
+	}
+	if got.Result != 7 {
 		t.Fatalf("got = %#v", got)
 	}
 }
