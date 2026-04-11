@@ -35,6 +35,8 @@ These are the user-facing fields for the request-construction API.
 | advancedRestrictions | EngineTaxonomyArg[] | [] | No | Advanced restrictions (see [common-types.md](../common-types.md)) |
 | mainQueryType | string | null | No | Main query type |
 
+> engineName and applicationIdentifier are mutually exclusive selectors. Exactly one must be provided.
+
 ---
 
 ## Raw Default Configuration
@@ -205,14 +207,19 @@ See [cli.md](../cli.md) for global flags and naming conventions.
 | `--restrictions` | string | "" | Restrictions (format: `Taxonomy=Query`, repeat for multiple) |
 | `--advancedRestrictions` | string | "" | Advanced restrictions (format: `Taxonomy=Query`) |
 
+> engineName and applicationIdentifier are mutually exclusive selectors. Exactly one must be provided.
+
 ### CLI Examples
 
 ```bash
 # Basic
-adpgo create-ocr-job
+adpgo create-ocr-job --engineName "myEngine"
 
 # With options
 adpgo create-ocr-job --engineName "myEngine" --query "*"
+
+# Using application identifier
+adpgo create-ocr-job --applicationIdentifier "my-app-id" --jobName "demo_ocr" --query "*"
 
 # Wait for completion
 adpgo create-ocr-job --engineName "myEngine" --wait

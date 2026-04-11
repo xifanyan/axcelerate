@@ -36,6 +36,8 @@ These are the user-facing fields for the request-construction API.
 | textIndicator | string | "" | No | Text indicator |
 | doNotChangeProtectedDocuments | boolean | false | No | Do not change protected documents |
 
+> engineName and applicationIdentifier are mutually exclusive selectors. Exactly one must be provided.
+
 ---
 
 ## Raw Default Configuration
@@ -252,6 +254,8 @@ See [cli.md](../cli.md) for global flags and naming conventions.
 | `--nativeBasePath` | string | null | Native base path |
 | `--textIndicator` | string | "" | Text indicator |
 
+> engineName and applicationIdentifier are mutually exclusive selectors. Exactly one must be provided.
+
 ### CLI Examples
 
 ```bash
@@ -260,6 +264,9 @@ adpgo csv-merge --csvFile "/path/to/data.csv"
 
 # Merge with options
 adpgo csv-merge --csvFile "/path/to/data.csv" --csvIdFieldKey "id" --mergeType "Merge content"
+
+# Merge using application identifier
+adpgo csv-merge --csvFile "/path/to/data.csv" --applicationIdentifier "my-app-id" --csvIdFieldKey "id"
 ```
 
 ---

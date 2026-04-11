@@ -17,13 +17,15 @@ These are the user-facing fields for the request-construction API.
 
 | Field | Type | Default | Required | Description |
 |-------|------|---------|----------|-------------|
-| engineName | string | — | Yes | Engine name |
+| engineName | string | — | Conditional | Engine name |
 | engineQuery | string | "*" | No | Query string |
 | computeCounts | boolean | true | No | Compute entity counts |
 | listCategoryProperties | boolean | false | No | List category properties |
 | engineTaxonomies | EngineTaxonomyArg[] | [] | No | Engine taxonomies to filter |
 | outputTaxonomies | OutputTaxonomiesArg[] | [] | No | Output taxonomies configuration |
-| applicationIdentifier | string | "" | No | Application identifier |
+| applicationIdentifier | string | "" | Conditional | Application identifier |
+
+> engineName and applicationIdentifier are mutually exclusive selectors. Exactly one must be provided.
 
 ### EngineTaxonomyArg
 
@@ -169,6 +171,8 @@ See [cli.md](../cli.md) for global flags and naming conventions.
 | `--outputTaxonomies` | string | — | Output taxonomies: comma-separated list or JSON array |
 | `--applicationIdentifier` | string | "" | Application identifier |
 
+> engineName and applicationIdentifier are mutually exclusive selectors. Exactly one must be provided.
+
 ### EngineTaxonomiesArg CLI Format
 
 Shorthand format: `Taxonomy=Query` or `Taxonomy!=Query`
@@ -185,6 +189,9 @@ Repeatable flag.
 ```bash
 # With outputTaxonomies (comma-separated taxonomy names)
 adpgo taxonomy-statistic --engineName "myEngine" --outputTaxonomies "rm_source,meta_documentcharacteristics"
+
+# Using application identifier
+adpgo taxonomy-statistic --applicationIdentifier "my-app-id" --outputTaxonomies "rm_source"
 
 # Single taxonomy equals
 adpgo taxonomy-statistic --engineName "myEngine" --engineTaxonomies "rm_mimetype=pdf"
