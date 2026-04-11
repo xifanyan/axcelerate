@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"strconv"
 	"testing"
+	"time"
 )
 
 func testClientForBuilder(t *testing.T, handler http.HandlerFunc) *Client {
@@ -502,5 +503,51 @@ func TestCLITaskExecuteRejectsExponentMetadataResult(t *testing.T) {
 	_, err := NewCLITaskBuilder(client).BatchScriptPath("c:/demo/script.ps1").Execute(context.Background())
 	if err == nil || err.Error() != "cli_result must be an integer" {
 		t.Fatalf("err = %v", err)
+	}
+}
+
+func TestCreateOcrJobStartBuildsRestrictions(t *testing.T) {
+	var gotBody map[string]any
+
+	client := testClientForBuilder(t, func(w http.ResponseWriter, r *http.Request) {
+		if err := json.NewDecoder(r.Body).Decode(&gotBody); err != nil {
+			t.Fatalf("decode request: %v", err)
+		}
+		io.WriteString(w, `{"executionId":"13","taskType":"Create OCR Job","loggingEnabled":"true","progressMax":0,"executionStatus":"","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":0,"progressPercentage":0.0,"taskDisplayName":"Create OCR Job","executionMetaData":[]}`)
+	})
+
+	_, err := NewCreateOcrJobBuilder(client).
+		EngineName("singleMindServer.demo00001").
+		JobName("demo_ocr").
+		Restrictions([]EngineTaxonomyArg{{Taxonomy: "rm_source", Negation: false, Query: "file_demo_04"}}).
+		Start(context.Background())
+	if err != nil {
+		t.Fatalf("Start error: %v", err)
+	}
+
+	cfg := gotBody["taskConfiguration"].(map[string]any)
+	restrictions := cfg["adp_createOcrJob_restrictions"].([]any)
+	if len(restrictions) != 1 {
+		t.Fatalf("restrictions = %#v", restrictions)
+	}
+}
+
+func TestCreateOcrJobWaitReturnsEmptyResult(t *testing.T) {
+	calls := 0
+	client := testClientForBuilder(t, func(w http.ResponseWriter, r *http.Request) {
+		calls++
+		if calls == 1 {
+			io.WriteString(w, `{"executionId":"13","taskType":"Create OCR Job","loggingEnabled":"true","progressMax":0,"executionStatus":"","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":0,"progressPercentage":0.0,"taskDisplayName":"Create OCR Job","executionMetaData":[]}`)
+			return
+		}
+		io.WriteString(w, `{"executionId":"13","taskType":"Create OCR Job","loggingEnabled":"true","progressMax":1,"executionStatus":"success","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":1,"progressPercentage":1.0,"taskDisplayName":"Create OCR Job","executionMetaData":[]}`)
+	})
+
+	got, err := NewCreateOcrJobBuilder(client).EngineName("engineA").Wait(context.Background(), time.Millisecond)
+	if err != nil {
+		t.Fatalf("Wait error: %v", err)
+	}
+	if got != (CreateOcrJobResult{}) {
+		t.Fatalf("got = %#v", got)
 	}
 }
