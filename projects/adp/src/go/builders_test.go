@@ -355,11 +355,17 @@ func TestReadConfigurationBuildsConfigObjectsAndDecodesResult(t *testing.T) {
 		var req rawTaskRequest
 		err := json.NewDecoder(r.Body).Decode(&req)
 		requestCh <- requestCapture{req: req, err: err}
-		io.WriteString(w, `{"executionId":"11","taskType":"Read Configuration","loggingEnabled":"true","progressMax":1,"executionStatus":"success","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":1,"progressPercentage":1.0,"taskDisplayName":"Read Configuration","executionMetaData":{"adp_entities_output_file_name":"output.json","adp_entities_json_output":"{\"dataSource.file_demo_01\":{\"DynamicComponents\":{},\"Global\":{\"Static\":{\"Parameters\":[]}}}}"}}`)
+		io.WriteString(w, `{"executionId":"11","taskType":"Read Configuration","loggingEnabled":"true","progressMax":1,"executionStatus":"success","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":1,"progressPercentage":1.0,"taskDisplayName":"Read Configuration","executionMetaData":{"adp_entities_output_file_name":"output.json","adp_entities_json_output":"{\"dataSource.file_demo_01\":{\"DynamicComponents\":{\"compA\":{\"Enabled\":true}},\"Global\":{\"Static\":{\"Parameters\":[{\"Cells\":[],\"Name\":\"param\",\"Value\":\"x\"}]}}}}"}}`)
 	})
 
 	got, err := NewReadConfigurationBuilder(client).
-		ConfigsToRead([]ConfigArg{{ConfigurationID: "dataSource.file_demo_01", FieldList: "name,value"}}).
+		ConfigsToRead([]ConfigArg{{
+			ConfigurationID:       "dataSource.file_demo_01",
+			DynamicComponentNames: "compA,compB",
+			FieldList:             "name,value",
+			NameValueList:         "k1,v1",
+			ApplicationType:       "appType",
+		}}).
 		Execute(context.Background())
 	if err != nil {
 		t.Fatalf("Execute error: %v", err)
@@ -376,17 +382,31 @@ func TestReadConfigurationBuildsConfigObjectsAndDecodesResult(t *testing.T) {
 	if !ok {
 		t.Fatalf("config = %#v", configs[0])
 	}
-	if len(config) != 2 {
+	if len(config) != 5 {
 		t.Fatalf("config = %#v", config)
 	}
-	if config["Configuration ID"] != "dataSource.file_demo_01" || config["Field list"] != "name,value" {
+	if config["Configuration ID"] != "dataSource.file_demo_01" ||
+		config["Dynamic Component Names"] != "compA,compB" ||
+		config["Field list"] != "name,value" ||
+		config["Name value list"] != "k1,v1" ||
+		config["Application type"] != "appType" {
 		t.Fatalf("config = %#v", config)
 	}
-	if _, ok := config["Dynamic Component Names"]; ok {
+	if _, ok := config["Entity type"]; ok {
 		t.Fatalf("config should omit empty fields: %#v", config)
 	}
-	if got.OutputFile != "output.json" || len(got.Configuration) != 1 {
+	info, ok := got.Configuration["dataSource.file_demo_01"]
+	if got.OutputFile != "output.json" || len(got.Configuration) != 1 || !ok {
 		t.Fatalf("got = %#v", got)
+	}
+	if len(info.DynamicComponents) != 1 || len(info.Global.Static.Parameters) != 1 {
+		t.Fatalf("info = %#v", info)
+	}
+	if _, ok := info.DynamicComponents["compA"]; !ok {
+		t.Fatalf("info = %#v", info)
+	}
+	if info.Global.Static.Parameters[0].Name != "param" || info.Global.Static.Parameters[0].Value != "x" {
+		t.Fatalf("info = %#v", info)
 	}
 }
 
@@ -443,5 +463,30 @@ func TestDecodeCLITaskAcceptsJSONNumber(t *testing.T) {
 	}
 	if got.Result != 7 {
 		t.Fatalf("got = %#v", got)
+	}
+}
+
+func TestCLITaskExecutePreservesLargeIntegerMetadataPrecision(t *testing.T) {
+	client := testClientForBuilder(t, func(w http.ResponseWriter, r *http.Request) {
+		io.WriteString(w, `{"executionId":"13","taskType":"CLI","loggingEnabled":"true","progressMax":1,"executionStatus":"success","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":1,"progressPercentage":1.0,"taskDisplayName":"Command Line Task","executionMetaData":{"cli_result":9007199254740993,"cli_error_path":"err.log","cli_result_path":"out.log"}}`)
+	})
+
+	got, err := NewCLITaskBuilder(client).BatchScriptPath("c:/demo/script.ps1").Execute(context.Background())
+	if err != nil {
+		t.Fatalf("Execute error: %v", err)
+	}
+	if got.Result != 9007199254740993 {
+		t.Fatalf("got = %#v", got)
+	}
+}
+
+func TestCLITaskExecuteRejectsExponentMetadataResult(t *testing.T) {
+	client := testClientForBuilder(t, func(w http.ResponseWriter, r *http.Request) {
+		io.WriteString(w, `{"executionId":"14","taskType":"CLI","loggingEnabled":"true","progressMax":1,"executionStatus":"success","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":1,"progressPercentage":1.0,"taskDisplayName":"Command Line Task","executionMetaData":{"cli_result":1e3,"cli_error_path":"err.log","cli_result_path":"out.log"}}`)
+	})
+
+	_, err := NewCLITaskBuilder(client).BatchScriptPath("c:/demo/script.ps1").Execute(context.Background())
+	if err == nil || err.Error() != "cli_result must be an integer" {
+		t.Fatalf("err = %v", err)
 	}
 }

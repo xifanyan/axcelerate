@@ -119,8 +119,8 @@ func (c *Client) execute(ctx context.Context, endpoint string, req rawTaskReques
 		return nil, errors.New(message)
 	}
 
-	var resp TaskResponse
-	if err := json.Unmarshal(respBody, &resp); err != nil {
+	resp, err := decodeTaskResponse(respBody)
+	if err != nil {
 		return nil, fmt.Errorf("decode response: %w", err)
 	}
 
@@ -134,7 +134,7 @@ func (c *Client) execute(ctx context.Context, endpoint string, req rawTaskReques
 		}
 	}
 
-	return &resp, nil
+	return resp, nil
 }
 
 func (c *Client) Poll(ctx context.Context, executionID string) (*TaskResponse, error) {
@@ -178,8 +178,8 @@ func (c *Client) Poll(ctx context.Context, executionID string) (*TaskResponse, e
 		return nil, errors.New(message)
 	}
 
-	var resp TaskResponse
-	if err := json.Unmarshal(respBody, &resp); err != nil {
+	resp, err := decodeTaskResponse(respBody)
+	if err != nil {
 		return nil, fmt.Errorf("decode response: %w", err)
 	}
 	if resp.ExecutionStatus == "" {
@@ -196,6 +196,16 @@ func (c *Client) Poll(ctx context.Context, executionID string) (*TaskResponse, e
 		}
 	}
 
+	return resp, nil
+}
+
+func decodeTaskResponse(body []byte) (*TaskResponse, error) {
+	var resp TaskResponse
+	decoder := json.NewDecoder(bytes.NewReader(body))
+	decoder.UseNumber()
+	if err := decoder.Decode(&resp); err != nil {
+		return nil, err
+	}
 	return &resp, nil
 }
 
