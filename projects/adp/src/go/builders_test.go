@@ -238,8 +238,14 @@ func TestStartApplicationDecodesURL(t *testing.T) {
 	if captured.req.TaskType != "Start Application" {
 		t.Fatalf("taskType = %q", captured.req.TaskType)
 	}
+	if len(captured.req.TaskConfiguration) != 1 {
+		t.Fatalf("taskConfiguration length = %d, want 1: %#v", len(captured.req.TaskConfiguration), captured.req.TaskConfiguration)
+	}
 	if captured.req.TaskConfiguration["adp_startApplication_applicationIdentifier"] != "app" {
 		t.Fatalf("taskConfiguration = %#v", captured.req.TaskConfiguration)
+	}
+	if _, ok := captured.req.TaskConfiguration["adp_startApplication_useHttps"]; ok {
+		t.Fatalf("taskConfiguration should omit useHttps: %#v", captured.req.TaskConfiguration)
 	}
 	if got.ApplicationURL != "https://example/app" {
 		t.Fatalf("got = %#v", got)
@@ -271,8 +277,17 @@ func TestExportDocumentsDecodesCounts(t *testing.T) {
 	if captured.req.TaskType != "Export Documents" {
 		t.Fatalf("taskType = %q", captured.req.TaskType)
 	}
+	if len(captured.req.TaskConfiguration) != 1 {
+		t.Fatalf("taskConfiguration length = %d, want 1: %#v", len(captured.req.TaskConfiguration), captured.req.TaskConfiguration)
+	}
 	if captured.req.TaskConfiguration["adp_exportDocuments_query"] != "*" {
 		t.Fatalf("taskConfiguration = %#v", captured.req.TaskConfiguration)
+	}
+	if _, ok := captured.req.TaskConfiguration["adp_exportDocuments_waitForExport"]; ok {
+		t.Fatalf("taskConfiguration should omit waitForExport: %#v", captured.req.TaskConfiguration)
+	}
+	if _, ok := captured.req.TaskConfiguration["adp_exportDocuments_exportFields"]; ok {
+		t.Fatalf("taskConfiguration should omit exportFields: %#v", captured.req.TaskConfiguration)
 	}
 	if got.SearchResultSize != 1000 {
 		t.Fatalf("got = %#v", got)
