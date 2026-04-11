@@ -477,16 +477,16 @@ func newClient(cmd *cli.Command) (*adp.Client, error) {
 	}
 
 	host := strings.TrimSpace(resolvedString(cmd, "host", cfg.Host))
-	user := strings.TrimSpace(resolvedString(cmd, "user", cfg.User))
-	password := strings.TrimSpace(resolvedString(cmd, "password", cfg.Password))
+	user := resolvedString(cmd, "user", cfg.User)
+	password := resolvedString(cmd, "password", cfg.Password)
 	missing := make([]string, 0, 3)
 	if host == "" {
 		missing = append(missing, "host")
 	}
-	if user == "" {
+	if strings.TrimSpace(user) == "" {
 		missing = append(missing, "user")
 	}
-	if password == "" {
+	if strings.TrimSpace(password) == "" {
 		missing = append(missing, "password")
 	}
 	if len(missing) > 0 {
