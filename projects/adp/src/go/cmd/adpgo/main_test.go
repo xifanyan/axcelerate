@@ -396,7 +396,7 @@ func TestQueryEngineCommandRequiresExactlyOneSelector(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected error")
 	}
-	if !strings.Contains(err.Error(), "exactly one of engineName or applicationIdentifier is required") {
+	if err.Error() != "exactly one of engineName or applicationIdentifier is required" {
 		t.Fatalf("error = %q", err)
 	}
 }
@@ -418,7 +418,7 @@ func TestQueryEngineCommandRejectsBothSelectors(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected error")
 	}
-	if !strings.Contains(err.Error(), "engineName and applicationIdentifier are mutually exclusive") {
+	if err.Error() != "engineName and applicationIdentifier are mutually exclusive" {
 		t.Fatalf("error = %q", err)
 	}
 }
@@ -567,7 +567,7 @@ func TestTaxonomyStatisticCommandRequiresExactlyOneSelector(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected error")
 	}
-	if !strings.Contains(err.Error(), "exactly one of engineName or applicationIdentifier is required") {
+	if err.Error() != "exactly one of engineName or applicationIdentifier is required" {
 		t.Fatalf("error = %q", err)
 	}
 }
@@ -589,7 +589,7 @@ func TestTaxonomyStatisticCommandRejectsBothSelectors(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected error")
 	}
-	if !strings.Contains(err.Error(), "engineName and applicationIdentifier are mutually exclusive") {
+	if err.Error() != "engineName and applicationIdentifier are mutually exclusive" {
 		t.Fatalf("error = %q", err)
 	}
 }
@@ -627,48 +627,6 @@ func TestTaxonomyStatisticCommandAllowsApplicationIdentifier(t *testing.T) {
 	}
 }
 
-func TestQueryEngineCommandRequiresEngineName(t *testing.T) {
-	stdout := &bytes.Buffer{}
-	stderr := &bytes.Buffer{}
-	cmd := newApp(stdout, stderr)
-
-	err := cmd.Run(context.Background(), []string{
-		"adpgo",
-		"--host", "https://example.test",
-		"--user", "adp",
-		"--password", "secret",
-		"query-engine",
-	})
-	if err == nil {
-		t.Fatal("expected error")
-	}
-
-	if !strings.Contains(err.Error(), "Required flag \"engineName\" not set") {
-		t.Fatalf("error = %q", err)
-	}
-}
-
-func TestTaxonomyStatisticCommandRequiresEngineName(t *testing.T) {
-	stdout := &bytes.Buffer{}
-	stderr := &bytes.Buffer{}
-	cmd := newApp(stdout, stderr)
-
-	err := cmd.Run(context.Background(), []string{
-		"adpgo",
-		"--host", "https://example.test",
-		"--user", "adp",
-		"--password", "secret",
-		"taxonomy-statistic",
-	})
-	if err == nil {
-		t.Fatal("expected error")
-	}
-
-	if !strings.Contains(err.Error(), "Required flag \"engineName\" not set") {
-		t.Fatalf("error = %q", err)
-	}
-}
-
 func TestRunPrintsParserErrorsToStderr(t *testing.T) {
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
@@ -684,8 +642,8 @@ func TestRunPrintsParserErrorsToStderr(t *testing.T) {
 	if exitCode != 1 {
 		t.Fatalf("exitCode = %d, want 1", exitCode)
 	}
-	if !strings.Contains(stderr.String(), "Required flag \"engineName\" not set") {
-		t.Fatalf("stderr = %q", stderr.String())
+	if got, want := stderr.String(), "exactly one of engineName or applicationIdentifier is required\n"; got != want {
+		t.Fatalf("stderr = %q, want %q", got, want)
 	}
 }
 
@@ -704,8 +662,8 @@ func TestRunPrintsTaxonomyStatisticParserErrorsToStderr(t *testing.T) {
 	if exitCode != 1 {
 		t.Fatalf("exitCode = %d, want 1", exitCode)
 	}
-	if !strings.Contains(stderr.String(), "Required flag \"engineName\" not set") {
-		t.Fatalf("stderr = %q", stderr.String())
+	if got, want := stderr.String(), "exactly one of engineName or applicationIdentifier is required\n"; got != want {
+		t.Fatalf("stderr = %q, want %q", got, want)
 	}
 }
 
@@ -831,7 +789,7 @@ func TestCreateOcrJobCommandRequiresExactlyOneSelector(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected error")
 	}
-	if !strings.Contains(err.Error(), "exactly one of engineName or applicationIdentifier is required") {
+	if err.Error() != "exactly one of engineName or applicationIdentifier is required" {
 		t.Fatalf("error = %q", err)
 	}
 }
@@ -853,7 +811,7 @@ func TestCreateOcrJobCommandRejectsBothSelectors(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected error")
 	}
-	if !strings.Contains(err.Error(), "engineName and applicationIdentifier are mutually exclusive") {
+	if err.Error() != "engineName and applicationIdentifier are mutually exclusive" {
 		t.Fatalf("error = %q", err)
 	}
 }
@@ -930,7 +888,7 @@ func TestCSVMergeCommandRequiresExactlyOneSelector(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected error")
 	}
-	if !strings.Contains(err.Error(), "exactly one of engineName or applicationIdentifier is required") {
+	if err.Error() != "exactly one of engineName or applicationIdentifier is required" {
 		t.Fatalf("error = %q", err)
 	}
 }
@@ -953,7 +911,7 @@ func TestCSVMergeCommandRejectsBothSelectors(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected error")
 	}
-	if !strings.Contains(err.Error(), "engineName and applicationIdentifier are mutually exclusive") {
+	if err.Error() != "engineName and applicationIdentifier are mutually exclusive" {
 		t.Fatalf("error = %q", err)
 	}
 }
