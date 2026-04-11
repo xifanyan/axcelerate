@@ -551,3 +551,22 @@ func TestCreateOcrJobWaitReturnsEmptyResult(t *testing.T) {
 		t.Fatalf("got = %#v", got)
 	}
 }
+
+func TestCreateOcrJobBuildRequestOmitsEmptyRestrictionSlices(t *testing.T) {
+	client := testClientForBuilder(t, func(w http.ResponseWriter, r *http.Request) {})
+
+	req, err := NewCreateOcrJobBuilder(client).
+		Restrictions([]EngineTaxonomyArg{}).
+		AdvancedRestrictions([]EngineTaxonomyArg{}).
+		buildRequest()
+	if err != nil {
+		t.Fatalf("buildRequest error: %v", err)
+	}
+
+	if _, ok := req.TaskConfiguration["adp_createOcrJob_restrictions"]; ok {
+		t.Fatalf("restrictions should be omitted: %#v", req.TaskConfiguration)
+	}
+	if _, ok := req.TaskConfiguration["adp_createOcrJob_AdvancedRestrictions"]; ok {
+		t.Fatalf("advancedRestrictions should be omitted: %#v", req.TaskConfiguration)
+	}
+}

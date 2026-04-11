@@ -170,10 +170,10 @@ func (b *CreateOcrJobBuilder) buildRequest() (rawTaskRequest, error) {
 	if b.globalSearchID != nil {
 		cfg["adp_createOcrJob_globalSearchId"] = *b.globalSearchID
 	}
-	if b.restrictions != nil {
+	if b.restrictions != nil && len(*b.restrictions) > 0 {
 		cfg["adp_createOcrJob_restrictions"] = *b.restrictions
 	}
-	if b.advancedRestrictions != nil {
+	if b.advancedRestrictions != nil && len(*b.advancedRestrictions) > 0 {
 		cfg["adp_createOcrJob_AdvancedRestrictions"] = *b.advancedRestrictions
 	}
 	if b.mainQueryType != nil {
