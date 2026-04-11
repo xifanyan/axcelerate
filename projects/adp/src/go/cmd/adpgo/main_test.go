@@ -381,6 +381,84 @@ func TestQueryEngineCommandParsesTaxonomyFlags(t *testing.T) {
 	}
 }
 
+func TestQueryEngineCommandRequiresExactlyOneSelector(t *testing.T) {
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+	cmd := newApp(stdout, stderr)
+
+	err := cmd.Run(context.Background(), []string{
+		"adpgo",
+		"--host", "https://example.test",
+		"--user", "adp",
+		"--password", "secret",
+		"query-engine",
+	})
+	if err == nil {
+		t.Fatal("expected error")
+	}
+	if !strings.Contains(err.Error(), "exactly one of engineName or applicationIdentifier is required") {
+		t.Fatalf("error = %q", err)
+	}
+}
+
+func TestQueryEngineCommandRejectsBothSelectors(t *testing.T) {
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+	cmd := newApp(stdout, stderr)
+
+	err := cmd.Run(context.Background(), []string{
+		"adpgo",
+		"--host", "https://example.test",
+		"--user", "adp",
+		"--password", "secret",
+		"query-engine",
+		"--engineName", "engineA",
+		"--applicationIdentifier", "appA",
+	})
+	if err == nil {
+		t.Fatal("expected error")
+	}
+	if !strings.Contains(err.Error(), "engineName and applicationIdentifier are mutually exclusive") {
+		t.Fatalf("error = %q", err)
+	}
+}
+
+func TestQueryEngineCommandAllowsApplicationIdentifier(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		cfg := decodeTaskConfiguration(t, r)
+		assertApplicationSelectorOnly(t, cfg, "adp_queryEngine_applicationIdentifier", "adp_queryEngine_engineName")
+
+		_, _ = io.WriteString(w, `{"executionId":"2","taskType":"Query Engine","loggingEnabled":"true","progressMax":1,"executionStatus":"success","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":1,"progressPercentage":1.0,"taskDisplayName":"Query engine","executionMetaData":{"adp_query_engine_documents_count":"100","adp_query_engine_aggregated_value":"500"}}`)
+	}))
+	defer server.Close()
+
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+	cmd := newApp(stdout, stderr)
+
+	err := cmd.Run(context.Background(), []string{
+		"adpgo",
+		"--host", server.URL,
+		"--path", "",
+		"--user", "adp",
+		"--password", "secret",
+		"query-engine",
+		"--applicationIdentifier", "appA",
+	})
+	if err != nil {
+		t.Fatalf("Run error: %v", err)
+	}
+	if stderr.Len() != 0 {
+		t.Fatalf("stderr = %q", stderr.String())
+	}
+	if !strings.Contains(stdout.String(), `"documentsCount": 100`) {
+		t.Fatalf("stdout = %q", stdout.String())
+	}
+	if strings.Contains(stdout.String(), "engineName") {
+		t.Fatalf("stdout = %q", stdout.String())
+	}
+}
+
 func TestCommandFailureFormatsTaskExecutionError(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		_, _ = io.WriteString(w, `{"executionId":"exec-123","taskType":"List Entities","loggingEnabled":"true","progressMax":1,"executionStatus":"failed","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":0,"progressPercentage":0.0,"taskDisplayName":"List entities","errorMessage":"boom","executionMetaData":null}`)
@@ -471,6 +549,81 @@ func TestCSVMergeCommandParsesFieldMappingsJSON(t *testing.T) {
 
 	if got, want := strings.TrimSpace(stdout.String()), "{}"; got != want {
 		t.Fatalf("stdout = %q, want %q", got, want)
+	}
+}
+
+func TestTaxonomyStatisticCommandRequiresExactlyOneSelector(t *testing.T) {
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+	cmd := newApp(stdout, stderr)
+
+	err := cmd.Run(context.Background(), []string{
+		"adpgo",
+		"--host", "https://example.test",
+		"--user", "adp",
+		"--password", "secret",
+		"taxonomy-statistic",
+	})
+	if err == nil {
+		t.Fatal("expected error")
+	}
+	if !strings.Contains(err.Error(), "exactly one of engineName or applicationIdentifier is required") {
+		t.Fatalf("error = %q", err)
+	}
+}
+
+func TestTaxonomyStatisticCommandRejectsBothSelectors(t *testing.T) {
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+	cmd := newApp(stdout, stderr)
+
+	err := cmd.Run(context.Background(), []string{
+		"adpgo",
+		"--host", "https://example.test",
+		"--user", "adp",
+		"--password", "secret",
+		"taxonomy-statistic",
+		"--engineName", "engineA",
+		"--applicationIdentifier", "appA",
+	})
+	if err == nil {
+		t.Fatal("expected error")
+	}
+	if !strings.Contains(err.Error(), "engineName and applicationIdentifier are mutually exclusive") {
+		t.Fatalf("error = %q", err)
+	}
+}
+
+func TestTaxonomyStatisticCommandAllowsApplicationIdentifier(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		cfg := decodeTaskConfiguration(t, r)
+		assertApplicationSelectorOnly(t, cfg, "adp_taxonomyStatistic_applicationIdentifier", "adp_taxonomyStatistic_engineName")
+
+		_, _ = io.WriteString(w, `{"executionId":"7","taskType":"Taxonomy Statistic","loggingEnabled":"true","progressMax":1,"executionStatus":"success","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":1,"progressPercentage":1.0,"taskDisplayName":"Taxonomy statistic","executionMetaData":{"adp_taxonomy_statistics_json_file_path":"taxonomy_stats.json","adp_taxonomy_statistics_json_output":"{\"date\":\"Wed\",\"searchParameter\":[],\"statistics\":{\"taxonomy\":[{\"id\":\"rm_source\",\"category\":[{\"id\":\"file_demo_04\",\"displayName\":\"file_demo_04\",\"count\":761}]}]}}"}}`)
+	}))
+	defer server.Close()
+
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+	cmd := newApp(stdout, stderr)
+
+	err := cmd.Run(context.Background(), []string{
+		"adpgo",
+		"--host", server.URL,
+		"--path", "",
+		"--user", "adp",
+		"--password", "secret",
+		"taxonomy-statistic",
+		"--applicationIdentifier", "appA",
+	})
+	if err != nil {
+		t.Fatalf("Run error: %v", err)
+	}
+	if stderr.Len() != 0 {
+		t.Fatalf("stderr = %q", stderr.String())
+	}
+	if !strings.Contains(stdout.String(), `"rm_source"`) {
+		t.Fatalf("stdout = %q", stdout.String())
 	}
 }
 
@@ -663,6 +816,84 @@ func TestCreateOcrJobCommandWaitsWhenRequested(t *testing.T) {
 	}
 }
 
+func TestCreateOcrJobCommandRequiresExactlyOneSelector(t *testing.T) {
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+	cmd := newApp(stdout, stderr)
+
+	err := cmd.Run(context.Background(), []string{
+		"adpgo",
+		"--host", "https://example.test",
+		"--user", "adp",
+		"--password", "secret",
+		"create-ocr-job",
+	})
+	if err == nil {
+		t.Fatal("expected error")
+	}
+	if !strings.Contains(err.Error(), "exactly one of engineName or applicationIdentifier is required") {
+		t.Fatalf("error = %q", err)
+	}
+}
+
+func TestCreateOcrJobCommandRejectsBothSelectors(t *testing.T) {
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+	cmd := newApp(stdout, stderr)
+
+	err := cmd.Run(context.Background(), []string{
+		"adpgo",
+		"--host", "https://example.test",
+		"--user", "adp",
+		"--password", "secret",
+		"create-ocr-job",
+		"--engineName", "engineA",
+		"--applicationIdentifier", "appA",
+	})
+	if err == nil {
+		t.Fatal("expected error")
+	}
+	if !strings.Contains(err.Error(), "engineName and applicationIdentifier are mutually exclusive") {
+		t.Fatalf("error = %q", err)
+	}
+}
+
+func TestCreateOcrJobCommandAllowsApplicationIdentifierWithoutEngineName(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/executeAdpTaskAsync" {
+			t.Fatalf("path = %q, want /executeAdpTaskAsync", r.URL.Path)
+		}
+		cfg := decodeTaskConfiguration(t, r)
+		assertApplicationSelectorOnly(t, cfg, "adp_createOcrJob_applicationIdentifier", "adp_createOcrJob_engineName")
+
+		_, _ = io.WriteString(w, `{"executionId":"ocr-123","taskType":"Create OCR Job","loggingEnabled":"true","progressMax":0,"executionStatus":"","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":0,"progressPercentage":0.0,"taskDisplayName":"Create OCR Job","executionMetaData":[]}`)
+	}))
+	defer server.Close()
+
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+	cmd := newApp(stdout, stderr)
+
+	err := cmd.Run(context.Background(), []string{
+		"adpgo",
+		"--host", server.URL,
+		"--path", "",
+		"--user", "adp",
+		"--password", "secret",
+		"create-ocr-job",
+		"--applicationIdentifier", "appA",
+	})
+	if err != nil {
+		t.Fatalf("Run error: %v", err)
+	}
+	if stderr.Len() != 0 {
+		t.Fatalf("stderr = %q", stderr.String())
+	}
+	if !strings.Contains(stdout.String(), `"executionId": "ocr-123"`) {
+		t.Fatalf("stdout = %q", stdout.String())
+	}
+}
+
 func TestCSVMergeCommandRequiresCSVFile(t *testing.T) {
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
@@ -683,6 +914,84 @@ func TestCSVMergeCommandRequiresCSVFile(t *testing.T) {
 	}
 }
 
+func TestCSVMergeCommandRequiresExactlyOneSelector(t *testing.T) {
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+	cmd := newApp(stdout, stderr)
+
+	err := cmd.Run(context.Background(), []string{
+		"adpgo",
+		"--host", "https://example.test",
+		"--user", "adp",
+		"--password", "secret",
+		"csv-merge",
+		"--csvFile", "input.csv",
+	})
+	if err == nil {
+		t.Fatal("expected error")
+	}
+	if !strings.Contains(err.Error(), "exactly one of engineName or applicationIdentifier is required") {
+		t.Fatalf("error = %q", err)
+	}
+}
+
+func TestCSVMergeCommandRejectsBothSelectors(t *testing.T) {
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+	cmd := newApp(stdout, stderr)
+
+	err := cmd.Run(context.Background(), []string{
+		"adpgo",
+		"--host", "https://example.test",
+		"--user", "adp",
+		"--password", "secret",
+		"csv-merge",
+		"--csvFile", "input.csv",
+		"--engineName", "engineA",
+		"--applicationIdentifier", "appA",
+	})
+	if err == nil {
+		t.Fatal("expected error")
+	}
+	if !strings.Contains(err.Error(), "engineName and applicationIdentifier are mutually exclusive") {
+		t.Fatalf("error = %q", err)
+	}
+}
+
+func TestCSVMergeCommandAllowsApplicationIdentifierWithoutEngineName(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		cfg := decodeTaskConfiguration(t, r)
+		assertApplicationSelectorOnly(t, cfg, "adp_csvMerge_applicationIdentifier", "adp_csvMerge_engineName")
+
+		_, _ = io.WriteString(w, `{"executionId":"3","taskType":"CSV Merge","loggingEnabled":"true","progressMax":1,"executionStatus":"success","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":1,"progressPercentage":1.0,"taskDisplayName":"Csv merge task","executionMetaData":[]}`)
+	}))
+	defer server.Close()
+
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+	cmd := newApp(stdout, stderr)
+
+	err := cmd.Run(context.Background(), []string{
+		"adpgo",
+		"--host", server.URL,
+		"--path", "",
+		"--user", "adp",
+		"--password", "secret",
+		"csv-merge",
+		"--csvFile", "input.csv",
+		"--applicationIdentifier", "appA",
+	})
+	if err != nil {
+		t.Fatalf("Run error: %v", err)
+	}
+	if stderr.Len() != 0 {
+		t.Fatalf("stderr = %q", stderr.String())
+	}
+	if got, want := strings.TrimSpace(stdout.String()), "{}"; got != want {
+		t.Fatalf("stdout = %q, want %q", got, want)
+	}
+}
+
 func TestCLICommandRequiresBatchScriptPath(t *testing.T) {
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
@@ -700,6 +1009,33 @@ func TestCLICommandRequiresBatchScriptPath(t *testing.T) {
 	}
 	if !strings.Contains(err.Error(), "Required flag \"batchScriptPath\" not set") {
 		t.Fatalf("error = %q", err)
+	}
+}
+
+func decodeTaskConfiguration(t *testing.T, r *http.Request) map[string]any {
+	t.Helper()
+
+	var req map[string]any
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		t.Fatalf("decode request: %v", err)
+	}
+
+	cfg, ok := req["taskConfiguration"].(map[string]any)
+	if !ok {
+		t.Fatalf("taskConfiguration type = %T", req["taskConfiguration"])
+	}
+
+	return cfg
+}
+
+func assertApplicationSelectorOnly(t *testing.T, cfg map[string]any, applicationKey, engineKey string) {
+	t.Helper()
+
+	if got := cfg[applicationKey]; got != "appA" {
+		t.Fatalf("%s = %#v", applicationKey, got)
+	}
+	if _, ok := cfg[engineKey]; ok {
+		t.Fatalf("taskConfiguration should omit %s: %#v", engineKey, cfg)
 	}
 }
 
