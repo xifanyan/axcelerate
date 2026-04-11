@@ -160,8 +160,8 @@ func TestQueryEngineAllowsApplicationIdentifierWhenEngineNameIsEmpty(t *testing.
 	if req.TaskConfiguration["adp_queryEngine_applicationIdentifier"] != "appA" {
 		t.Fatalf("taskConfiguration = %#v", req.TaskConfiguration)
 	}
-	if _, ok := req.TaskConfiguration["adp_queryEngine_engineName"]; ok {
-		t.Fatalf("taskConfiguration should omit engineName: %#v", req.TaskConfiguration)
+	if got := req.TaskConfiguration["adp_queryEngine_engineName"]; got != "" {
+		t.Fatalf("engineName = %#v", got)
 	}
 }
 
@@ -317,8 +317,8 @@ func TestTaxonomyStatisticAllowsApplicationIdentifierWhenEngineNameIsEmpty(t *te
 	if req.TaskConfiguration["adp_taxonomyStatistic_applicationIdentifier"] != "appA" {
 		t.Fatalf("taskConfiguration = %#v", req.TaskConfiguration)
 	}
-	if _, ok := req.TaskConfiguration["adp_taxonomyStatistic_engineName"]; ok {
-		t.Fatalf("taskConfiguration should omit engineName: %#v", req.TaskConfiguration)
+	if got := req.TaskConfiguration["adp_taxonomyStatistic_engineName"]; got != "" {
+		t.Fatalf("engineName = %#v", got)
 	}
 }
 
@@ -899,8 +899,8 @@ func TestCreateOcrJobAllowsApplicationIdentifierWhenEngineNameIsEmpty(t *testing
 	if req.TaskConfiguration["adp_createOcrJob_applicationIdentifier"] != "appA" {
 		t.Fatalf("taskConfiguration = %#v", req.TaskConfiguration)
 	}
-	if _, ok := req.TaskConfiguration["adp_createOcrJob_engineName"]; ok {
-		t.Fatalf("taskConfiguration should omit engineName: %#v", req.TaskConfiguration)
+	if got := req.TaskConfiguration["adp_createOcrJob_engineName"]; got != "" {
+		t.Fatalf("engineName = %#v", got)
 	}
 }
 
