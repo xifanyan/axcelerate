@@ -21,17 +21,31 @@ Use [urfave/cli/v3](https://github.com/urfave/cli) for CLI implementation.
 ## Project Structure
 
 ```
-src/go/
+go/
 ├── cmd/adpgo/
-│   └── main.go       # CLI entrypoint
+│   ├── main.go       # CLI entrypoint
+│   └── main_test.go
 ├── client.go         # HTTP client
-├── types.go          # Shared types
+├── client_test.go
+├── types.go          # Shared types + builder pattern
 ├── list_entities.go  # List Entities task
 ├── query_engine.go   # Query Engine task
 ├── taxonomy_statistic.go  # Taxonomy Statistic task
 ├── csv_merge.go      # CSV Merge task
 ├── export_documents.go    # Export Documents task
-└── start_application.go  # Start Application task
+├── start_application.go  # Start Application task
+├── read_configuration.go # Read Configuration task
+├── create_ocr_job.go     # Create OCR Job task
+├── cli_task.go       # CLI task
+├── cli_helpers.go    # CLI helper functions
+├── decode.go         # JSON response decoding
+├── decode_test.go
+├── builders_test.go
+├── parsing_test.go
+├── go.mod
+├── go.sum
+├── AGENTS.md         # Agent guidelines
+└── task_spec.json    # Task specification source
 ```
 
 ---
