@@ -224,3 +224,232 @@ func TestCSVMergeCommandParsesFieldMappingsJSON(t *testing.T) {
 		t.Fatalf("stdout = %q, want %q", got, want)
 	}
 }
+
+func TestQueryEngineCommandRequiresEngineName(t *testing.T) {
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+	cmd := newApp(stdout, stderr)
+
+	err := cmd.Run(context.Background(), []string{
+		"adpgo",
+		"--host", "https://example.test",
+		"--user", "adp",
+		"--password", "secret",
+		"query-engine",
+	})
+	if err == nil {
+		t.Fatal("expected error")
+	}
+
+	if !strings.Contains(err.Error(), "Required flag \"engineName\" not set") {
+		t.Fatalf("error = %q", err)
+	}
+}
+
+func TestTaxonomyStatisticCommandRequiresEngineName(t *testing.T) {
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+	cmd := newApp(stdout, stderr)
+
+	err := cmd.Run(context.Background(), []string{
+		"adpgo",
+		"--host", "https://example.test",
+		"--user", "adp",
+		"--password", "secret",
+		"taxonomy-statistic",
+	})
+	if err == nil {
+		t.Fatal("expected error")
+	}
+
+	if !strings.Contains(err.Error(), "Required flag \"engineName\" not set") {
+		t.Fatalf("error = %q", err)
+	}
+}
+
+func TestRunPrintsParserErrorsToStderr(t *testing.T) {
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+
+	exitCode := run(stdout, stderr, []string{
+		"adpgo",
+		"--host", "https://example.test",
+		"--user", "adp",
+		"--password", "secret",
+		"query-engine",
+	})
+
+	if exitCode != 1 {
+		t.Fatalf("exitCode = %d, want 1", exitCode)
+	}
+	if !strings.Contains(stderr.String(), "Required flag \"engineName\" not set") {
+		t.Fatalf("stderr = %q", stderr.String())
+	}
+}
+
+func TestRunPrintsTaxonomyStatisticParserErrorsToStderr(t *testing.T) {
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+
+	exitCode := run(stdout, stderr, []string{
+		"adpgo",
+		"--host", "https://example.test",
+		"--user", "adp",
+		"--password", "secret",
+		"taxonomy-statistic",
+	})
+
+	if exitCode != 1 {
+		t.Fatalf("exitCode = %d, want 1", exitCode)
+	}
+	if !strings.Contains(stderr.String(), "Required flag \"engineName\" not set") {
+		t.Fatalf("stderr = %q", stderr.String())
+	}
+}
+
+func TestRunDoesNotDuplicateTaskExecutionErrors(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = io.WriteString(w, `{"executionId":"exec-123","taskType":"List Entities","loggingEnabled":"true","progressMax":1,"executionStatus":"failed","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":0,"progressPercentage":0.0,"taskDisplayName":"List entities","errorMessage":"boom","executionMetaData":null}`)
+	}))
+	defer server.Close()
+
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+
+	exitCode := run(stdout, stderr, []string{
+		"adpgo",
+		"--host", server.URL,
+		"--path", "",
+		"--user", "adp",
+		"--password", "secret",
+		"list-entities",
+	})
+
+	if exitCode != 1 {
+		t.Fatalf("exitCode = %d, want 1", exitCode)
+	}
+	if stdout.Len() != 0 {
+		t.Fatalf("stdout = %q", stdout.String())
+	}
+
+	got := stderr.String()
+	const want = "Error: boom\nExecutionID: exec-123\nTaskType: List Entities\n"
+	if got != want {
+		t.Fatalf("stderr = %q, want %q", got, want)
+	}
+}
+
+func TestCreateOcrJobCommandStartsWithoutWaitingByDefault(t *testing.T) {
+	requests := make([]string, 0, 2)
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		requests = append(requests, r.URL.Path)
+		_, _ = io.WriteString(w, `{"executionId":"ocr-123","taskType":"Create OCR Job","loggingEnabled":"true","progressMax":0,"executionStatus":"","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":0,"progressPercentage":0.0,"taskDisplayName":"Create OCR Job","executionMetaData":[]}`)
+	}))
+	defer server.Close()
+
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+	cmd := newApp(stdout, stderr)
+
+	err := cmd.Run(context.Background(), []string{
+		"adpgo",
+		"--host", server.URL,
+		"--path", "",
+		"--user", "adp",
+		"--password", "secret",
+		"create-ocr-job",
+		"--engineName", "engineA",
+	})
+	if err != nil {
+		t.Fatalf("Run error: %v", err)
+	}
+	if stderr.Len() != 0 {
+		t.Fatalf("stderr = %q", stderr.String())
+	}
+	if len(requests) != 1 || requests[0] != "/executeAdpTaskAsync" {
+		t.Fatalf("requests = %#v", requests)
+	}
+	if !strings.Contains(stdout.String(), `"executionId": "ocr-123"`) {
+		t.Fatalf("stdout = %q", stdout.String())
+	}
+}
+
+func TestCreateOcrJobCommandWaitsWhenRequested(t *testing.T) {
+	requests := make([]string, 0, 2)
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		requests = append(requests, r.URL.Path)
+		if len(requests) == 1 {
+			_, _ = io.WriteString(w, `{"executionId":"ocr-123","taskType":"Create OCR Job","loggingEnabled":"true","progressMax":0,"executionStatus":"","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":0,"progressPercentage":0.0,"taskDisplayName":"Create OCR Job","executionMetaData":[]}`)
+			return
+		}
+		_, _ = io.WriteString(w, `{"executionId":"ocr-123","taskType":"Create OCR Job","loggingEnabled":"true","progressMax":1,"executionStatus":"success","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":1,"progressPercentage":1.0,"taskDisplayName":"Create OCR Job","executionMetaData":[]}`)
+	}))
+	defer server.Close()
+
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+	cmd := newApp(stdout, stderr)
+
+	err := cmd.Run(context.Background(), []string{
+		"adpgo",
+		"--host", server.URL,
+		"--path", "",
+		"--user", "adp",
+		"--password", "secret",
+		"create-ocr-job",
+		"--engineName", "engineA",
+		"--wait",
+	})
+	if err != nil {
+		t.Fatalf("Run error: %v", err)
+	}
+	if stderr.Len() != 0 {
+		t.Fatalf("stderr = %q", stderr.String())
+	}
+	if len(requests) != 2 || requests[0] != "/executeAdpTaskAsync" || requests[1] != "/statusAndProgress" {
+		t.Fatalf("requests = %#v", requests)
+	}
+	if got, want := strings.TrimSpace(stdout.String()), "{}"; got != want {
+		t.Fatalf("stdout = %q, want %q", got, want)
+	}
+}
+
+func TestCSVMergeCommandRequiresCSVFile(t *testing.T) {
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+	cmd := newApp(stdout, stderr)
+
+	err := cmd.Run(context.Background(), []string{
+		"adpgo",
+		"--host", "https://example.test",
+		"--user", "adp",
+		"--password", "secret",
+		"csv-merge",
+	})
+	if err == nil {
+		t.Fatal("expected error")
+	}
+	if !strings.Contains(err.Error(), "Required flag \"csvFile\" not set") {
+		t.Fatalf("error = %q", err)
+	}
+}
+
+func TestCLICommandRequiresBatchScriptPath(t *testing.T) {
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+	cmd := newApp(stdout, stderr)
+
+	err := cmd.Run(context.Background(), []string{
+		"adpgo",
+		"--host", "https://example.test",
+		"--user", "adp",
+		"--password", "secret",
+		"cli",
+	})
+	if err == nil {
+		t.Fatal("expected error")
+	}
+	if !strings.Contains(err.Error(), "Required flag \"batchScriptPath\" not set") {
+		t.Fatalf("error = %q", err)
+	}
+}

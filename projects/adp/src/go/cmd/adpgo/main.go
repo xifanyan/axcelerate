@@ -15,9 +15,22 @@ import (
 const pollInterval = 0
 
 func main() {
-	if err := newApp(os.Stdout, os.Stderr).Run(context.Background(), os.Args); err != nil {
-		os.Exit(1)
+	os.Exit(run(os.Stdout, os.Stderr, os.Args))
+}
+
+func run(stdout io.Writer, stderr io.Writer, args []string) int {
+	err := newApp(stdout, stderr).Run(context.Background(), args)
+	if err == nil {
+		return 0
 	}
+	var execErr *adp.TaskExecutionError
+	if errors.As(err, &execErr) {
+		return 1
+	}
+	if _, writeErr := fmt.Fprintln(stderr, err); writeErr != nil {
+		return 1
+	}
+	return 1
 }
 
 func newApp(stdout io.Writer, stderr io.Writer) *cli.Command {
@@ -72,7 +85,7 @@ func newApp(stdout io.Writer, stderr io.Writer) *cli.Command {
 			{
 				Name: "query-engine",
 				Flags: []cli.Flag{
-					&cli.StringFlag{Name: "engineName"},
+					&cli.StringFlag{Name: "engineName", Required: true},
 					&cli.StringFlag{Name: "engineQuery"},
 					&cli.StringFlag{Name: "engineUserName"},
 					&cli.StringFlag{Name: "engineUserPassword"},
@@ -110,7 +123,7 @@ func newApp(stdout io.Writer, stderr io.Writer) *cli.Command {
 			{
 				Name: "taxonomy-statistic",
 				Flags: []cli.Flag{
-					&cli.StringFlag{Name: "engineName"},
+					&cli.StringFlag{Name: "engineName", Required: true},
 					&cli.StringFlag{Name: "engineQuery"},
 					&cli.BoolFlag{Name: "computeCounts", Value: true},
 					&cli.BoolFlag{Name: "listCategoryProperties"},
@@ -186,7 +199,7 @@ func newApp(stdout io.Writer, stderr io.Writer) *cli.Command {
 			{
 				Name: "csv-merge",
 				Flags: []cli.Flag{
-					&cli.StringFlag{Name: "csvFile"},
+					&cli.StringFlag{Name: "csvFile", Required: true},
 					&cli.StringFlag{Name: "csvIdFieldKey"},
 					&cli.StringFlag{Name: "mergeType"},
 					&cli.StringFlag{Name: "csvMode"},
@@ -382,7 +395,15 @@ func newApp(stdout io.Writer, stderr io.Writer) *cli.Command {
 						builder.AdvancedRestrictions(items)
 					}
 
-					result, err := builder.Wait(ctx, pollInterval)
+					if cmd.Bool("wait") {
+						result, err := builder.Wait(ctx, pollInterval)
+						if err != nil {
+							return printCommandError(stderr, err)
+						}
+						return writeJSON(stdout, result)
+					}
+
+					result, err := builder.Start(ctx)
 					if err != nil {
 						return printCommandError(stderr, err)
 					}
@@ -392,7 +413,7 @@ func newApp(stdout io.Writer, stderr io.Writer) *cli.Command {
 			{
 				Name: "cli",
 				Flags: []cli.Flag{
-					&cli.StringFlag{Name: "batchScriptPath"},
+					&cli.StringFlag{Name: "batchScriptPath", Required: true},
 					&cli.StringFlag{Name: "batchScriptParameters"},
 					&cli.StringFlag{Name: "workingDirectory"},
 					&cli.StringFlag{Name: "batchScriptJsonLogOutput"},

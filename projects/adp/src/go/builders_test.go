@@ -357,7 +357,7 @@ func TestReadConfigurationBuildsConfigObjectsAndDecodesResult(t *testing.T) {
 		var req rawTaskRequest
 		err := json.NewDecoder(r.Body).Decode(&req)
 		requestCh <- requestCapture{req: req, err: err}
-		io.WriteString(w, `{"executionId":"11","taskType":"Read Configuration","loggingEnabled":"true","progressMax":1,"executionStatus":"success","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":1,"progressPercentage":1.0,"taskDisplayName":"Read Configuration","executionMetaData":{"adp_entities_output_file_name":"output.json","adp_entities_json_output":"{\"dataSource.file_demo_01\":{\"DynamicComponents\":{\"compA\":{\"Enabled\":true}},\"Global\":{\"Static\":{\"Parameters\":[{\"Cells\":[],\"Name\":\"param\",\"Value\":\"x\"}]}}}}"}}`)
+		io.WriteString(w, `{"executionId":"11","taskType":"Read Configuration","loggingEnabled":"true","progressMax":1,"executionStatus":"success","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":1,"progressPercentage":1.0,"taskDisplayName":"Read Configuration","executionMetaData":{"adp_entities_output_file_name":"output.json","adp_entities_json_output":"{\"dataSource.file_demo_01\":{\"DynamicComponents\":{\"compA\":{\"Enabled\":true}},\"Global\":{\"Static\":{\"Parameters\":[{\"cells\":[[{\"name\":\"column\",\"value\":\"cell-value\"}]],\"name\":\"param\",\"value\":\"x\"}]}}}}"}}`)
 	})
 
 	got, err := NewReadConfigurationBuilder(client).
@@ -408,6 +408,12 @@ func TestReadConfigurationBuildsConfigObjectsAndDecodesResult(t *testing.T) {
 		t.Fatalf("info = %#v", info)
 	}
 	if info.Global.Static.Parameters[0].Name != "param" || info.Global.Static.Parameters[0].Value != "x" {
+		t.Fatalf("info = %#v", info)
+	}
+	if len(info.Global.Static.Parameters[0].Cells) != 1 || len(info.Global.Static.Parameters[0].Cells[0]) != 1 {
+		t.Fatalf("info = %#v", info)
+	}
+	if info.Global.Static.Parameters[0].Cells[0][0].Name != "column" || info.Global.Static.Parameters[0].Cells[0][0].Value != "cell-value" {
 		t.Fatalf("info = %#v", info)
 	}
 }
