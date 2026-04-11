@@ -7,6 +7,8 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -60,6 +62,221 @@ func TestListEntitiesCommandPrintsDecodedEntities(t *testing.T) {
 	}
 
 	if got, want := strings.TrimSpace(stdout.String()), "[\n  {\n    \"id\": \"entity-1\",\n    \"displayName\": \"Entity One\"\n  }\n]"; got != want {
+		t.Fatalf("stdout = %q, want %q", got, want)
+	}
+}
+
+func TestListEntitiesCommandReadsGlobalConfigFile(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/executeAdpTask" {
+			t.Fatalf("path = %q, want /executeAdpTask", r.URL.Path)
+		}
+
+		if got, want := r.Header.Get("Auth-Username"), "adp"; got != want {
+			t.Fatalf("Auth-Username = %q, want %q", got, want)
+		}
+		if got, want := r.Header.Get("Auth-Password"), "secret"; got != want {
+			t.Fatalf("Auth-Password = %q, want %q", got, want)
+		}
+
+		var req map[string]any
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			t.Fatalf("decode request: %v", err)
+		}
+
+		if got := req["taskType"]; got != "List Entities" {
+			t.Fatalf("taskType = %#v", got)
+		}
+
+		_, _ = io.WriteString(w, `{"executionId":"1","taskType":"List Entities","loggingEnabled":"true","progressMax":1,"executionStatus":"success","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":1,"progressPercentage":1.0,"taskDisplayName":"List entities","executionMetaData":{"adp_entities_output_file_name":"output.json","adp_entities_json_output":"[]"}}`)
+	}))
+	defer server.Close()
+
+	dir := t.TempDir()
+	writeADPConfigFile(t, dir, map[string]any{
+		"host":     server.URL,
+		"user":     "adp",
+		"password": "secret",
+		"path":     "",
+	})
+
+	withWorkingDir(t, dir)
+
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+	cmd := newApp(stdout, stderr)
+
+	err := cmd.Run(context.Background(), []string{
+		"adpgo",
+		"list-entities",
+	})
+	if err != nil {
+		t.Fatalf("Run error: %v", err)
+	}
+
+	if stderr.Len() != 0 {
+		t.Fatalf("stderr = %q", stderr.String())
+	}
+
+	if got, want := strings.TrimSpace(stdout.String()), "[]"; got != want {
+		t.Fatalf("stdout = %q, want %q", got, want)
+	}
+}
+
+func TestListEntitiesCommandCLIFlagsOverrideConfigFile(t *testing.T) {
+	configServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		t.Fatalf("unexpected request to config-backed server: %s", r.URL.Path)
+	}))
+	defer configServer.Close()
+
+	cliServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/executeAdpTask" {
+			t.Fatalf("path = %q, want /executeAdpTask", r.URL.Path)
+		}
+
+		if got, want := r.Header.Get("Auth-Username"), "cli-user"; got != want {
+			t.Fatalf("Auth-Username = %q, want %q", got, want)
+		}
+		if got, want := r.Header.Get("Auth-Password"), "cli-secret"; got != want {
+			t.Fatalf("Auth-Password = %q, want %q", got, want)
+		}
+
+		_, _ = io.WriteString(w, `{"executionId":"1","taskType":"List Entities","loggingEnabled":"true","progressMax":1,"executionStatus":"success","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":1,"progressPercentage":1.0,"taskDisplayName":"List entities","executionMetaData":{"adp_entities_output_file_name":"output.json","adp_entities_json_output":"[]"}}`)
+	}))
+	defer cliServer.Close()
+
+	dir := t.TempDir()
+	writeADPConfigFile(t, dir, map[string]any{
+		"host":     configServer.URL,
+		"user":     "config-user",
+		"password": "config-secret",
+		"path":     "",
+	})
+
+	withWorkingDir(t, dir)
+
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+	cmd := newApp(stdout, stderr)
+
+	err := cmd.Run(context.Background(), []string{
+		"adpgo",
+		"--host", cliServer.URL,
+		"--path", "",
+		"--user", "cli-user",
+		"--password", "cli-secret",
+		"list-entities",
+	})
+	if err != nil {
+		t.Fatalf("Run error: %v", err)
+	}
+
+	if stderr.Len() != 0 {
+		t.Fatalf("stderr = %q", stderr.String())
+	}
+
+	if got, want := strings.TrimSpace(stdout.String()), "[]"; got != want {
+		t.Fatalf("stdout = %q, want %q", got, want)
+	}
+}
+
+func TestRunReportsInvalidConfigFile(t *testing.T) {
+	dir := t.TempDir()
+	configPath := filepath.Join(dir, "adp_config.json")
+	if err := os.WriteFile(configPath, []byte(`{"host":`), 0o644); err != nil {
+		t.Fatalf("write config: %v", err)
+	}
+
+	withWorkingDir(t, dir)
+
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+
+	exitCode := run(stdout, stderr, []string{
+		"adpgo",
+		"list-entities",
+	})
+
+	if exitCode != 1 {
+		t.Fatalf("exitCode = %d, want 1", exitCode)
+	}
+	if stdout.Len() != 0 {
+		t.Fatalf("stdout = %q", stdout.String())
+	}
+	if got := stderr.String(); !strings.Contains(got, "adp_config.json") || !strings.Contains(strings.ToLower(got), "invalid") {
+		t.Fatalf("stderr = %q", got)
+	}
+}
+
+func TestRunReportsMissingRequiredGlobalsAfterConfigResolution(t *testing.T) {
+	dir := t.TempDir()
+	writeADPConfigFile(t, dir, map[string]any{
+		"host": "https://example.test",
+		"path": "",
+	})
+
+	withWorkingDir(t, dir)
+
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+
+	exitCode := run(stdout, stderr, []string{
+		"adpgo",
+		"list-entities",
+	})
+
+	if exitCode != 1 {
+		t.Fatalf("exitCode = %d, want 1", exitCode)
+	}
+	if stdout.Len() != 0 {
+		t.Fatalf("stdout = %q", stdout.String())
+	}
+	text := stderr.String()
+	for _, want := range []string{"host", "user", "password"} {
+		if !strings.Contains(text, want) {
+			t.Fatalf("stderr = %q, missing %q", text, want)
+		}
+	}
+}
+
+func TestListEntitiesCommandCLIPathOverridesConfigFile(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/executeAdpTask" {
+			t.Fatalf("path = %q, want /executeAdpTask", r.URL.Path)
+		}
+
+		_, _ = io.WriteString(w, `{"executionId":"1","taskType":"List Entities","loggingEnabled":"true","progressMax":1,"executionStatus":"success","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":1,"progressPercentage":1.0,"taskDisplayName":"List entities","executionMetaData":{"adp_entities_output_file_name":"output.json","adp_entities_json_output":"[]"}}`)
+	}))
+	defer server.Close()
+
+	dir := t.TempDir()
+	writeADPConfigFile(t, dir, map[string]any{
+		"host":     server.URL,
+		"user":     "adp",
+		"password": "secret",
+		"path":     "/wrong-base",
+	})
+
+	withWorkingDir(t, dir)
+
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+	cmd := newApp(stdout, stderr)
+
+	err := cmd.Run(context.Background(), []string{
+		"adpgo",
+		"--path", "",
+		"list-entities",
+	})
+	if err != nil {
+		t.Fatalf("Run error: %v", err)
+	}
+
+	if stderr.Len() != 0 {
+		t.Fatalf("stderr = %q", stderr.String())
+	}
+
+	if got, want := strings.TrimSpace(stdout.String()), "[]"; got != want {
 		t.Fatalf("stdout = %q, want %q", got, want)
 	}
 }
@@ -452,4 +669,35 @@ func TestCLICommandRequiresBatchScriptPath(t *testing.T) {
 	if !strings.Contains(err.Error(), "Required flag \"batchScriptPath\" not set") {
 		t.Fatalf("error = %q", err)
 	}
+}
+
+func writeADPConfigFile(t *testing.T, dir string, config map[string]any) {
+	t.Helper()
+
+	body, err := json.Marshal(config)
+	if err != nil {
+		t.Fatalf("marshal config: %v", err)
+	}
+
+	configPath := filepath.Join(dir, "adp_config.json")
+	if err := os.WriteFile(configPath, body, 0o644); err != nil {
+		t.Fatalf("write config: %v", err)
+	}
+}
+
+func withWorkingDir(t *testing.T, dir string) {
+	t.Helper()
+
+	wd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("getwd: %v", err)
+	}
+	if err := os.Chdir(dir); err != nil {
+		t.Fatalf("chdir %q: %v", dir, err)
+	}
+	t.Cleanup(func() {
+		if err := os.Chdir(wd); err != nil {
+			t.Fatalf("restore working directory: %v", err)
+		}
+	})
 }
