@@ -96,7 +96,7 @@ func newApp(stdout io.Writer, stderr io.Writer) *cli.Command {
 			{
 				Name: "query-engine",
 				Flags: []cli.Flag{
-					&cli.StringFlag{Name: "engineName", Required: true},
+					&cli.StringFlag{Name: "engineName"},
 					&cli.StringFlag{Name: "engineQuery"},
 					&cli.StringFlag{Name: "engineUserName"},
 					&cli.StringFlag{Name: "engineUserPassword"},
@@ -104,17 +104,21 @@ func newApp(stdout io.Writer, stderr io.Writer) *cli.Command {
 					&cli.StringFlag{Name: "applicationIdentifier"},
 				},
 				Action: func(ctx context.Context, cmd *cli.Command) error {
+					if err := validateExclusiveSelectors(cmd); err != nil {
+						return err
+					}
+
 					client, err := newClient(cmd)
 					if err != nil {
 						return err
 					}
 
 					builder := adp.NewQueryEngineBuilder(client)
-					applyString(cmd, "engineName", builder.EngineName)
+					applySelectorString(cmd, "engineName", builder.EngineName)
 					applyString(cmd, "engineQuery", builder.EngineQuery)
 					applyString(cmd, "engineUserName", builder.EngineUserName)
 					applyString(cmd, "engineUserPassword", builder.EngineUserPassword)
-					applyString(cmd, "applicationIdentifier", builder.ApplicationIdentifier)
+					applySelectorString(cmd, "applicationIdentifier", builder.ApplicationIdentifier)
 
 					if cmd.IsSet("engineTaxonomies") {
 						taxonomies, err := parseEngineTaxonomies(cmd.StringSlice("engineTaxonomies"))
@@ -134,7 +138,7 @@ func newApp(stdout io.Writer, stderr io.Writer) *cli.Command {
 			{
 				Name: "taxonomy-statistic",
 				Flags: []cli.Flag{
-					&cli.StringFlag{Name: "engineName", Required: true},
+					&cli.StringFlag{Name: "engineName"},
 					&cli.StringFlag{Name: "engineQuery"},
 					&cli.BoolFlag{Name: "computeCounts", Value: true},
 					&cli.BoolFlag{Name: "listCategoryProperties"},
@@ -143,13 +147,17 @@ func newApp(stdout io.Writer, stderr io.Writer) *cli.Command {
 					&cli.StringFlag{Name: "applicationIdentifier"},
 				},
 				Action: func(ctx context.Context, cmd *cli.Command) error {
+					if err := validateExclusiveSelectors(cmd); err != nil {
+						return err
+					}
+
 					client, err := newClient(cmd)
 					if err != nil {
 						return err
 					}
 
 					builder := adp.NewTaxonomyStatisticBuilder(client)
-					applyString(cmd, "engineName", builder.EngineName)
+					applySelectorString(cmd, "engineName", builder.EngineName)
 					applyString(cmd, "engineQuery", builder.EngineQuery)
 					if cmd.IsSet("computeCounts") {
 						builder.ComputeCounts(cmd.Bool("computeCounts"))
@@ -157,7 +165,7 @@ func newApp(stdout io.Writer, stderr io.Writer) *cli.Command {
 					if cmd.IsSet("listCategoryProperties") {
 						builder.ListCategoryProperties(cmd.Bool("listCategoryProperties"))
 					}
-					applyString(cmd, "applicationIdentifier", builder.ApplicationIdentifier)
+					applySelectorString(cmd, "applicationIdentifier", builder.ApplicationIdentifier)
 
 					if cmd.IsSet("engineTaxonomies") {
 						taxonomies, err := parseEngineTaxonomies(cmd.StringSlice("engineTaxonomies"))
@@ -230,6 +238,14 @@ func newApp(stdout io.Writer, stderr io.Writer) *cli.Command {
 					&cli.BoolFlag{Name: "doNotChangeProtectedDocuments"},
 				},
 				Action: func(ctx context.Context, cmd *cli.Command) error {
+					if strings.TrimSpace(cmd.String("csvFile")) == "" {
+						return errors.New("csvFile is required")
+					}
+
+					if err := validateExclusiveSelectors(cmd); err != nil {
+						return err
+					}
+
 					client, err := newClient(cmd)
 					if err != nil {
 						return err
@@ -240,11 +256,11 @@ func newApp(stdout io.Writer, stderr io.Writer) *cli.Command {
 					applyString(cmd, "csvIdFieldKey", builder.CSVIDFieldKey)
 					applyString(cmd, "mergeType", builder.MergeType)
 					applyString(cmd, "csvMode", builder.CSVMode)
-					applyString(cmd, "engineName", builder.EngineName)
+					applySelectorString(cmd, "engineName", builder.EngineName)
 					applyString(cmd, "engineUser", builder.EngineUser)
 					applyString(cmd, "enginePassword", builder.EnginePassword)
 					applyString(cmd, "engineIdFieldKey", builder.EngineIDFieldKey)
-					applyString(cmd, "applicationIdentifier", builder.ApplicationIdentifier)
+					applySelectorString(cmd, "applicationIdentifier", builder.ApplicationIdentifier)
 					if cmd.IsSet("fieldMappings") {
 						var fieldMappings []map[string]any
 						if err := json.Unmarshal([]byte(cmd.String("fieldMappings")), &fieldMappings); err != nil {
@@ -367,13 +383,17 @@ func newApp(stdout io.Writer, stderr io.Writer) *cli.Command {
 					&cli.StringSliceFlag{Name: "advancedRestrictions"},
 				},
 				Action: func(ctx context.Context, cmd *cli.Command) error {
+					if err := validateExclusiveSelectors(cmd); err != nil {
+						return err
+					}
+
 					client, err := newClient(cmd)
 					if err != nil {
 						return err
 					}
 
 					builder := adp.NewCreateOcrJobBuilder(client)
-					applyString(cmd, "engineName", builder.EngineName)
+					applySelectorString(cmd, "engineName", builder.EngineName)
 					applyString(cmd, "query", builder.Query)
 					applyString(cmd, "engineUserName", builder.EngineUserName)
 					applyString(cmd, "engineUserPassword", builder.EngineUserPassword)
@@ -382,7 +402,7 @@ func newApp(stdout io.Writer, stderr io.Writer) *cli.Command {
 					if cmd.IsSet("jobPriority") {
 						builder.JobPriority(cmd.Int("jobPriority"))
 					}
-					applyString(cmd, "applicationIdentifier", builder.ApplicationIdentifier)
+					applySelectorString(cmd, "applicationIdentifier", builder.ApplicationIdentifier)
 					applyString(cmd, "applicationType", builder.ApplicationType)
 					if cmd.IsSet("wait") {
 						builder.WaitFlag(cmd.Bool("wait"))
@@ -553,8 +573,27 @@ func printCommandError(w io.Writer, err error) error {
 	return err
 }
 
+func validateExclusiveSelectors(cmd *cli.Command) error {
+	hasEngine := strings.TrimSpace(cmd.String("engineName")) != ""
+	hasApplication := strings.TrimSpace(cmd.String("applicationIdentifier")) != ""
+
+	if !hasEngine && !hasApplication {
+		return errors.New("exactly one of engineName or applicationIdentifier is required")
+	}
+	if hasEngine && hasApplication {
+		return errors.New("engineName and applicationIdentifier are mutually exclusive")
+	}
+	return nil
+}
+
 func applyString[T any](cmd *cli.Command, name string, apply func(string) T) {
 	if cmd.IsSet(name) {
+		apply(cmd.String(name))
+	}
+}
+
+func applySelectorString[T any](cmd *cli.Command, name string, apply func(string) T) {
+	if cmd.IsSet(name) && strings.TrimSpace(cmd.String(name)) != "" {
 		apply(cmd.String(name))
 	}
 }

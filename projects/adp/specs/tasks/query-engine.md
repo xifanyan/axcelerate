@@ -17,12 +17,14 @@ These are the user-facing fields for the request-construction API.
 
 | Field | Type | Default | Required | Description |
 |-------|------|---------|----------|-------------|
-| engineName | string | — | Yes | Engine name |
+| engineName | string | — | Conditional | Engine name |
 | engineQuery | string | "*" | No | Query string |
 | engineUserName | string | — | No | Engine username |
 | engineUserPassword | string | — | No | Engine password |
 | engineTaxonomies | EngineTaxonomyArg[] | [] | No | Engine taxonomies filter |
-| applicationIdentifier | string | "" | No | Application identifier |
+| applicationIdentifier | string | "" | Conditional | Application identifier |
+
+> engineName and applicationIdentifier are mutually exclusive selectors. Exactly one must be provided.
 
 ---
 
@@ -189,6 +191,8 @@ See [cli.md](../cli.md) for global flags and naming conventions.
 | `--engineTaxonomies` | string | — | Engine taxonomies filter (repeatable, see format below) |
 | `--applicationIdentifier` | string | "" | Application identifier |
 
+> engineName and applicationIdentifier are mutually exclusive selectors. Exactly one must be provided.
+
 ### EngineTaxonomiesArg CLI Format
 
 Shorthand format: `Taxonomy=Query` or `Taxonomy!=Query`
@@ -205,6 +209,9 @@ Repeatable flag.
 ```bash
 # Basic query
 adpgo query-engine --engineName "myEngine"
+
+# Query by application identifier
+adpgo query-engine --applicationIdentifier "my-app-id"
 
 # Single taxonomy equals
 adpgo query-engine --engineName "myEngine" --engineTaxonomies "rm_mimetype=pdf"

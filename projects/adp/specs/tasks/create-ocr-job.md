@@ -17,14 +17,14 @@ These are the user-facing fields for the request-construction API.
 
 | Field | Type | Default | Required | Description |
 |-------|------|---------|----------|-------------|
-| engineName | string | "" | No | Engine name |
+| engineName | string | "" | Conditional | Engine name |
 | query | string | "*" | No | Query string |
 | engineUserName | string | "" | No | Engine username |
 | engineUserPassword | string | "" | No | Engine password |
 | jobName | string | "" | No | Job name |
 | jobDescription | string | "" | No | Job description |
 | jobPriority | integer | 10 | No | Job priority |
-| applicationIdentifier | string | "" | No | Application identifier |
+| applicationIdentifier | string | "" | Conditional | Application identifier |
 | applicationType | string | "" | No | Application type |
 | wait | boolean | false | No | Wait for completion |
 | engineType | string | "true" | No | Engine type |
@@ -35,11 +35,14 @@ These are the user-facing fields for the request-construction API.
 | advancedRestrictions | EngineTaxonomyArg[] | [] | No | Advanced restrictions (see [common-types.md](../common-types.md)) |
 | mainQueryType | string | null | No | Main query type |
 
+> engineName and applicationIdentifier are mutually exclusive selectors. Exactly one must be provided.
+
 ---
 
 ## Raw Default Configuration
 
 > Configuration below shows **all fields with their exact default values** from [API-SPEC.md](../../API-SPEC.md). This is for reference only. Clients must not pre-populate all fields. See [request-construction.md](../request-construction.md).
+> These upstream defaults are shown as-is for reference. Real client-built requests must still provide exactly one of `engineName` or `applicationIdentifier`.
 
 ```json
 {
@@ -113,6 +116,7 @@ These are the user-facing fields for the request-construction API.
 ## Raw Example Request
 
 > Example below matches **exactly** the default configuration from [API-SPEC.md](../../API-SPEC.md).
+> This raw reference example mirrors upstream defaults. Real client-built requests must still provide exactly one of `engineName` or `applicationIdentifier`.
 
 ```json
 {
@@ -205,14 +209,19 @@ See [cli.md](../cli.md) for global flags and naming conventions.
 | `--restrictions` | string | "" | Restrictions (format: `Taxonomy=Query`, repeat for multiple) |
 | `--advancedRestrictions` | string | "" | Advanced restrictions (format: `Taxonomy=Query`) |
 
+> engineName and applicationIdentifier are mutually exclusive selectors. Exactly one must be provided.
+
 ### CLI Examples
 
 ```bash
 # Basic
-adpgo create-ocr-job
+adpgo create-ocr-job --engineName "myEngine"
 
 # With options
 adpgo create-ocr-job --engineName "myEngine" --query "*"
+
+# Using application identifier
+adpgo create-ocr-job --applicationIdentifier "my-app-id" --jobName "demo_ocr" --query "*"
 
 # Wait for completion
 adpgo create-ocr-job --engineName "myEngine" --wait

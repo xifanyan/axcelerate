@@ -21,11 +21,11 @@ These are the user-facing fields for the request-construction API.
 | csvIdFieldKey | string | null | No | CSV ID field key |
 | mergeType | string | "Merge content" | No | Merge type (`Merge content` or `Update natives/images`) |
 | csvMode | string | "append" | No | CSV mode (append/merge) |
-| engineName | string | null | No | Engine name |
+| engineName | string | null | Conditional | Engine name |
 | engineUser | string | null | No | Engine user |
 | enginePassword | string | null | No | Engine password |
 | engineIdFieldKey | string | null | No | Engine ID field key |
-| applicationIdentifier | string | "" | No | Application identifier |
+| applicationIdentifier | string | "" | Conditional | Application identifier |
 | fieldMappings | array | [] | No | Field mappings as column definitions |
 | fieldSeparator | string | ";" | No | Field separator |
 | imageBasePath | string | null | No | Image base path |
@@ -36,11 +36,14 @@ These are the user-facing fields for the request-construction API.
 | textIndicator | string | "" | No | Text indicator |
 | doNotChangeProtectedDocuments | boolean | false | No | Do not change protected documents |
 
+> engineName and applicationIdentifier are mutually exclusive selectors. Exactly one must be provided.
+
 ---
 
 ## Raw Default Configuration
 
 > Configuration below shows **all fields with their exact default values** from [API-SPEC.md](../../API-SPEC.md). This is for reference only. Clients must not pre-populate all fields. See [request-construction.md](../request-construction.md).
+> These upstream defaults are shown as-is for reference. Real client-built requests must still provide exactly one of `engineName` or `applicationIdentifier`.
 
 ```json
 {
@@ -164,6 +167,7 @@ These are the user-facing fields for the request-construction API.
 ## Raw Example Request
 
 > Example below matches **exactly** the default configuration from [API-SPEC.md](../../API-SPEC.md).
+> This raw reference example mirrors upstream defaults. Real client-built requests must still provide exactly one of `engineName` or `applicationIdentifier`.
 
 ```json
 {
@@ -252,14 +256,19 @@ See [cli.md](../cli.md) for global flags and naming conventions.
 | `--nativeBasePath` | string | null | Native base path |
 | `--textIndicator` | string | "" | Text indicator |
 
+> engineName and applicationIdentifier are mutually exclusive selectors. Exactly one must be provided.
+
 ### CLI Examples
 
 ```bash
 # Basic merge
-adpgo csv-merge --csvFile "/path/to/data.csv"
+adpgo csv-merge --csvFile "/path/to/data.csv" --engineName "myEngine"
 
 # Merge with options
-adpgo csv-merge --csvFile "/path/to/data.csv" --csvIdFieldKey "id" --mergeType "Merge content"
+adpgo csv-merge --csvFile "/path/to/data.csv" --engineName "myEngine" --csvIdFieldKey "id" --mergeType "Merge content"
+
+# Merge using application identifier
+adpgo csv-merge --csvFile "/path/to/data.csv" --applicationIdentifier "my-app-id" --csvIdFieldKey "id"
 ```
 
 ---

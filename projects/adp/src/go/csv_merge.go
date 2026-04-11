@@ -136,6 +136,14 @@ func (b *CSVMergeBuilder) buildRequest() (rawTaskRequest, error) {
 	if b.csvFile == nil || *b.csvFile == "" {
 		return rawTaskRequest{}, errors.New("csvFile is required")
 	}
+	hasEngine := b.engineName != nil && *b.engineName != ""
+	hasApplication := b.applicationIdentifier != nil && *b.applicationIdentifier != ""
+	if !hasEngine && !hasApplication {
+		return rawTaskRequest{}, errors.New("exactly one of engineName or applicationIdentifier is required")
+	}
+	if hasEngine && hasApplication {
+		return rawTaskRequest{}, errors.New("engineName and applicationIdentifier are mutually exclusive")
+	}
 
 	cfg := map[string]any{
 		"adp_csvMerge_csvFile": *b.csvFile,
@@ -149,7 +157,7 @@ func (b *CSVMergeBuilder) buildRequest() (rawTaskRequest, error) {
 	if b.csvMode != nil {
 		cfg["adp_csvMerge_csvMode"] = *b.csvMode
 	}
-	if b.engineName != nil {
+	if hasEngine {
 		cfg["adp_csvMerge_engineName"] = *b.engineName
 	}
 	if b.engineUser != nil {
@@ -161,7 +169,7 @@ func (b *CSVMergeBuilder) buildRequest() (rawTaskRequest, error) {
 	if b.engineIDFieldKey != nil {
 		cfg["adp_csvMerge_engineIdFieldKey"] = *b.engineIDFieldKey
 	}
-	if b.applicationIdentifier != nil {
+	if hasApplication {
 		cfg["adp_csvMerge_applicationIdentifier"] = *b.applicationIdentifier
 	}
 	if b.fieldMappings != nil && len(*b.fieldMappings) > 0 {
