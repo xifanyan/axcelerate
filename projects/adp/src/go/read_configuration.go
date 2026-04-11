@@ -1,11 +1,6 @@
 package adp
 
-import (
-	"context"
-	"encoding/json"
-	"fmt"
-	"strings"
-)
+import "context"
 
 const (
 	readConfigurationTaskType        = "Read Configuration"
@@ -90,17 +85,9 @@ func decodeReadConfiguration(meta any) (ReadConfigurationResult, error) {
 		return ReadConfigurationResult{}, err
 	}
 
-	text, err := stringField(obj, "adp_entities_json_output")
-	if err != nil {
-		return ReadConfigurationResult{}, err
-	}
-
 	configuration := map[string]ConfigurationInfo{}
-	if err := json.Unmarshal([]byte(text), &configuration); err != nil {
-		repaired := text + strings.Repeat("}", strings.Count(text, "{")-strings.Count(text, "}"))
-		if repairErr := json.Unmarshal([]byte(repaired), &configuration); repairErr != nil {
-			return ReadConfigurationResult{}, fmt.Errorf("parse adp_entities_json_output: %w", err)
-		}
+	if err := jsonStringField(obj, "adp_entities_json_output", &configuration); err != nil {
+		return ReadConfigurationResult{}, err
 	}
 
 	return ReadConfigurationResult{

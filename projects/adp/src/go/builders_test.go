@@ -346,7 +346,7 @@ func TestCSVMergeBuildRequestSerializesFieldMappingsAsArrayAndOmitsEmptyValue(t 
 
 func TestReadConfigurationBuildsConfigObjectsAndDecodesResult(t *testing.T) {
 	client := testClientForBuilder(t, func(w http.ResponseWriter, r *http.Request) {
-		io.WriteString(w, `{"executionId":"11","taskType":"Read Configuration","loggingEnabled":"true","progressMax":1,"executionStatus":"success","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":1,"progressPercentage":1.0,"taskDisplayName":"Read Configuration","executionMetaData":{"adp_entities_output_file_name":"output.json","adp_entities_json_output":"{\"dataSource.file_demo_01\":{\"DynamicComponents\":{},\"Global\":{\"Static\":{\"Parameters\":[]}}}"}}`)
+		io.WriteString(w, `{"executionId":"11","taskType":"Read Configuration","loggingEnabled":"true","progressMax":1,"executionStatus":"success","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":1,"progressPercentage":1.0,"taskDisplayName":"Read Configuration","executionMetaData":{"adp_entities_output_file_name":"output.json","adp_entities_json_output":"{\"dataSource.file_demo_01\":{\"DynamicComponents\":{},\"Global\":{\"Static\":{\"Parameters\":[]}}}}"}}`)
 	})
 
 	got, err := NewReadConfigurationBuilder(client).
