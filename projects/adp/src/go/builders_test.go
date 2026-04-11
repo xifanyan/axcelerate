@@ -343,3 +343,38 @@ func TestCSVMergeBuildRequestSerializesFieldMappingsAsArrayAndOmitsEmptyValue(t 
 		t.Fatalf("fieldMappings should be omitted: %#v", req.TaskConfiguration)
 	}
 }
+
+func TestReadConfigurationBuildsConfigObjectsAndDecodesResult(t *testing.T) {
+	client := testClientForBuilder(t, func(w http.ResponseWriter, r *http.Request) {
+		io.WriteString(w, `{"executionId":"11","taskType":"Read Configuration","loggingEnabled":"true","progressMax":1,"executionStatus":"success","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":1,"progressPercentage":1.0,"taskDisplayName":"Read Configuration","executionMetaData":{"adp_entities_output_file_name":"output.json","adp_entities_json_output":"{\"dataSource.file_demo_01\":{\"DynamicComponents\":{},\"Global\":{\"Static\":{\"Parameters\":[]}}}"}}`)
+	})
+
+	got, err := NewReadConfigurationBuilder(client).
+		ConfigsToRead([]ConfigArg{{ConfigurationID: "dataSource.file_demo_01", FieldList: "name,value"}}).
+		Execute(context.Background())
+	if err != nil {
+		t.Fatalf("Execute error: %v", err)
+	}
+	if got.OutputFile != "output.json" || len(got.Configuration) != 1 {
+		t.Fatalf("got = %#v", got)
+	}
+}
+
+func TestCLITaskRequiresBatchScriptPathAndDecodesJSONOutput(t *testing.T) {
+	client := testClientForBuilder(t, func(w http.ResponseWriter, r *http.Request) {
+		io.WriteString(w, `{"executionId":"12","taskType":"CLI","loggingEnabled":"true","progressMax":1,"executionStatus":"success","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":1,"progressPercentage":1.0,"taskDisplayName":"Command Line Task","executionMetaData":{"cli_result":0,"json_output":"{\"stdout\":\"ok\",\"errout\":\"\"}","cli_error_path":"err.log","cli_result_path":"out.log"}}`)
+	})
+
+	_, err := NewCLITaskBuilder(client).Execute(context.Background())
+	if err == nil || err.Error() != "batchScriptPath is required" {
+		t.Fatalf("err = %v", err)
+	}
+
+	got, err := NewCLITaskBuilder(client).BatchScriptPath("c:/demo/script.ps1").Execute(context.Background())
+	if err != nil {
+		t.Fatalf("Execute error: %v", err)
+	}
+	if got.Result != 0 || got.JSONOutput["stdout"] != "ok" {
+		t.Fatalf("got = %#v", got)
+	}
+}
