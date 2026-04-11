@@ -150,7 +150,7 @@ func TestListEntitiesCommandCLIFlagsOverrideConfigFile(t *testing.T) {
 		"host":     configServer.URL,
 		"user":     "config-user",
 		"password": "config-secret",
-		"path":     "",
+		"path":     "/wrong-base",
 	})
 
 	withWorkingDir(t, dir)
@@ -164,6 +164,7 @@ func TestListEntitiesCommandCLIFlagsOverrideConfigFile(t *testing.T) {
 		"--host", cliServer.URL,
 		"--path", "",
 		"--user", "cli-user",
+		"--password", "cli-secret",
 		"list-entities",
 	})
 	if err != nil {
@@ -235,6 +236,9 @@ func TestRunReportsMissingRequiredGlobalsAfterConfigResolution(t *testing.T) {
 		if !strings.Contains(text, want) {
 			t.Fatalf("stderr = %q, missing %q", text, want)
 		}
+	}
+	if strings.Contains(text, "host") {
+		t.Fatalf("stderr = %q, unexpectedly mentions host", text)
 	}
 }
 
