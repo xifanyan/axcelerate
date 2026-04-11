@@ -100,6 +100,44 @@ func TestQueryEngineRejectsEmptyEngineName(t *testing.T) {
 	}
 }
 
+func TestQueryEngineRequiresExactlyOneSelector(t *testing.T) {
+	client := testClientForBuilder(t, func(w http.ResponseWriter, r *http.Request) {})
+
+	_, err := NewQueryEngineBuilder(client).buildRequest()
+	if err == nil || err.Error() != "exactly one of engineName or applicationIdentifier is required" {
+		t.Fatalf("err = %v", err)
+	}
+}
+
+func TestQueryEngineRejectsBothSelectors(t *testing.T) {
+	client := testClientForBuilder(t, func(w http.ResponseWriter, r *http.Request) {})
+
+	_, err := NewQueryEngineBuilder(client).
+		EngineName("engineA").
+		ApplicationIdentifier("appA").
+		buildRequest()
+	if err == nil || err.Error() != "engineName and applicationIdentifier are mutually exclusive" {
+		t.Fatalf("err = %v", err)
+	}
+}
+
+func TestQueryEngineAllowsApplicationIdentifierWithoutEngineName(t *testing.T) {
+	client := testClientForBuilder(t, func(w http.ResponseWriter, r *http.Request) {})
+
+	req, err := NewQueryEngineBuilder(client).
+		ApplicationIdentifier("appA").
+		buildRequest()
+	if err != nil {
+		t.Fatalf("buildRequest error: %v", err)
+	}
+	if req.TaskConfiguration["adp_queryEngine_applicationIdentifier"] != "appA" {
+		t.Fatalf("taskConfiguration = %#v", req.TaskConfiguration)
+	}
+	if _, ok := req.TaskConfiguration["adp_queryEngine_engineName"]; ok {
+		t.Fatalf("taskConfiguration should omit engineName: %#v", req.TaskConfiguration)
+	}
+}
+
 func TestQueryEngineBuildsTaxonomyFiltersAndDecodesResult(t *testing.T) {
 	client := testClientForBuilder(t, func(w http.ResponseWriter, r *http.Request) {
 		var req rawTaskRequest
@@ -164,6 +202,44 @@ func TestTaxonomyStatisticRequiresEngineName(t *testing.T) {
 	_, err := NewTaxonomyStatisticBuilder(client).Execute(context.Background())
 	if err == nil || err.Error() != "engineName is required" {
 		t.Fatalf("err = %v", err)
+	}
+}
+
+func TestTaxonomyStatisticRequiresExactlyOneSelector(t *testing.T) {
+	client := testClientForBuilder(t, func(w http.ResponseWriter, r *http.Request) {})
+
+	_, err := NewTaxonomyStatisticBuilder(client).buildRequest()
+	if err == nil || err.Error() != "exactly one of engineName or applicationIdentifier is required" {
+		t.Fatalf("err = %v", err)
+	}
+}
+
+func TestTaxonomyStatisticRejectsBothSelectors(t *testing.T) {
+	client := testClientForBuilder(t, func(w http.ResponseWriter, r *http.Request) {})
+
+	_, err := NewTaxonomyStatisticBuilder(client).
+		EngineName("engineA").
+		ApplicationIdentifier("appA").
+		buildRequest()
+	if err == nil || err.Error() != "engineName and applicationIdentifier are mutually exclusive" {
+		t.Fatalf("err = %v", err)
+	}
+}
+
+func TestTaxonomyStatisticAllowsApplicationIdentifierWithoutEngineName(t *testing.T) {
+	client := testClientForBuilder(t, func(w http.ResponseWriter, r *http.Request) {})
+
+	req, err := NewTaxonomyStatisticBuilder(client).
+		ApplicationIdentifier("appA").
+		buildRequest()
+	if err != nil {
+		t.Fatalf("buildRequest error: %v", err)
+	}
+	if req.TaskConfiguration["adp_taxonomyStatistic_applicationIdentifier"] != "appA" {
+		t.Fatalf("taskConfiguration = %#v", req.TaskConfiguration)
+	}
+	if _, ok := req.TaskConfiguration["adp_taxonomyStatistic_engineName"]; ok {
+		t.Fatalf("taskConfiguration should omit engineName: %#v", req.TaskConfiguration)
 	}
 }
 
@@ -312,6 +388,48 @@ func TestCSVMergeRequiresCSVFileAndAcceptsEmptyArrayMetadata(t *testing.T) {
 	}
 	if got != (CSVMergeResult{}) {
 		t.Fatalf("got = %#v", got)
+	}
+}
+
+func TestCSVMergeRequiresExactlyOneSelector(t *testing.T) {
+	client := testClientForBuilder(t, func(w http.ResponseWriter, r *http.Request) {})
+
+	_, err := NewCSVMergeBuilder(client).
+		CSVFile("/tmp/data.csv").
+		buildRequest()
+	if err == nil || err.Error() != "exactly one of engineName or applicationIdentifier is required" {
+		t.Fatalf("err = %v", err)
+	}
+}
+
+func TestCSVMergeRejectsBothSelectors(t *testing.T) {
+	client := testClientForBuilder(t, func(w http.ResponseWriter, r *http.Request) {})
+
+	_, err := NewCSVMergeBuilder(client).
+		CSVFile("/tmp/data.csv").
+		EngineName("engineA").
+		ApplicationIdentifier("appA").
+		buildRequest()
+	if err == nil || err.Error() != "engineName and applicationIdentifier are mutually exclusive" {
+		t.Fatalf("err = %v", err)
+	}
+}
+
+func TestCSVMergeAllowsApplicationIdentifierWithoutEngineName(t *testing.T) {
+	client := testClientForBuilder(t, func(w http.ResponseWriter, r *http.Request) {})
+
+	req, err := NewCSVMergeBuilder(client).
+		CSVFile("/tmp/data.csv").
+		ApplicationIdentifier("appA").
+		buildRequest()
+	if err != nil {
+		t.Fatalf("buildRequest error: %v", err)
+	}
+	if req.TaskConfiguration["adp_csvMerge_applicationIdentifier"] != "appA" {
+		t.Fatalf("taskConfiguration = %#v", req.TaskConfiguration)
+	}
+	if _, ok := req.TaskConfiguration["adp_csvMerge_engineName"]; ok {
+		t.Fatalf("taskConfiguration should omit engineName: %#v", req.TaskConfiguration)
 	}
 }
 
@@ -589,5 +707,43 @@ func TestCreateOcrJobBuildRequestOmitsEmptyRestrictionSlices(t *testing.T) {
 	}
 	if _, ok := req.TaskConfiguration["adp_createOcrJob_AdvancedRestrictions"]; ok {
 		t.Fatalf("advancedRestrictions should be omitted: %#v", req.TaskConfiguration)
+	}
+}
+
+func TestCreateOcrJobRequiresExactlyOneSelector(t *testing.T) {
+	client := testClientForBuilder(t, func(w http.ResponseWriter, r *http.Request) {})
+
+	_, err := NewCreateOcrJobBuilder(client).buildRequest()
+	if err == nil || err.Error() != "exactly one of engineName or applicationIdentifier is required" {
+		t.Fatalf("err = %v", err)
+	}
+}
+
+func TestCreateOcrJobRejectsBothSelectors(t *testing.T) {
+	client := testClientForBuilder(t, func(w http.ResponseWriter, r *http.Request) {})
+
+	_, err := NewCreateOcrJobBuilder(client).
+		EngineName("engineA").
+		ApplicationIdentifier("appA").
+		buildRequest()
+	if err == nil || err.Error() != "engineName and applicationIdentifier are mutually exclusive" {
+		t.Fatalf("err = %v", err)
+	}
+}
+
+func TestCreateOcrJobAllowsApplicationIdentifierWithoutEngineName(t *testing.T) {
+	client := testClientForBuilder(t, func(w http.ResponseWriter, r *http.Request) {})
+
+	req, err := NewCreateOcrJobBuilder(client).
+		ApplicationIdentifier("appA").
+		buildRequest()
+	if err != nil {
+		t.Fatalf("buildRequest error: %v", err)
+	}
+	if req.TaskConfiguration["adp_createOcrJob_applicationIdentifier"] != "appA" {
+		t.Fatalf("taskConfiguration = %#v", req.TaskConfiguration)
+	}
+	if _, ok := req.TaskConfiguration["adp_createOcrJob_engineName"]; ok {
+		t.Fatalf("taskConfiguration should omit engineName: %#v", req.TaskConfiguration)
 	}
 }
