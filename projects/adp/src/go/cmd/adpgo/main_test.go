@@ -242,6 +242,35 @@ func TestRunReportsMissingRequiredGlobalsAfterConfigResolution(t *testing.T) {
 	}
 }
 
+func TestRunReportsMalformedHostFromConfig(t *testing.T) {
+	dir := t.TempDir()
+	writeADPConfigFile(t, dir, map[string]any{
+		"host":     "http://[::1",
+		"user":     "adp",
+		"password": "secret",
+	})
+
+	withWorkingDir(t, dir)
+
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+
+	exitCode := run(stdout, stderr, []string{
+		"adpgo",
+		"list-entities",
+	})
+
+	if exitCode != 1 {
+		t.Fatalf("exitCode = %d, want 1", exitCode)
+	}
+	if stdout.Len() != 0 {
+		t.Fatalf("stdout = %q", stdout.String())
+	}
+	if got := strings.ToLower(stderr.String()); !strings.Contains(got, "host") {
+		t.Fatalf("stderr = %q", stderr.String())
+	}
+}
+
 func TestListEntitiesCommandCLIPathOverridesConfigFile(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/executeAdpTask" {

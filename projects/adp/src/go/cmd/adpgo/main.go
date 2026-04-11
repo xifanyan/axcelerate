@@ -493,14 +493,29 @@ func newClient(cmd *cli.Command) (*adp.Client, error) {
 		return nil, fmt.Errorf("missing required global setting(s): %s", strings.Join(missing, ", "))
 	}
 
+	baseURL, err := validatedBaseURL(host, resolvedInt(cmd, "port", cfg.Port), resolvedString(cmd, "path", cfg.Path))
+	if err != nil {
+		return nil, fmt.Errorf("invalid host: %w", err)
+	}
+
 	return adp.NewClient(adp.ClientConfig{
-		BaseURL:  adp.MustBaseURL(host, resolvedInt(cmd, "port", cfg.Port), resolvedString(cmd, "path", cfg.Path)),
+		BaseURL:  baseURL,
 		Username: user,
 		Password: password,
 		Insecure: resolvedBool(cmd, "insecure", cfg.Insecure),
 		Debug:    resolvedBool(cmd, "debug", cfg.Debug),
 		DebugOut: cmd.ErrWriter,
 	})
+}
+
+func validatedBaseURL(host string, port int, path string) (_ string, err error) {
+	defer func() {
+		if recovered := recover(); recovered != nil {
+			err = fmt.Errorf("%v", recovered)
+		}
+	}()
+
+	return adp.MustBaseURL(host, port, path), nil
 }
 
 func loadCLIConfigFile() (cliConfigFile, error) {
