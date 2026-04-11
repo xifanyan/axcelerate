@@ -17,14 +17,14 @@ These are the user-facing fields for the request-construction API.
 
 | Field | Type | Default | Required | Description |
 |-------|------|---------|----------|-------------|
-| engineName | string | "" | No | Engine name |
+| engineName | string | "" | Conditional | Engine name |
 | query | string | "*" | No | Query string |
 | engineUserName | string | "" | No | Engine username |
 | engineUserPassword | string | "" | No | Engine password |
 | jobName | string | "" | No | Job name |
 | jobDescription | string | "" | No | Job description |
 | jobPriority | integer | 10 | No | Job priority |
-| applicationIdentifier | string | "" | No | Application identifier |
+| applicationIdentifier | string | "" | Conditional | Application identifier |
 | applicationType | string | "" | No | Application type |
 | wait | boolean | false | No | Wait for completion |
 | engineType | string | "true" | No | Engine type |
@@ -114,7 +114,7 @@ These are the user-facing fields for the request-construction API.
 
 ## Raw Example Request
 
-> Example below matches **exactly** the default configuration from [API-SPEC.md](../../API-SPEC.md).
+> Example below shows a minimal valid request with exactly one selector.
 
 ```json
 {
@@ -132,7 +132,7 @@ These are the user-facing fields for the request-construction API.
     "adp_createOcrJob_AdvancedRestrictions": [],
     "adp_createOcrJob_globalSearchJson": "",
     "adp_createOcrJob_wait": "false",
-    "adp_createOcrJob_engineName": "",
+    "adp_createOcrJob_engineName": "myEngine",
     "adp_createOcrJob_jobDescription": "",
     "adp_createOcrJob_applicationIdentifier": "",
     "adp_createOcrJob_jobPriority": "10",

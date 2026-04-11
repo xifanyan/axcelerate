@@ -21,11 +21,11 @@ These are the user-facing fields for the request-construction API.
 | csvIdFieldKey | string | null | No | CSV ID field key |
 | mergeType | string | "Merge content" | No | Merge type (`Merge content` or `Update natives/images`) |
 | csvMode | string | "append" | No | CSV mode (append/merge) |
-| engineName | string | null | No | Engine name |
+| engineName | string | null | Conditional | Engine name |
 | engineUser | string | null | No | Engine user |
 | enginePassword | string | null | No | Engine password |
 | engineIdFieldKey | string | null | No | Engine ID field key |
-| applicationIdentifier | string | "" | No | Application identifier |
+| applicationIdentifier | string | "" | Conditional | Application identifier |
 | fieldMappings | array | [] | No | Field mappings as column definitions |
 | fieldSeparator | string | ";" | No | Field separator |
 | imageBasePath | string | null | No | Image base path |
@@ -81,7 +81,7 @@ These are the user-facing fields for the request-construction API.
     "adp_abortWfOnFailure": true,
     "adp_csvMerge_customLineSeparator": "U+000DU+000A",
     "adp_csvMerge_multiValueDelimiter": null,
-    "adp_csvMerge_csvFile": null,
+    "adp_csvMerge_csvFile": "/path/to/data.csv",
     "adp_csvMerge_csvIdFieldKey": null,
     "adp_csvMerge_textFileRefIndicator": "",
     "adp_csvMerge_engineUser": null,
@@ -165,7 +165,7 @@ These are the user-facing fields for the request-construction API.
 
 ## Raw Example Request
 
-> Example below matches **exactly** the default configuration from [API-SPEC.md](../../API-SPEC.md).
+> Example below shows a minimal valid request with exactly one selector.
 
 ```json
 {
@@ -174,7 +174,7 @@ These are the user-facing fields for the request-construction API.
     "adp_csvMerge_noUniqueMatch": "false",
     "adp_csvMerge_noFlushAfterMerge": "false",
     "adp_csvMerge_forceChange": "false",
-    "adp_csvMerge_engineName": null,
+    "adp_csvMerge_engineName": "myEngine",
     "adp_csvMerge_applicationIdentifier": "",
     "adp_csvMerge_mergeType": "Merge content",
     "adp_csvMerge_displayNameMappingErrorFile": null,
@@ -204,7 +204,7 @@ These are the user-facing fields for the request-construction API.
     "adp_abortWfOnFailure": true,
     "adp_csvMerge_customLineSeparator": "U+000DU+000A",
     "adp_csvMerge_multiValueDelimiter": null,
-    "adp_csvMerge_csvFile": null,
+    "adp_csvMerge_csvFile": "/path/to/data.csv",
     "adp_csvMerge_csvIdFieldKey": null,
     "adp_csvMerge_textFileRefIndicator": "",
     "adp_csvMerge_engineUser": null,
@@ -260,10 +260,10 @@ See [cli.md](../cli.md) for global flags and naming conventions.
 
 ```bash
 # Basic merge
-adpgo csv-merge --csvFile "/path/to/data.csv"
+adpgo csv-merge --csvFile "/path/to/data.csv" --engineName "myEngine"
 
 # Merge with options
-adpgo csv-merge --csvFile "/path/to/data.csv" --csvIdFieldKey "id" --mergeType "Merge content"
+adpgo csv-merge --csvFile "/path/to/data.csv" --engineName "myEngine" --csvIdFieldKey "id" --mergeType "Merge content"
 
 # Merge using application identifier
 adpgo csv-merge --csvFile "/path/to/data.csv" --applicationIdentifier "my-app-id" --csvIdFieldKey "id"
