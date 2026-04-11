@@ -13,8 +13,9 @@ Describes the command-line interface contract. Language-agnostic.
 | `--path` | string | `/adp/rest/api/task` | ADP task endpoint path |
 | `--user` | string | — | Username (required) |
 | `--password` | string | — | Password (required) |
-| `--insecure` | boolean | false | Skip TLS certificate verification; must support `--insecure=true|false` |
-| `--debug` | boolean | false | Enable debug logging — traces request/response payloads; must support `--debug=true|false` and `-d` to enable |
+| `--insecure` | boolean | false | Enables insecure mode; must support `--insecure=true|false` |
+| `--debug` | boolean | false | Enables debug logging; must support `--debug=true|false` |
+| `-d` | boolean | false | Shorthand for enabling debug logging |
 
 Global flags may be provided by explicit CLI flags or `adp_config.json`.
 
@@ -38,7 +39,9 @@ Resolution precedence for all global flags:
 2. `adp_config.json`
 3. Built-in default
 
-Boolean global flags must allow explicit override from the CLI, including `--debug=true|false` and `--insecure=true|false`. `-d` remains a shorthand alias for enabling debug.
+Boolean global flags must support both enable and explicit override forms: `--debug` and `-d` enable debug, `--debug=true|false` explicitly sets debug, `--insecure` enables insecure mode, and `--insecure=true|false` explicitly sets insecure mode.
+
+If the same explicit global flag is provided multiple times, the last explicit value wins.
 
 Built-in defaults:
 - `port=8443`
