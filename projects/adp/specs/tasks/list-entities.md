@@ -188,6 +188,12 @@ adpgo list-entities --type singleMindServer
 
 # With multiple options
 adpgo list-entities --type singleMindServer --whiteList "id,displayName,processStatus"
+
+# get all datasources for ingestion application documentHold.demo00001
+adpgo --debug=false list-entities --type dataSource --relatedEntity documentHold.demo00001
+
+# get all running ingestion applications
+adpgo list-entities --type docmentHold --status running
 ```
 
 ---
