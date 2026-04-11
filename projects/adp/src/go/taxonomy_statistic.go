@@ -81,6 +81,10 @@ func (b *TaxonomyStatisticBuilder) buildRequest() (rawTaskRequest, error) {
 	if hasEngine {
 		cfg["adp_taxonomyStatistic_engineName"] = *b.engineName
 	}
+	if hasApplication {
+		cfg["adp_taxonomyStatistic_engineName"] = ""
+		cfg["adp_taxonomyStatistic_applicationIdentifier"] = *b.applicationIdentifier
+	}
 	if b.engineQuery != nil {
 		cfg["adp_taxonomyStatistic_engineQuery"] = *b.engineQuery
 	}
@@ -95,9 +99,6 @@ func (b *TaxonomyStatisticBuilder) buildRequest() (rawTaskRequest, error) {
 	}
 	if b.outputTaxonomies != nil {
 		cfg["adp_taxonomyStatistic_outputTaxonomies"] = *b.outputTaxonomies
-	}
-	if hasApplication {
-		cfg["adp_taxonomyStatistic_applicationIdentifier"] = *b.applicationIdentifier
 	}
 	b.apply(cfg)
 

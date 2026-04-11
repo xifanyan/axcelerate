@@ -141,6 +141,10 @@ func (b *CreateOcrJobBuilder) buildRequest() (rawTaskRequest, error) {
 	if hasEngine {
 		cfg["adp_createOcrJob_engineName"] = *b.engineName
 	}
+	if hasApplication {
+		cfg["adp_createOcrJob_engineName"] = ""
+		cfg["adp_createOcrJob_applicationIdentifier"] = *b.applicationIdentifier
+	}
 	if b.query != nil {
 		cfg["adp_createOcrJob_query"] = *b.query
 	}
@@ -158,9 +162,6 @@ func (b *CreateOcrJobBuilder) buildRequest() (rawTaskRequest, error) {
 	}
 	if b.jobPriority != nil {
 		cfg["adp_createOcrJob_jobPriority"] = strconv.Itoa(*b.jobPriority)
-	}
-	if hasApplication {
-		cfg["adp_createOcrJob_applicationIdentifier"] = *b.applicationIdentifier
 	}
 	if b.applicationType != nil {
 		cfg["adp_createOcrJob_applicationType"] = *b.applicationType
