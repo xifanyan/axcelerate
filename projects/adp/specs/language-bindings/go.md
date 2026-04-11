@@ -7,7 +7,7 @@ Maps the language-agnostic ADP contracts into idiomatic Go APIs.
 ## Module
 
 ```
-github.com/xifanyan/axcelerate/adp
+github.com/xifanyan/adp/v2
 ```
 
 ---
