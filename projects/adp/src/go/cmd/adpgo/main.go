@@ -238,6 +238,10 @@ func newApp(stdout io.Writer, stderr io.Writer) *cli.Command {
 					&cli.BoolFlag{Name: "doNotChangeProtectedDocuments"},
 				},
 				Action: func(ctx context.Context, cmd *cli.Command) error {
+					if strings.TrimSpace(cmd.String("csvFile")) == "" {
+						return errors.New("csvFile is required")
+					}
+
 					if err := validateExclusiveSelectors(cmd); err != nil {
 						return err
 					}

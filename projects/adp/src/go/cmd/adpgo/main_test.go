@@ -953,6 +953,27 @@ func TestCSVMergeCommandRequiresCSVFile(t *testing.T) {
 	}
 }
 
+func TestCSVMergeCommandRequiresNonEmptyCSVFileBeforeSelectorValidation(t *testing.T) {
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+	cmd := newApp(stdout, stderr)
+
+	err := cmd.Run(context.Background(), []string{
+		"adpgo",
+		"--host", "https://example.test",
+		"--user", "adp",
+		"--password", "secret",
+		"csv-merge",
+		"--csvFile", "",
+	})
+	if err == nil {
+		t.Fatal("expected error")
+	}
+	if err.Error() != "csvFile is required" {
+		t.Fatalf("error = %q", err)
+	}
+}
+
 func TestCSVMergeCommandRequiresExactlyOneSelector(t *testing.T) {
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
