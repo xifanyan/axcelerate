@@ -214,7 +214,16 @@ func TestTaxonomyStatisticDecodesStatisticsDocument(t *testing.T) {
 }
 
 func TestStartApplicationDecodesURL(t *testing.T) {
+	type requestCapture struct {
+		req rawTaskRequest
+		err error
+	}
+	requestCh := make(chan requestCapture, 1)
+
 	client := testClientForBuilder(t, func(w http.ResponseWriter, r *http.Request) {
+		var req rawTaskRequest
+		err := json.NewDecoder(r.Body).Decode(&req)
+		requestCh <- requestCapture{req: req, err: err}
 		io.WriteString(w, `{"executionId":"8","taskType":"Start Application","loggingEnabled":"true","progressMax":1,"executionStatus":"success","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":1,"progressPercentage":1.0,"taskDisplayName":"Start application","executionMetaData":{"adp_started_application_url":"https://example/app"}}`)
 	})
 
@@ -222,19 +231,48 @@ func TestStartApplicationDecodesURL(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Execute error: %v", err)
 	}
+	captured := <-requestCh
+	if captured.err != nil {
+		t.Fatalf("Decode request error: %v", captured.err)
+	}
+	if captured.req.TaskType != "Start Application" {
+		t.Fatalf("taskType = %q", captured.req.TaskType)
+	}
+	if captured.req.TaskConfiguration["adp_startApplication_applicationIdentifier"] != "app" {
+		t.Fatalf("taskConfiguration = %#v", captured.req.TaskConfiguration)
+	}
 	if got.ApplicationURL != "https://example/app" {
 		t.Fatalf("got = %#v", got)
 	}
 }
 
 func TestExportDocumentsDecodesCounts(t *testing.T) {
+	type requestCapture struct {
+		req rawTaskRequest
+		err error
+	}
+	requestCh := make(chan requestCapture, 1)
+
 	client := testClientForBuilder(t, func(w http.ResponseWriter, r *http.Request) {
+		var req rawTaskRequest
+		err := json.NewDecoder(r.Body).Decode(&req)
+		requestCh <- requestCapture{req: req, err: err}
 		io.WriteString(w, `{"executionId":"9","taskType":"Export Documents","loggingEnabled":"true","progressMax":1,"executionStatus":"success","executionRootDir":"root","contextId":"ctx","executionPersistent":"true","progressCurrent":1,"progressPercentage":1.0,"taskDisplayName":"Export documents task","executionMetaData":{"adp_exportDocuments_exportFileName":"export.csv","adp_exportDocuments_exportPath":"/tmp/export.csv","adp_exportDocuments_searchResultSize":"1000"}}`)
 	})
 
 	got, err := NewExportDocumentsBuilder(client).Query("*").Execute(context.Background())
 	if err != nil {
 		t.Fatalf("Execute error: %v", err)
+	}
+	captured := <-requestCh
+	if captured.err != nil {
+		t.Fatalf("Decode request error: %v", captured.err)
+	}
+	if captured.req.TaskType != "Export Documents" {
+		t.Fatalf("taskType = %q", captured.req.TaskType)
+	}
+	if captured.req.TaskConfiguration["adp_exportDocuments_query"] != "*" {
+		t.Fatalf("taskConfiguration = %#v", captured.req.TaskConfiguration)
 	}
 	if got.SearchResultSize != 1000 {
 		t.Fatalf("got = %#v", got)
