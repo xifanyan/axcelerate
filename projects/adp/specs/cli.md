@@ -13,14 +13,16 @@ Describes the command-line interface contract. Language-agnostic.
 | `--path` | string | `/adp/rest/api/task` | ADP task endpoint path |
 | `--user` | string | — | Username (required) |
 | `--password` | string | — | Password (required) |
-| `--insecure` | boolean | false | Skip TLS certificate verification |
-| `--debug` | boolean | false | Enable debug logging — traces request/response payloads |
+| `--insecure` | boolean | false | Skip TLS certificate verification; must support `--insecure=true|false` |
+| `--debug` | boolean | false | Enable debug logging — traces request/response payloads; must support `--debug=true|false` and `-d` to enable |
 
 Global flags may be provided by explicit CLI flags or `adp_config.json`.
 
 ## CLI Configuration File
 
 All language CLIs must support `adp_config.json`.
+
+`adp_config.json` is read from the current working directory.
 
 Supported config keys:
 - `host`
@@ -35,6 +37,8 @@ Resolution precedence for all global flags:
 1. Explicit command-line flag
 2. `adp_config.json`
 3. Built-in default
+
+Boolean global flags must allow explicit override from the CLI, including `--debug=true|false` and `--insecure=true|false`. `-d` remains a shorthand alias for enabling debug.
 
 Built-in defaults:
 - `port=8443`
