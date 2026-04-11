@@ -24,7 +24,7 @@ type CSVMergeBuilder struct {
 	enginePassword                *string
 	engineIDFieldKey              *string
 	applicationIdentifier         *string
-	fieldMappings                 *string
+	fieldMappings                 *[]map[string]any
 	fieldSeparator                *string
 	imageBasePath                 *string
 	nativeBasePath                *string
@@ -87,7 +87,7 @@ func (b *CSVMergeBuilder) ApplicationIdentifier(value string) *CSVMergeBuilder {
 	return b
 }
 
-func (b *CSVMergeBuilder) FieldMappings(value string) *CSVMergeBuilder {
+func (b *CSVMergeBuilder) FieldMappings(value []map[string]any) *CSVMergeBuilder {
 	b.fieldMappings = &value
 	return b
 }
@@ -164,7 +164,7 @@ func (b *CSVMergeBuilder) buildRequest() (rawTaskRequest, error) {
 	if b.applicationIdentifier != nil {
 		cfg["adp_csvMerge_applicationIdentifier"] = *b.applicationIdentifier
 	}
-	if b.fieldMappings != nil {
+	if b.fieldMappings != nil && len(*b.fieldMappings) > 0 {
 		cfg["adp_csvMerge_fieldMappings"] = *b.fieldMappings
 	}
 	if b.fieldSeparator != nil {

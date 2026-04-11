@@ -259,3 +259,34 @@ func TestCSVMergeRequiresCSVFileAndAcceptsEmptyArrayMetadata(t *testing.T) {
 		t.Fatalf("got = %#v", got)
 	}
 }
+
+func TestCSVMergeBuildRequestSerializesFieldMappingsAsArrayAndOmitsEmptyValue(t *testing.T) {
+	client := testClientForBuilder(t, func(w http.ResponseWriter, r *http.Request) {})
+
+	req, err := NewCSVMergeBuilder(client).
+		CSVFile("/tmp/data.csv").
+		FieldMappings([]map[string]any{{"csvField": "source", "adpField": "target"}}).
+		buildRequest()
+	if err != nil {
+		t.Fatalf("buildRequest error: %v", err)
+	}
+
+	mappings, ok := req.TaskConfiguration["adp_csvMerge_fieldMappings"].([]map[string]any)
+	if !ok || len(mappings) != 1 {
+		t.Fatalf("fieldMappings = %#v", req.TaskConfiguration["adp_csvMerge_fieldMappings"])
+	}
+	if mappings[0]["csvField"] != "source" || mappings[0]["adpField"] != "target" {
+		t.Fatalf("fieldMappings = %#v", mappings)
+	}
+
+	req, err = NewCSVMergeBuilder(client).
+		CSVFile("/tmp/data.csv").
+		FieldMappings([]map[string]any{}).
+		buildRequest()
+	if err != nil {
+		t.Fatalf("buildRequest error: %v", err)
+	}
+	if _, ok := req.TaskConfiguration["adp_csvMerge_fieldMappings"]; ok {
+		t.Fatalf("fieldMappings should be omitted: %#v", req.TaskConfiguration)
+	}
+}
