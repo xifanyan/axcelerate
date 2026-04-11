@@ -43,6 +43,7 @@ These are the user-facing fields for the request-construction API.
 ## Raw Default Configuration
 
 > Configuration below shows **all fields with their exact default values** from [API-SPEC.md](../../API-SPEC.md). This is for reference only. Clients must not pre-populate all fields. See [request-construction.md](../request-construction.md).
+> These upstream defaults are shown as-is for reference. Real client-built requests must still provide exactly one of `engineName` or `applicationIdentifier`.
 
 ```json
 {
@@ -166,6 +167,7 @@ These are the user-facing fields for the request-construction API.
 ## Raw Example Request
 
 > Example below matches **exactly** the default configuration from [API-SPEC.md](../../API-SPEC.md).
+> This raw reference example mirrors upstream defaults. Real client-built requests must still provide exactly one of `engineName` or `applicationIdentifier`.
 
 ```json
 {
