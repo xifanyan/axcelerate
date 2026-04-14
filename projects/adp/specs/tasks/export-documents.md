@@ -25,10 +25,13 @@ These are the user-facing fields for the request-construction API.
 | engineIdentifier | string | null | No | Engine identifier |
 | engineUser | string | null | No | Engine username |
 | enginePassword | string | null | No | Engine password |
-| exportName | string | null | No | Export name |
-| exportFields | string | null | No | Fields to export |
+| exportName | string | null | **Yes** | Export name (must be unique per run, cannot be reused) |
+| exportFields | string | null | No | Fields to export as JSON map (e.g., `{"URI":"URI","rm_custodian":"Custodian"}` where key is internal field name, value is CSV header) |
 | exportDirectory | string | null | No | Export directory |
 | fileEnding | string | "csv" | No | File extension for export |
+| imageField | boolean | false | No | Include image field in export |
+| nativesField | boolean | false | No | Include natives field in export |
+| textField | boolean | false | No | Include text field in export |
 
 ---
 
@@ -85,7 +88,7 @@ These are the user-facing fields for the request-construction API.
 | adp_exportDocuments_field_separator | string | ";" | Field separator for CSV output |
 | adp_exportDocuments_waitForExport | boolean | false | Wait for export to complete |
 | adp_exportDocuments_image_field | string | null | Image field to include in export |
-| adp_exportDocuments_searchResultSize | string | "adp_exportDocuments_searchResultSize" | Search result size variable |
+| adp_exportDocuments_searchResultSize | string | "100000" | Maximum number of documents to export |
 | adp_taskActive | boolean | true | Whether task is active |
 | adp_exportDocuments_File_Ending | string | "csv" | File extension for export |
 | adp_exportDocuments_applicationType | string | "" | Application type |
@@ -93,7 +96,7 @@ These are the user-facing fields for the request-construction API.
 | adp_abortWfOnFailure | boolean | true | Abort workflow on failure |
 | adp_exportDocuments_query | string | "*" | Query to select documents |
 | adp_loggingEnabled | boolean | true | Enable logging |
-| adp_exportDocuments_exportName | string | null | Export name |
+| adp_exportDocuments_exportName | string | null | Export name (required, must be unique per run, cannot be reused) |
 | adp_exportDocuments_text_indicator | string | "\"" | Text indicator for CSV |
 | adp_exportDocuments_natives_field | string | null | Natives field to include |
 | adp_exportDocuments_multivalue_separator | string | "|" | Multi-value separator |
@@ -103,7 +106,7 @@ These are the user-facing fields for the request-construction API.
 | adp_exportDocuments_exportFileName | string | "adp_exportDocuments_exportFileName" | Export file name variable |
 | adp_exportDocuments_engineUser | string | null | Engine username |
 | adp_exportDocuments_image_volume | string | "Volume" | Image volume |
-| adp_exportDocuments_exportFields | string | null | Fields to export |
+| adp_exportDocuments_exportFields | string | null | Fields to export as JSON map (key = internal field name, value = CSV header) |
 | adp_exportDocuments_fullExportPath | string | "adp_exportDocuments_exportPath" | Full export path variable |
 | adp_exportDocuments_text_field | string | null | Text field to include |
 | adp_cleanUpHistory | boolean | false | Clean up history |
@@ -174,19 +177,20 @@ See [cli.md](../cli.md) for global flags and naming conventions.
 | `--engineIdentifier` | string | null | Engine identifier |
 | `--engineUser` | string | null | Engine username |
 | `--enginePassword` | string | null | Engine password |
-| `--exportName` | string | null | Export name |
-| `--exportFields` | string | null | Fields to export |
+| `--exportName` | string | null | **Required** — Export name (must be unique per run, cannot be reused) |
+| `--exportFields` | string | null | Fields to export as JSON map (e.g., `{"URI":"URI","rm_custodian":"Custodian"}`) |
 | `--exportDirectory` | string | null | Export directory |
 | `--fileEnding` | string | "csv" | File extension for export |
+| `--imageField` | boolean (switch) | false | Include image field in export |
+| `--nativesField` | boolean (switch) | false | Include natives field in export |
+| `--textField` | boolean (switch) | false | Include text field in export |
 
 ### CLI Examples
 
 ```bash
-# Basic export
-adpgo export-documents --query "*"
-
-# Export with custom query and directory
-adpgo export-documents --query "rm_mimetype=pdf" --exportDirectory "/tmp/exports"
+# Working example with application identifier, fields, and natives
+# exportFields can be tricky, it needs to be a properly escaped JSON string. and powershell and command prompt might use different escaping rules. Below is an example for powershell, for command prompt you might need to adjust the escaping. 
+.\bin\adpgo.exe export-documents --applicationIdentifier documentHold.demo00001 --exportFields '{"URI": "URI", "rm_custodian": "Custodian"}' --nativesField --exportName demo_exp_01
 ```
 
 ---
