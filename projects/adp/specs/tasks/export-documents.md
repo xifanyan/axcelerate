@@ -29,9 +29,9 @@ These are the user-facing fields for the request-construction API.
 | exportFields | string | null | No | Fields to export as JSON map (e.g., `{"URI":"URI","rm_custodian":"Custodian"}` where key is internal field name, value is CSV header) |
 | exportDirectory | string | null | No | Export directory |
 | fileEnding | string | "csv" | No | File extension for export |
-| imageField | boolean | false | No | Include image field in export |
-| nativesField | boolean | false | No | Include natives field in export |
-| textField | boolean | false | No | Include text field in export |
+| imageField | string | "images" | No | Image field to include in export |
+| nativesField | string | "natives" | No | Natives field to include in export |
+| textField | string | "text" | No | Text field to include in export |
 
 ---
 
@@ -181,9 +181,9 @@ See [cli.md](../cli.md) for global flags and naming conventions.
 | `--exportFields` | string | null | Fields to export as JSON map (e.g., `{"URI":"URI","rm_custodian":"Custodian"}`) |
 | `--exportDirectory` | string | null | Export directory |
 | `--fileEnding` | string | "csv" | File extension for export |
-| `--imageField` | boolean (switch) | false | Include image field in export |
-| `--nativesField` | boolean (switch) | false | Include natives field in export |
-| `--textField` | boolean (switch) | false | Include text field in export |
+| `--imageField` | string | "images" | Image field to include in export |
+| `--nativesField` | string | "natives" | Natives field to include in export |
+| `--textField` | string | "text" | Text field to include in export |
 
 ### CLI Examples
 
