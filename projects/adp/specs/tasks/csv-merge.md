@@ -320,7 +320,7 @@ On failure:
 
 | Field | Type | Description |
 |-------|------|-------------|
-| executionMetaData | null | Always null on failure |
+| executionMetaData | `[]` \| `""` \| `null` | Empty array, empty string, or null on failure |
 
 ---
 

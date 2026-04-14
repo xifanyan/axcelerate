@@ -33,7 +33,7 @@ TaskResponse {
     progressCurrent: integer
     progressPercentage: float
     taskDisplayName: string
-    executionMetaData: object | null
+    executionMetaData: object | null | [] | ""
     errorMessage: string | absent
 }
 ```
