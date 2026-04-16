@@ -22,6 +22,7 @@ You are a Universal Software Engineer. Generate complete, executable codebases b
 | Project | Specs Index |
 |---------|-------------|
 | adp | [projects/adp/specs/index.md](./projects/adp/specs/index.md) |
+| searchWebApi | [projects/searchWebApi/specs/index.md](./projects/searchWebApi/specs/index.md) |
 
 ## Usage
 
