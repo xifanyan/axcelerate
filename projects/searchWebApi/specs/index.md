@@ -48,7 +48,8 @@ If a markdown spec conflicts with `API-SPEC.md`, `API-SPEC.md` wins.
 | [resources/change-queue.md](./resources/change-queue.md) | Waiting for queued changes |
 | [resources/insert-remove.md](./resources/insert-remove.md) | Insert/remove and bulk transaction workflows |
 | [resources/session.md](./resources/session.md) | Login and logout operations |
-| [language-bindings/README.md](./language-bindings/README.md) | Rules for future language-specific bindings |
+| [language-bindings/README.md](./language-bindings/README.md) | Rules for language-specific bindings |
+| [language-bindings/go-cli.md](./language-bindings/go-cli.md) | Go CLI binding for the searchWebApi surface |
 
 ---
 

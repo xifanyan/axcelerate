@@ -1,6 +1,6 @@
 # searchWebApi Language Bindings
 
-This directory is reserved for future language-specific bindings.
+This directory contains language-specific bindings.
 
 The core markdown specs in the parent directory remain language-agnostic.
 
@@ -12,4 +12,4 @@ Language bindings may define:
 - streaming abstractions,
 - and session-state handling conventions for a specific language.
 
-Language bindings must not change wire-level paths, parameters, headers, request bodies, or response shapes defined by `../API-SPEC.md` and the core specs.
+Language bindings must not change wire-level paths, parameters, headers, request bodies, or response shapes defined by `../../API-SPEC.md` and the core specs.

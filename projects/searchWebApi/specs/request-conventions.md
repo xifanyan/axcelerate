@@ -24,14 +24,17 @@ Common search-oriented parameters include:
 - `offset`
 - `fields`
 - `folderFields`
-- `folderProperties`
+- `folderFieldsWithProperties`
 - `body`
 - `highlight`
 - `sponsoredLinks`
 - `spellingSuggestions`
-- `SearchCacheControl`
 
-Resource specs must define which of these apply to each operation without renaming their wire format.
+## Shared Search Headers
+
+- `SWA-searchCacheControl`
+
+Resource specs must define which of these query parameters and headers apply to each operation without renaming their wire format.
 
 ## Request Body Conventions
 

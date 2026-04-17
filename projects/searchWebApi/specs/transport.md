@@ -8,7 +8,7 @@
 ## Supported Content Types
 
 - `application/json` for standard request and response bodies
-- `application/x-www-form-urlencoded` as an alternative encoding for eligible read-oriented operations documented in `API-SPEC.md`
+- `application/x-www-form-urlencoded` as an alternative encoding for operations where `API-SPEC.md` explicitly allows it
 - `multipart/form-data` for operations that upload binary or streamed content
 - `application/octet-stream` for binary download responses
 - `application/x-ndjson` for streaming search results on the records search endpoint
@@ -16,7 +16,7 @@
 ## HTTP Method Rules
 
 - Use the exact HTTP method defined by `API-SPEC.md`.
-- If `API-SPEC.md` documents form-encoded POST as an alternative to GET for an eligible operation, the client may expose that as a transport option without changing the semantic operation name.
+- If `API-SPEC.md` documents form-encoded POST as an alternative transport for an operation, the client may expose that option without changing the semantic operation name.
 
 ## Headers
 
