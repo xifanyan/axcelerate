@@ -152,6 +152,19 @@ CreateReviewInterfaceResult {
 }
 ```
 
+### Publish To Review
+
+```
+PublishToReviewResult {
+    usedWebserviceUrl: string
+    publishApplicationId: string
+    publishApplicationUrl: string
+    publishEngineId: string
+    publishResponseMessage: string
+    publishRequestId: string
+}
+```
+
 ## Decoding Flow
 
 ### Sync Call
@@ -195,19 +208,20 @@ Clients may implement polling internally (hiding async nature) or expose it to c
 
 ## TaskDecoder Contract
 
-Each task implements a decoder that transforms `executionMetaData: object` into the task's typed result.
+Each task implements a decoder that transforms `executionMetaData` into the task's typed result.
 
 Language-agnostic interface:
 
 ```
 interface TaskDecoder[T] {
-    decode(executionMetaData: Map<string, any>): T
+    decode(executionMetaData: Map<string, any> | integer[]): T
 }
 ```
 
 Implementations must handle:
 - Missing fields (return zero value or error depending on whether field is required)
 - JSON string fields that must be parsed separately (e.g., `adp_entities_json_output`)
+- Byte-array `executionMetaData` values that contain UTF-8 JSON and must be decoded to text before JSON parsing
 - Type coercion from string to integer/float where the API returns strings
 
 ---
@@ -230,6 +244,7 @@ Output only the parsed task-specific data:
 - `Create Data Source`: displayName, hostname, cpuLoad, dataSourceName, hostMemory, hostMemoryRatio, engineName, usedTemplate
 - `Matter Management`: processedMatterId, processedSavedSearchId, usedWebserviceUrl
 - `Create Review Interface`: publishEngineId, publishApplicationId, applicationHost, engineHost, usedWebserviceUrl
+- `Publish To Review`: usedWebserviceUrl, publishApplicationId, publishApplicationUrl, publishEngineId, publishResponseMessage, publishRequestId
 
 ### On Failure (HTTP 200 + executionStatus == "failed")
 
@@ -264,6 +279,7 @@ The ADP API returns many numeric and boolean values as strings. Decoders must co
 | string `"100"` | integer `100` |
 | string `"1.0"` | float `1.0` |
 | JSON string `"[...]"` | parsed array/object |
+| byte array `[123,...]` | UTF-8 string, then parsed object |
 | `null` | language null / None / nil |
 
 Always consult `VERIFICATION.md` and test with the live API to confirm actual types.

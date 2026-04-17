@@ -16,6 +16,7 @@
 | 10 | [create-data-source.md](./create-data-source.md) | `create-data-source` | Creates a new data source | adp_created_data_source_displayname, adp_hostname, adp_chosen_host_cpu_load, adp_created_data_source_name, adp_chosen_host_memory, adp_chosen_host_memory_ratio, adp_chosen_engine, adp_used_data_source_template |
 | 11 | [matter-management.md](./matter-management.md) | `matter-management` | Task to manage matters and saved searches | processedMatterId, matterProcessingRequestId, matterProcessingResponseMessage, processedSavedSearchId, savedSearchProcessingRequestId, savedSearchProcessingResponseMessage, usedWebserviceUrl |
 | 12 | [create-review-interface.md](./create-review-interface.md) | `create-review-interface` | Task to create a review interface | publishEngineId, publishApplicationId, applicationHost, applicationHostMemory, applicationHostMemoryRatio, engineHost, engineHostMemory, engineHostMemoryRatio, createReviewRequestId, createReviewResponseMessage, usedWebserviceUrl |
+| 13 | [publish-to-review.md](./publish-to-review.md) | `publish-to-review` | Task to publish stuff | usedWebserviceUrl, publishApplicationId, publishApplicationUrl, publishEngineId, publishResponseMessage, publishRequestId |
 
 ---
 
