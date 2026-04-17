@@ -26,7 +26,32 @@ These are the user-facing fields for the request-construction API.
 | enginePassword | string | null | No | Engine password |
 | engineIdFieldKey | string | null | No | Engine ID field key |
 | applicationIdentifier | string | "" | Conditional | Application identifier |
-| fieldMappings | array | [] | No | Field mappings as column definitions |
+| fieldMappings | FieldMappingArg[] | [] | No | Field mappings as column definitions |
+
+### FieldMappingArg
+
+Used by: CSV Merge
+
+```json
+{
+  "csvFieldName": "Column Header",
+  "textType": "internal_field_name",
+  "valueDelimiter": "|",
+  "useDisplayName": "true"
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| csvFieldName | string | CSV column header name |
+| textType | string | Internal field name |
+| valueDelimiter | string | Value delimiter |
+| useDisplayName | string | Use display name ("true"/"false") |
+
+### Semantic Inputs (continued)
+
+| Field | Type | Default | Required | Description |
+|-------|------|---------|----------|-------------|
 | fieldSeparator | string | ";" | No | Field separator |
 | imageBasePath | string | null | No | Image base path |
 | nativeBasePath | string | null | No | Native base path |
@@ -248,7 +273,7 @@ See [cli.md](../cli.md) for global flags and naming conventions.
 | `--engineName` | string | null | Engine name |
 | `--enginePassword` | string | null | Engine password |
 | `--engineUser` | string | null | Engine user |
-| `--fieldMappings` | JSON array | [] | Field mappings |
+| `--fieldMappings` | JSON array | [] | Field mappings as JSON array (e.g., `[{"csvFieldName":"Column A","textType":"field_a","valueDelimiter":"|","useDisplayName":"true"}]`) |
 | `--fieldSeparator` | string | ";" | Field separator |
 | `--imageBasePath` | string | null | Image base path |
 | `--mergeType` | string | "Merge content" | Merge type |

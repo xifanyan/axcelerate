@@ -99,7 +99,58 @@ ExportDocumentsResult {
 
 > **Pending**: `executionMetaData` response fields not yet verified against actual API response.
 
----
+On success, `executionMetaData` is an **empty array `[]`** — no fields to decode.
+
+### Create OCR Job
+
+> **Pending verification**: Completion response `executionMetaData` shape is unconfirmed.
+
+On async completion, `executionMetaData` is an **empty array `[]`** — no fields to decode.
+
+### CLI
+
+```
+CLIResult {
+    result: integer
+    jsonOutput: Record<string, any> | absent
+    errorPath: string
+    resultPath: string
+}
+```
+
+Where `json_output` is parsed from a JSON string containing `stdout` and `errout` fields.
+
+### Matter Management
+
+```
+MatterManagementResult {
+    processedMatterId: string
+    matterProcessingRequestId: string
+    matterProcessingResponseMessage: string
+    processedSavedSearchId: string
+    savedSearchProcessingRequestId: string
+    savedSearchProcessingResponseMessage: string
+    usedWebserviceUrl: string
+}
+```
+
+### Create Review Interface
+
+```
+CreateReviewInterfaceResult {
+    publishEngineId: string
+    publishApplicationId: string
+    applicationHost: string
+    applicationHostMemory: string
+    applicationHostMemoryRatio: string
+    engineHost: string
+    engineHostMemory: string
+    engineHostMemoryRatio: string
+    createReviewRequestId: string
+    createReviewResponseMessage: string
+    usedWebserviceUrl: string
+}
+```
 
 ## Decoding Flow
 
@@ -173,6 +224,12 @@ Output only the parsed task-specific data:
 - `Taxonomy Statistic`: the decoded statistics JSON
 - `Start Application`: the application URL
 - `Export Documents`: export file name, path, and count
+- `CSV Merge`: no output (empty executionMetaData)
+- `Create OCR Job`: no output (empty executionMetaData, async-only)
+- `CLI`: result code, jsonOutput (if set), errorPath, resultPath
+- `Create Data Source`: displayName, hostname, cpuLoad, dataSourceName, hostMemory, hostMemoryRatio, engineName, usedTemplate
+- `Matter Management`: processedMatterId, processedSavedSearchId, usedWebserviceUrl
+- `Create Review Interface`: publishEngineId, publishApplicationId, applicationHost, engineHost, usedWebserviceUrl
 
 ### On Failure (HTTP 200 + executionStatus == "failed")
 

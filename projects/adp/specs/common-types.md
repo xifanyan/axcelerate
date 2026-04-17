@@ -68,3 +68,30 @@ Comma-separated taxonomy names or JSON array:
 ```bash
 --outputTaxonomies "rm_source,meta_documentcharacteristics"
 ```
+
+### FieldMappingArg
+
+Used by: CSV Merge
+
+```json
+{
+  "csvFieldName": "Column Header",
+  "textType": "internal_field_name",
+  "valueDelimiter": "|",
+  "useDisplayName": "true"
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| csvFieldName | string | CSV column header name |
+| textType | string | Internal field name |
+| valueDelimiter | string | Value delimiter |
+| useDisplayName | string | Use display name ("true"/"false") |
+
+#### CLI Format
+
+JSON array format:
+```bash
+--fieldMappings '[{"csvFieldName":"Column A","textType":"field_a","valueDelimiter":"|","useDisplayName":"true"}]'
+```
