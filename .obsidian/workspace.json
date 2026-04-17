@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "projects/adp/specs/tasks/query-engine.md",
+                "file": "projects/searchWebApi/specs/resources/cached-searches.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "query-engine"
+              "title": "cached-searches"
             }
           }
         ]
@@ -183,12 +183,26 @@
       "bases:Create new base": false
     }
   },
-  "active": "0fabd34c276c592c",
+  "active": "2f2430a6c1126e9f",
   "lastOpenFiles": [
+    "projects/searchWebApi/specs/language-bindings/README.md",
+    "projects/searchWebApi/API-SPEC.md",
+    "projects/searchWebApi/specs/transport.md",
+    "projects/searchWebApi/specs/request-conventions.md",
+    "projects/searchWebApi/specs/index.md",
+    "projects/searchWebApi/specs/common-types.md",
+    "projects/searchWebApi/specs/auth-and-session.md",
+    "projects/searchWebApi/specs/api-contract.md",
+    "projects/searchWebApi/specs/resources/session.md",
+    "projects/searchWebApi/specs/resources/records.md",
+    "projects/searchWebApi/specs/resources/projects.md",
+    "projects/searchWebApi/specs/resources/change-queue.md",
+    "projects/searchWebApi/specs/resources/cached-searches.md",
+    "projects/searchWebApi/specs/resources/binary.md",
+    "projects/adp/specs/tasks/query-engine.md",
     "projects/adp/go.mod",
     "projects/adp/go.work",
     "projects/adp/specs/tasks/taxonomy-statistic.md",
-    "projects/adp/specs/tasks/query-engine.md",
     "projects/adp/specs/tasks/list-entities.md",
     "projects/adp/specs/tasks/TEMPLATE.md",
     "projects/adp/API-SPEC.md",
@@ -206,7 +220,6 @@
     "projects/adp/src/go/cmd/adp-go/main.go",
     "projects/adp/src/go/cmd/adp-go",
     "projects/adp/src/go/cmd",
-    "projects/adp/src/go/go.mod",
     "projects/adp/ADP-SPEC.md"
   ]
 }
