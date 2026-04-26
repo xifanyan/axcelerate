@@ -1,10 +1,10 @@
 # {Task Name} Task Specification
 
-Use this template when creating new task specification files in `specs/tasks/`.
+> **Template:** Use this template when creating new task specification files in `specs/tasks/`.
 
 ---
 
-## Overview
+## [Overview](#overview)
 
 | Property | Value |
 |----------|-------|
@@ -15,7 +15,7 @@ Use this template when creating new task specification files in `specs/tasks/`.
 
 ---
 
-## Semantic Inputs
+## [Semantic Inputs](#semantic-inputs)
 
 These are the user-facing fields for the request-construction API. These are the fields callers set directly. Raw field names are implementation details.
 
@@ -25,7 +25,7 @@ These are the user-facing fields for the request-construction API. These are the
 
 ---
 
-## Raw Default Configuration
+## [Raw Default Configuration](#raw-default-configuration)
 
 > Configuration below shows **all fields with their exact default values** from [API-SPEC.md](../../API-SPEC.md). This is for reference only. Clients must not pre-populate all fields — only send fields explicitly set by the caller. See [request-construction.md](../request-construction.md).
 
@@ -42,24 +42,7 @@ These are the user-facing fields for the request-construction API. These are the
 
 ---
 
-## Raw Example Request
-
-> Example below matches **exactly** the default configuration from [API-SPEC.md](../../API-SPEC.md). This is the raw upstream shape.
-
-```json
-{
-  "taskType": "{Task Name}",
-  "taskConfiguration": {
-    // SAME AS DEFAULT CONFIGURATION
-  },
-  "taskDescription": "{description}",
-  "taskDisplayName": "{display name}"
-}
-```
-
----
-
-## CLI Arguments
+## [CLI Arguments](#cli-arguments)
 
 See [cli.md](../cli.md) for global flags and naming conventions.
 
@@ -79,7 +62,9 @@ adpgo {kebab-case-name} --field value
 
 ---
 
-## Raw Example Response
+## [Responses](#responses)
+
+### Raw Example Response
 
 ```json
 {
@@ -100,9 +85,23 @@ adpgo {kebab-case-name} --field value
 }
 ```
 
+### Failure Response
+
+On `executionStatus: "failed"`:
+
+```json
+{
+  "executionId": "uuid",
+  "taskType": "{Task Name}",
+  "executionStatus": "failed",
+  "errorMessage": "Error details",
+  "executionMetaData": null
+}
+```
+
 ---
 
-## Decoded Result
+## [Decoded Result](#decoded-result)
 
 ### Result Type
 
@@ -122,7 +121,7 @@ Describe how to transform `executionMetaData` into the typed result:
 
 ---
 
-## executionMetaData Contract
+## [executionMetaData Contract](#executionmetadata-contract)
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -138,32 +137,7 @@ Some `executionMetaData` fields contain JSON strings that must be parsed:
 
 ---
 
-## Failure Response
-
-On `executionStatus: "failed"`:
-
-```json
-{
-  "executionId": "uuid",
-  "taskType": "{Task Name}",
-  "executionStatus": "failed",
-  "errorMessage": "Error details",
-  "executionMetaData": null
-}
-```
-
----
-
-## Adding a New Task
-
-1. Copy this template
-2. Fill using [API-SPEC.md](../../API-SPEC.md)
-3. Add entry to [index.md](./index.md) tasks table — **the tasks table must always reflect all current task specs**
-4. Do NOT generate code — only update specs
-
----
-
-## Rules
+## [Rules](#rules)
 
 - Raw Default Configuration must match API-SPEC.md exactly (field names, values, ordering)
 - Example Request must match Default Configuration exactly (no custom values)
@@ -183,3 +157,12 @@ On `executionStatus: "failed"`:
 | `any` | `interface{}` | TypeScript/Rust `any`; Go-specific `interface{}` not allowed |
 | `absent` | `null` | "absent" describes optionality; "null" is a value |
 | `Cell[][]` | `[][]Cell` | Arrays of arrays in TS notation |
+
+---
+
+## [Adding a New Task](#adding-a-new-task)
+
+1. Copy this template
+2. Fill using [API-SPEC.md](../../API-SPEC.md)
+3. Add entry to [index.md](./index.md) tasks table — **the tasks table must always reflect all current task specs**
+4. Do NOT generate code — only update specs

@@ -68,7 +68,7 @@ These are the user-facing fields for the request-construction API.
     "adp_listEntities_id": "",
     "adp_listEntities_httpsAllowUntrustedHosts": "true"
   },
-  "taskDescription": "Writes a list of entities ot an output variable",
+  "taskDescription": "Writes a list of entities to an output variable",
   "taskDisplayName": "List entities"
 }
 ```
@@ -157,7 +157,7 @@ These are the user-facing fields for the request-construction API.
     "adp_listEntities_id": "",
     "adp_listEntities_httpsAllowUntrustedHosts": "true"
   },
-  "taskDescription": "Writes a list of entities ot an output variable",
+  "taskDescription": "Writes a list of entities to an output variable",
   "taskDisplayName": "List entities"
 }
 ```

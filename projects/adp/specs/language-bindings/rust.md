@@ -26,6 +26,12 @@ src/rust/
 
 ---
 
+## Generated Code Path
+
+Generated code lives at: `$HOME/ai-generated/adp/rust/`
+
+---
+
 ## Request Construction
 
 Rust clients use a **builder pattern**.

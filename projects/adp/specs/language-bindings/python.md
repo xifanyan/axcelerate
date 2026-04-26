@@ -27,6 +27,12 @@ src/python/
 
 ---
 
+## Generated Code Path
+
+Generated code lives at: `$HOME/ai-generated/adp/python/`
+
+---
+
 ## Request Construction
 
 Python clients use a **builder pattern** with keyword arguments.

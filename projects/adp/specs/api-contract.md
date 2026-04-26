@@ -261,3 +261,40 @@ Used by: Taxonomy Statistic
 > - `executionMetaData` — null on failure, object on success
 
 Always test with debug logging enabled to verify actual payload shapes.
+
+### Field Verification Checklist
+
+Before finalizing any spec, verify against actual API:
+
+- [ ] All response fields use camelCase (e.g., `executionId`, not `ExecutionID`)
+- [ ] Test with real API call using debug logging
+- [ ] `loggingEnabled` — boolean or string?
+- [ ] `executionPersistent` — boolean or string?
+- [ ] `progressPercentage` — integer or float?
+- [ ] `executionMetaData` — required or optional?
+- [ ] Test failure scenarios — document `errorMessage` field presence
+- [ ] Document `executionMetaData` behavior on failure (null?)
+
+---
+
+## HTTP Transport
+
+All requests use HTTP PUT with JSON body and authentication headers:
+
+| Property | Value | Required |
+|----------|-------|----------|
+| Method | PUT | Yes |
+| Content-Type | `application/json` | Yes |
+| Auth headers | `Auth-Username`, `Auth-Password` | Yes |
+| SSL | `--insecure` flag skips certificate verification | No |
+| Timeout | 30s default | No |
+
+Three endpoints:
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/executeAdpTask` | PUT | Execute task synchronously — waits for completion and returns final result |
+| `/executeAdpTaskAsync` | PUT | Execute task asynchronously — returns immediately with an execution ID |
+| `/statusAndProgress` | PUT | Poll task status by execution ID |
+
+Base URL is constructed from `--host`, `--port`, and `--path` flags (default: `https://host:8443/adp/rest/api/task`).

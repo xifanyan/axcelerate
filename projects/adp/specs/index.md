@@ -4,6 +4,22 @@ Single source of truth for all ADP specifications. This document describes the o
 
 ---
 
+## Quick Start
+
+**New to ADP?** Start here:
+
+1. [Tasks Index](./tasks/index.md) — See all available operations grouped by category
+2. [API Contract](./api-contract.md) — Understand the transport layer and endpoints
+3. [CLI](./cli.md) — Learn the command-line interface
+
+**Quick nav:**
+- [Discovery tasks](./tasks/index.md#discovery) — Find entities, query engines
+- [Processing tasks](./tasks/index.md#processing) — Run applications, export data, OCR
+- [Management tasks](./tasks/index.md#management) — Create data sources, publish to review
+- [CLI task](./tasks/index.md#cli) — Execute native commands
+
+---
+
 ## Spec Structure
 
 | File | Description |
@@ -15,8 +31,6 @@ Single source of truth for all ADP specifications. This document describes the o
 | [common-types.md](./common-types.md) | Shared input types referenced across multiple specs |
 | [cli.md](./cli.md) | CLI interface, subcommands, flags, output rules |
 | [tasks/index.md](./tasks/index.md) | Available tasks and add-task rules |
-| [http-client.md](./http-client.md) | HTTP client transport details |
-| [VERIFICATION.md](./VERIFICATION.md) | API response verification checklist |
 
 ### Language Bindings
 
@@ -25,7 +39,6 @@ Single source of truth for all ADP specifications. This document describes the o
 | [language-bindings/go.md](./language-bindings/go.md) | Go-specific API conventions |
 | [language-bindings/rust.md](./language-bindings/rust.md) | Rust-specific API conventions |
 | [language-bindings/python.md](./language-bindings/python.md) | Python-specific API conventions |
-| [languages.md](./languages.md) | **Deprecated** — superseded by language-bindings/ |
 
 Language bindings are non-authoritative — they map the contracts defined in core specs into idiomatic APIs for each language.
 
